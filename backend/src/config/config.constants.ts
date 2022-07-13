@@ -1,0 +1,1 @@
+export const SECRET_JWT = Buffer.from("Faymary").toString("base64")

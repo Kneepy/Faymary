@@ -1,1 +1,1 @@
-export { UtilService } from "./util.service";
+export * from "./util.service";
