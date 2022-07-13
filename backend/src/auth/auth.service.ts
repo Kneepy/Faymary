@@ -6,9 +6,7 @@ import { JwtDto } from "./dto";
 export class AuthService {
     constructor(
         private jwtService: JwtService
-    ) {}
-
-    async 
+    ) {} 
 
     async jwtSign(args: JwtDto) {
         return await this.jwtService.signAsync(args)
