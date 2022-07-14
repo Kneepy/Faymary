@@ -1,1 +1,1 @@
-export * from "./jwt.dto"
+export * from "./tokens.dto"

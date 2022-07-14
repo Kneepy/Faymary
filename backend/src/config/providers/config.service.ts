@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { JwtModuleOptions } from "@nestjs/jwt"
-import { SECRET_JWT } from "../config.constants";
+import { JwtModuleOptions, JwtSignOptions } from "@nestjs/jwt"
+import { SECRET_JWT, SECRET_REFRESH_JWT } from "../config.constants";
 
 @Injectable()
 export class ConfigService {
@@ -18,6 +18,11 @@ export class ConfigService {
 
     getJwtOptions = (): JwtModuleOptions => ({
         secret: SECRET_JWT,
-        signOptions: {expiresIn: "14d"}
+        signOptions: {expiresIn: "900000ms"} // 15min
+    })
+
+    getJwtRefreshTokenOptions = (): JwtSignOptions => ({
+        secret: SECRET_REFRESH_JWT,
+        expiresIn: "14d"
     })
 }

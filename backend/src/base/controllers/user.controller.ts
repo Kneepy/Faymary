@@ -1,10 +1,10 @@
 import { Controller, Get, Post } from "@nestjs/common";
 
-@Controller()
+@Controller("user")
 export class UserController { 
 
-    @Get("user/login")
-    public async createUser() {
+    @Get("login")
+    public async loginUser() {
         
     }
 }
