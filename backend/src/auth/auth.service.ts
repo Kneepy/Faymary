@@ -3,7 +3,6 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt"
 import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_REFRESH_JWT } from 'src/config';
-
 @Injectable()
 export class AuthService {
     constructor(

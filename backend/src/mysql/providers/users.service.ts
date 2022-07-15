@@ -12,7 +12,7 @@ export class UsersService {
 
     public async findOne(
         args: UsersArgs,
-        options: FindOneOptions,
+        options?: FindOneOptions,
     ): Promise<Users> {
         return await this.repository.findOne({
             where: this.util.removeUndefined(args),

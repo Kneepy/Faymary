@@ -7,7 +7,6 @@ export class UsersInput {
     email: string;
 
     @IsString()
-    @Length(7)
     @IsNotEmpty()
     password: string;
 

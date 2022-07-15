@@ -3,10 +3,12 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
+    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm";
 import { Files, Dialogs } from "./";
+import { Sessions } from "./sessions.entity";
 
 @Entity()
 export class Users {
@@ -40,4 +42,7 @@ export class Users {
 
     @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.users)
     dialogs: Dialogs[];
+
+    @ManyToOne(() => Sessions, (session: Sessions) => session.user)
+    sessions: Sessions[]
 }
