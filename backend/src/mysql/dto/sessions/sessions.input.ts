@@ -5,11 +5,14 @@ import { Users } from "src/entity";
 export class SessionsInput {
     @IsNotEmpty()
     @Type(() => Users)
-    user: Users
+    user: Users;
 
     @IsNotEmpty()
-    ip: string
+    ip: string;
 
     @IsNotEmpty()
-    ua: string
+    token: string;
+
+    @IsNotEmpty()
+    ua: string;
 }

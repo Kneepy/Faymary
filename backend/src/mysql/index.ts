@@ -1,3 +1,3 @@
 export * from "./providers";
 export * from "./dto";
-export * from "./mysql.module"
+export * from "./mysql.module";

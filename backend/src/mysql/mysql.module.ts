@@ -5,6 +5,8 @@ import { ConfigModule } from "src/config/config.module";
 import { Users, Files, Dialogs, Messages, Sessions } from "src/entity";
 import * as allMySQLProviders from "./providers";
 
+const providers = [...Object.values(allMySQLProviders)];
+
 @Module({
     imports: [
         TypeOrmModule.forRootAsync({
@@ -13,8 +15,9 @@ import * as allMySQLProviders from "./providers";
                 configService.getMySqlConnectionData(),
             inject: [ConfigService],
         }),
-        TypeOrmModule.forFeature([Users, Files, Dialogs, Messages, Sessions])
+        TypeOrmModule.forFeature([Users, Files, Dialogs, Messages, Sessions]),
     ],
-    providers: [...Object.values(allMySQLProviders)],
+    providers: providers,
+    exports: providers,
 })
 export class MySqlModule {}

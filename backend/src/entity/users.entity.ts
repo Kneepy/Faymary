@@ -44,5 +44,5 @@ export class Users {
     dialogs: Dialogs[];
 
     @ManyToOne(() => Sessions, (session: Sessions) => session.user)
-    sessions: Sessions[]
+    sessions: Sessions[];
 }

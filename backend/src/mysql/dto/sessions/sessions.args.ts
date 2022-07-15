@@ -1,9 +1,9 @@
-import { Type } from "class-transformer"
-import { Users } from "src/entity"
+import { Type } from "class-transformer";
+import { Users } from "src/entity";
 
 export class SessionsArgs {
-    id: number
+    id: number;
 
     @Type(() => Users)
-    user: Users
+    user: Users;
 }

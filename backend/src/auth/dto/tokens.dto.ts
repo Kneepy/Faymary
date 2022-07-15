@@ -1,13 +1,17 @@
+import type useragent from "express-useragent";
+import { Users } from "src/entity";
+
 export interface AccessToken {
-    userId: string
+    userId: string;
 }
 
 export interface RefreshToken {
-    userId: string
-    deviceIP: string
+    user: Users;
+    ua: useragent.Details["source"]; // user-agent
+    ip: string;
 }
 
 export interface Payload {
-    refreshToken: string
-    accessToken: string
+    refreshToken: string;
+    accessToken: string;
 }

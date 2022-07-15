@@ -5,20 +5,27 @@ import { Users } from "./users.entity";
 @Entity()
 export class Sessions {
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
 
     @Column({ nullable: false })
-    ua: string // user-agent
+    token: string;
 
     @Column({ nullable: false })
-    ip: string
+    ua: string; // user-agent
 
-    @Column({ nullable: false, type: "bigint", default: Date.now() + EXPIRENS_IN_REFRESH_TOKEN })
-    expirensIn: number
+    @Column({ nullable: false })
+    ip: string;
+
+    @Column({
+        nullable: false,
+        type: "bigint",
+        default: Date.now() + EXPIRENS_IN_REFRESH_TOKEN,
+    })
+    expirensIn: number;
 
     @Column({ nullable: false, type: "bigint", default: Date.now() })
-    createdAt: number
+    createdAt: number;
 
     @OneToMany(() => Users, (user: Users) => user.sessions)
-    user: Users
+    user: Users;
 }
