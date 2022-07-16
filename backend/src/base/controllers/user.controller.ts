@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { CreateUserDto, LoginUserDto } from "../dto/users";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql";
 import { Users } from "src/entity";
 import { AuthService } from "src/auth";
@@ -19,7 +19,7 @@ export class UserController {
     public async createUser(
         @Body() body: CreateUserDto,
         @Req() req: ICustomRequest,
-        @Res() res: ICustomResponse,
+        @Res({ passthrough: true }) res: ICustomResponse,
     ): Promise<{ user: Users; tokens: Payload }> {
         body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(2));
 

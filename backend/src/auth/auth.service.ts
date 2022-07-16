@@ -23,7 +23,9 @@ export class AuthService {
     }
 
     async getRefreshToken(args: RefreshToken): Promise<string> {
-        const dataToken = { ...args, userId: args.user.id };
+        const userId = args.user.id
+        delete args.user
+        const dataToken = { ...args, userId };
         const token = await this.jwtService.signAsync(
             dataToken,
             this.configService.getJwtRefreshTokenOptions(),

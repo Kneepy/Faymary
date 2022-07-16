@@ -15,7 +15,7 @@ async function bootstrap(): Promise<string> {
 
 (async () => {
     try {
-        const url = await bootstrap();
+        const url = await bootstrap()
         Logger.log(url, "Bootstrap");
     } catch (e) {
         Logger.log(e, "Bootstrap");

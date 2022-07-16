@@ -1,7 +1,6 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
-import cookieParser from "cookie-parser";
-import { NextFunction } from "express";
-import useragent from "express-useragent";
+import * as cookieParser from "cookie-parser";
+import * as useragent from "express-useragent";
 import { ICustomRequest } from "./common";
 
 export function middlware(app: INestApplication): INestApplication {
@@ -12,8 +11,9 @@ export function middlware(app: INestApplication): INestApplication {
     app.use(cookieParser());
 
     app.use(useragent.express());
-    app.use((req: ICustomRequest, res, next: NextFunction) => {
-        if (!req.session.useragent) {
+    app.use((req: ICustomRequest, res, next) => {
+        if (!req.session?.useragent) {
+            req.session = Object.assign(req.session || {}, {useragent: req.useragent})
             req.session.useragent = req.useragent;
         }
         return next();

@@ -15,19 +15,19 @@ export class Users {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({nullable: false})
     email: string;
 
-    @Column()
+    @Column({nullable: false})
     firstName: string;
 
-    @Column()
+    @Column({nullable: false})
     lastName: string;
 
-    @Column()
+    @Column({nullable: true})
     surname: string;
 
-    @Column()
+    @Column({nullable: false, default: false})
     isActive: boolean;
 
     @OneToMany(() => Files, (files: Files) => files.user)
@@ -43,6 +43,6 @@ export class Users {
     @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.users)
     dialogs: Dialogs[];
 
-    @ManyToOne(() => Sessions, (session: Sessions) => session.user)
+    @OneToMany(() => Sessions, (session: Sessions) => session.user)
     sessions: Sessions[];
 }
