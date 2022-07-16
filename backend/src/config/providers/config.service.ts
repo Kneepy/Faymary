@@ -4,7 +4,7 @@ import { JwtModuleOptions, JwtSignOptions } from "@nestjs/jwt";
 import {
     EXPIRENS_IN_ACCESS_TOKEN,
     EXPIRENS_IN_REFRESH_TOKEN,
-    SECRET_JWT,
+    SECRET_ACCESS_JWT,
     SECRET_REFRESH_JWT,
 } from "../config.constants";
 
@@ -23,7 +23,7 @@ export class ConfigService {
 
     // access token options
     getJwtOptions = (): JwtModuleOptions => ({
-        secret: SECRET_JWT,
+        secret: SECRET_ACCESS_JWT,
         signOptions: { expiresIn: EXPIRENS_IN_ACCESS_TOKEN },
     });
 

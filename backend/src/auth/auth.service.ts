@@ -2,7 +2,7 @@ import { ConfigService } from "src/config/providers/config.service";
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
-import { SECRET_REFRESH_JWT } from "src/config";
+import { SECRET_ACCESS_JWT, SECRET_REFRESH_JWT } from "src/config";
 import { SessionService } from "src/mysql/providers/session.service";
 @Injectable()
 export class AuthService {
@@ -11,17 +11,6 @@ export class AuthService {
         private configService: ConfigService,
         private sessionService: SessionService,
     ) {}
-
-    async validateRefreshToken(
-        userId: string,
-        refreshToken: string,
-    ): Promise<boolean> {
-        return (
-            this.jwtService.verify(refreshToken, {
-                secret: SECRET_REFRESH_JWT,
-            }) && this.jwtService.decode(refreshToken) === userId
-        );
-    }
 
     async getTokens(
         access_token: AccessToken,
@@ -42,5 +31,16 @@ export class AuthService {
         const session = await this.sessionService.create({ ...args, token });
 
         return token;
+    }
+
+    verifyAccessToken(access_token) {
+        return this.jwtService.verify(access_token, {
+            secret: SECRET_ACCESS_JWT,
+        });
+    }
+    verifyRefreshToken(refresh_token) {
+        return this.jwtService.verify(refresh_token, {
+            secret: SECRET_REFRESH_JWT,
+        });
     }
 }
