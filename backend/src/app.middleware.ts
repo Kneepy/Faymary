@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import * as useragent from "express-useragent";
-import { ICustomRequest } from "./common";
+import { ICustomRequest, ICustomResponse } from "./common";
 
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
@@ -18,6 +18,17 @@ export function middlware(app: INestApplication): INestApplication {
         }
         return next();
     });
+
+    app.use((req: ICustomRequest, res: ICustomResponse, next) => {
+        try {
+            const authorizationHeader = req.headers.authorization.split(" ")
+            if(authorizationHeader[0] === "Bearer") {
+                req.headers.authorization = authorizationHeader[1]
+            }
+        } catch (e) {
+            next(e)
+        }
+    })
 
     return app;
 }

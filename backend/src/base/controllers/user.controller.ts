@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res, Headers } from "@nestjs/common";
 import { CreateUserDto, LoginUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
-import { UsersService } from "src/mysql";
+import { SessionService, UsersService } from "src/mysql";
 import { Users } from "src/entity";
 import { AuthService } from "src/auth";
-import { ICustomRequest, ICustomResponse } from "src/common/types";
+import { ICustomHeaders, ICustomRequest, ICustomResponse } from "src/common/types";
 import { Payload } from "src/auth/dto";
 import { EXPIRENS_IN_REFRESH_TOKEN } from "src/config";
 
@@ -13,6 +13,7 @@ export class UserController {
     constructor(
         private userService: UsersService,
         private authService: AuthService,
+        private sessionService: SessionService
     ) {}
 
     @Post("create")
@@ -20,13 +21,13 @@ export class UserController {
         @Body() body: CreateUserDto,
         @Req() req: ICustomRequest,
         @Res({ passthrough: true }) res: ICustomResponse,
-    ): Promise<{ user: Users; tokens: Payload }> {
+    ): Promise<{ user: Users; token: string }> {
         body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(2));
 
         const user = await this.userService.create(body);
         const accessToken = { userId: user.id };
         const refreshToken = {
-            user,
+            userId: user.id,
             ua: req.session.useragent.source,
             ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
         };
@@ -42,31 +43,23 @@ export class UserController {
         });
 
         return {
-            user: user,
-            tokens,
+            user,
+            token: tokens.accessToken,
         };
     }
 
     @Get("login")
     public async loginUser(
-        @Body() body: LoginUserDto,
         @Req() req: ICustomRequest,
-        @Res() res: ICustomResponse,
+        @Res({ passthrough: true }) res: ICustomResponse,
     ) {
-        const currentRefreshToken = req.cookie.refreshToken
-        const decodedCurrentRefreshToken = this.authService.verifyRefreshToken(currentRefreshToken)
+        try {
+            const currentRefreshToken = req.cookie.refreshToken
+            const decodedCurrentRefreshToken = this.authService.verifyRefreshToken(currentRefreshToken)
 
-        if(!!decodedCurrentRefreshToken) {
-            return true
+            return await this.userService.findOne({id: decodedCurrentRefreshToken.userId})
+        } catch (e) {
+            res.redirect(401, "/tokens/refresh")
         }
-        else {
-            
-        }
-
-        const refreshSession = {
-            user: this.userService.findOne({ id: body.userId }),
-            ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-            ua: req.session.useragent.source,
-        };
     }
 }

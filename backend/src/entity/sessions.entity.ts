@@ -4,8 +4,8 @@ import { Users } from "./users.entity";
 
 @Entity()
 export class Sessions {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("rowid")
+    id: string;
 
     @Column({ nullable: false, type: "text" })
     token: string;

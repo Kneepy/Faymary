@@ -4,12 +4,15 @@ import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_ACCESS_JWT, SECRET_REFRESH_JWT } from "src/config";
 import { SessionService } from "src/mysql/providers/session.service";
+import { Sessions } from "src/entity";
+import { UsersService } from "src/mysql";
 @Injectable()
 export class AuthService {
     constructor(
         private jwtService: JwtService,
         private configService: ConfigService,
         private sessionService: SessionService,
+        private userService: UsersService
     ) {}
 
     async getTokens(
@@ -17,30 +20,27 @@ export class AuthService {
         refresh_token: RefreshToken,
     ): Promise<Payload> {
         return {
-            refreshToken: await this.getRefreshToken(refresh_token),
+            refreshToken: (await this.getRefreshToken(refresh_token)).id,
             accessToken: await this.jwtService.signAsync(access_token),
         };
     }
 
-    async getRefreshToken(args: RefreshToken): Promise<string> {
-        const userId = args.user.id
-        delete args.user
-        const dataToken = { ...args, userId };
+    async getRefreshToken(args: RefreshToken): Promise<Sessions> {
+        const user = await this.userService.findOne({id: args.userId})
         const token = await this.jwtService.signAsync(
-            dataToken,
+            args,
             this.configService.getJwtRefreshTokenOptions(),
         );
-        const session = await this.sessionService.create({ ...args, token });
 
-        return token;
+        return await this.sessionService.create({ ua: args.ua, ip: args.ip, user, token });
     }
 
-    verifyAccessToken(access_token) {
+    verifyAccessToken(access_token): AccessToken {
         return this.jwtService.verify(access_token, {
             secret: SECRET_ACCESS_JWT,
         });
     }
-    verifyRefreshToken(refresh_token) {
+    verifyRefreshToken(refresh_token): RefreshToken {
         return this.jwtService.verify(refresh_token, {
             secret: SECRET_REFRESH_JWT,
         });

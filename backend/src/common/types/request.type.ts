@@ -1,11 +1,16 @@
 import type useragent from "express-useragent";
 import type net from "node:net";
-import type cookieParser from "cookie-parser";
+import { ICustomHeaders } from "./headers.type";
 export interface ICustomRequest extends Request {
-    cookie: any
+    ip: string;
+    cookie: {
+        refreshToken: string,
+        accessToken: string 
+    }
     useragent?: useragent.Details | undefined;
     session: {
         useragent?: useragent.Details | undefined;
     };
     socket?: net.Socket;
+    headers: ICustomHeaders
 }

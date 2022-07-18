@@ -6,7 +6,7 @@ export interface AccessToken {
 }
 
 export interface RefreshToken {
-    user: Users;
+    userId: string;
     ua: useragent.Details["source"]; // user-agent
     ip: string;
 }
@@ -14,4 +14,8 @@ export interface RefreshToken {
 export interface Payload {
     refreshToken: string;
     accessToken: string;
+}
+
+export interface AccessPayload {
+    token: string 
 }

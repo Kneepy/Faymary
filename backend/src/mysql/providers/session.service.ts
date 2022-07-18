@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AuthService } from "src/auth";
 import { Sessions } from "src/entity";
 import { Repository } from "typeorm";
-import { FindOneOptions, SessionsArgs, SessionsInput } from "../dto";
+import { FindOneOptions, ManySessionsArgs, SessionsArgs, SessionsInput } from "../dto";
 
 @Injectable()
 export class SessionService {
@@ -16,13 +16,23 @@ export class SessionService {
     }
 
     public async find(
-        args: SessionsArgs,
+        args: ManySessionsArgs,
         options: FindOneOptions,
     ): Promise<Sessions[]> {
         return await this.repository.find({
             where: args,
             ...options,
         });
+    }
+
+    public async findOne(
+        args: SessionsArgs,
+        options: FindOneOptions,
+    ): Promise<Sessions> {
+        return await this.repository.findOne({
+            where: args,
+            ...options
+        })
     }
 
     public async delete(sessionId) {
