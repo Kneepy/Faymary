@@ -1,11 +1,10 @@
-import { Body, Controller, Get, Post, Req, Res, Headers } from "@nestjs/common";
-import { CreateUserDto, LoginUserDto } from "../dto/users";
+import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { CreateUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { SessionService, UsersService } from "src/mysql";
 import { Users } from "src/entity";
 import { AuthService } from "src/auth";
-import { ICustomHeaders, ICustomRequest, ICustomResponse } from "src/common/types";
-import { Payload } from "src/auth/dto";
+import { ICustomRequest, ICustomResponse } from "src/common/types";
 import { EXPIRENS_IN_REFRESH_TOKEN } from "src/config";
 
 @Controller("user")
