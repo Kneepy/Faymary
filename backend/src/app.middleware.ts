@@ -21,8 +21,8 @@ export function middlware(app: INestApplication): INestApplication {
 
     app.use((req: ICustomRequest, res: ICustomResponse, next) => {
         try {
-            const authorizationHeader = req.headers.authorization.split(" ")
-            if(authorizationHeader[0] === "Bearer") {
+            const authorizationHeader = req.headers?.authorization.split(" ")
+            if(authorizationHeader?[0] === "Bearer") {
                 req.headers.authorization = authorizationHeader[1]
             }
         } catch (e) {

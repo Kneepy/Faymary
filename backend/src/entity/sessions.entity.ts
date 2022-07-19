@@ -10,6 +10,9 @@ export class Sessions {
     @Column({ nullable: false, type: "text" })
     token: string;
 
+    @Column({ nullable: false, type: "text" })
+    fingerprint: string
+
     @Column({ nullable: false })
     ua: string; // user-agent
 
