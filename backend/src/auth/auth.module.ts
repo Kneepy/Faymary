@@ -3,6 +3,9 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "src/config";
 import { MySqlModule } from "src/mysql";
 import { AuthService } from "./auth.service";
+import * as AllGuards from "./guards"
+
+const guards = Object.values(AllGuards)
 
 @Module({
     imports: [
@@ -15,7 +18,7 @@ import { AuthService } from "./auth.service";
         MySqlModule,
         ConfigModule
     ],
-    providers: [AuthService],
-    exports: [AuthService],
+    providers: [AuthService, ...guards],
+    exports: [AuthService, ...guards],
 })
 export class AuthModule {}

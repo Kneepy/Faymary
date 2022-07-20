@@ -6,7 +6,7 @@ import { Users } from "src/entity";
 import { AuthService } from "src/auth";
 import { ICustomRequest, ICustomResponse } from "src/common/types";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
-import { DisableAuth } from "src/common";
+import { DisableAuth } from "src/auth";
 
 @Controller("user")
 export class UserController {
