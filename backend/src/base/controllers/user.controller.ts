@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res, Headers, HttpException, HttpStatus } from "@nestjs/common";
-import { CreateUserDto, LoginUserDto } from "../dto/users";
+import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { CreateUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql";
 import { Users } from "src/entity";
 import { AuthService } from "src/auth";
 import { ICustomRequest, ICustomResponse } from "src/common/types";
-import { EXPIRENS_IN_REFRESH_TOKEN } from "src/config";
+import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
+import { DisableAuth } from "src/auth";
 
 @Controller("user")
 export class UserController {
@@ -15,6 +16,7 @@ export class UserController {
     ) {}
 
     @Post("create")
+    @DisableAuth()
     public async createUser(
         @Body() body: CreateUserDto,
         @Req() req: ICustomRequest,
@@ -26,15 +28,16 @@ export class UserController {
         const accessToken = { userId: user.id };
         const refreshToken = {
             userId: user.id,
-            ua: req.session.useragent.source,
-            ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+            ua: req.session.useragent,
+            ip: req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+            fingerprint: req.headers.fingerprint
         };
         const tokens = await this.authService.getTokens(
             accessToken,
             refreshToken,
         );
 
-        res.cookie("refreshToken", tokens.refreshToken, {
+        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
             httpOnly: true,
             secure: true,
             maxAge: EXPIRENS_IN_REFRESH_TOKEN,
@@ -57,7 +60,7 @@ export class UserController {
 
             return await this.userService.findOne({id: decodedCurrentRefreshToken.userId})
         } catch (e) {
-            throw new HttpException("Нужно обновить токены доступа", HttpStatus.UNAUTHORIZED)
+            res.redirect(401, "/tokens/refresh")
         }
     }
 }
