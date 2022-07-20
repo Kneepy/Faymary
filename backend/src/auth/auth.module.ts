@@ -12,8 +12,8 @@ import { AuthService } from "./auth.service";
                 configService.getJwtOptions(),
             inject: [ConfigService],
         }),
-        ConfigModule,
         MySqlModule,
+        ConfigModule
     ],
     providers: [AuthService],
     exports: [AuthService],

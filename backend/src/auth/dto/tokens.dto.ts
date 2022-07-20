@@ -1,4 +1,3 @@
-import type useragent from "express-useragent";
 import { Users } from "src/entity";
 
 export interface AccessToken {
@@ -7,8 +6,9 @@ export interface AccessToken {
 
 export interface RefreshToken {
     userId: string;
-    ua: useragent.Details["source"]; // user-agent
+    ua: string; // user-agent
     ip: string;
+    fingerprint: string
 }
 
 export interface Payload {

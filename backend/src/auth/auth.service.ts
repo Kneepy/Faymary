@@ -20,12 +20,12 @@ export class AuthService {
         refresh_token: RefreshToken,
     ): Promise<Payload> {
         return {
-            refreshToken: (await this.getRefreshToken(refresh_token)).id,
+            refreshToken: (await this.getRefreshSession(refresh_token)).token,
             accessToken: await this.jwtService.signAsync(access_token),
         };
     }
 
-    async getRefreshToken(args: RefreshToken): Promise<Sessions> {
+    async getRefreshSession(args: RefreshToken): Promise<Sessions> {
         const user = await this.userService.findOne({id: args.userId})
         const token = await this.jwtService.signAsync(
             args,
