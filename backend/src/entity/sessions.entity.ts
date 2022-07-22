@@ -8,9 +8,6 @@ export class Sessions {
     id: string;
 
     @Column({ nullable: false, type: "text" })
-    token: string;
-
-    @Column({ nullable: false, type: "text" })
     fingerprint: string
 
     @Column({ nullable: false })

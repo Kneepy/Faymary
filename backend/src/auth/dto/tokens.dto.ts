@@ -1,4 +1,3 @@
-import { Users } from "src/entity";
 
 export interface AccessToken {
     userId: string;

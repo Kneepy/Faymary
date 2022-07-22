@@ -1,10 +1,9 @@
 import { ICustomRequest, ICustomHeaders, ICustomResponse } from 'src/common/types';
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
-import { AuthService } from 'src/auth';
+import { AuthService, USE_AUTH_METADATA } from 'src/auth';
 import { SessionService } from 'src/mysql';
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from 'src/config';
 import { Reflector } from '@nestjs/core';
-import { USE_AUTH_METADATA } from '../decorators';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -32,12 +31,16 @@ export class AuthGuard implements CanActivate {
 
             this.authService.verifyAccessToken(headers.authorization) && 
             this.authService.verifyRefreshToken(req.cookie.refreshToken)
+
+            return true     
         } catch (e) {  
             if(!req.cookie.refreshToken) {
                 throw new UnauthorizedException()
             }
             
             const session = await this.sessionService.findOne({id: req.cookie.refreshToken}, {relations: ["user"]})
+            const deleteOutdatedSession = await this.sessionService.delete(session.id)
+            
             const fingerprint = req.headers.fingerprint
             const ip = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress
             
@@ -46,7 +49,7 @@ export class AuthGuard implements CanActivate {
             }
 
             const accessToken = { userId: session.user.id };
-            const refreshToken = {
+            const refreshSession = {
                 userId: session.user.id,
                 ua: req.session.useragent,
                 ip,
@@ -54,7 +57,7 @@ export class AuthGuard implements CanActivate {
             };
             const tokens = await this.authService.getTokens(
                 accessToken,
-                refreshToken,
+                refreshSession,
             );
 
             res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {httpOnly: true, secure: true, maxAge: EXPIRENS_IN_REFRESH_TOKEN});

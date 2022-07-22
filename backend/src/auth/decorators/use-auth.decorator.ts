@@ -1,10 +1,9 @@
 import { SetMetadata } from "@nestjs/common"
+import { USE_AUTH_METADATA } from "../constants"
 
-// контролирует использование глобального защитника AuthGuard
-
-export const USE_AUTH_METADATA = "useAuth"
-
+// Контролирует использование глобального защитника AuthGuard
 // true - on; false - off
 export const UseAuth = (use: boolean) => SetMetadata(USE_AUTH_METADATA, use)
-// off
+
+// off AuthGuard
 export const DisableAuth = () => SetMetadata(USE_AUTH_METADATA, false) 
