@@ -2,11 +2,12 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { ICustomRequest, ICustomResponse } from "./common";
 import uaParser from "ua-parser-js"
+import { ValPipe } from "./base/decorators/user-exist.decorator";
 
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
 
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe(), new ValPipe());
 
     app.use(cookieParser());
 

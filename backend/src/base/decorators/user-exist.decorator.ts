@@ -1,5 +1,7 @@
 // Необходимо разобраться с тем как делать декораторы для валидации
 
+import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common"
+
 
 export interface UserExistOptions {
     message: string
@@ -27,7 +29,7 @@ export interface RegisterDecoratorOptions {
 }
 
 const registerDecorator = (options: RegisterDecoratorOptions) => {
-    
+    // Reflect.defineMetadata()
 }
 
 export function Validate(options: ValidateOptions) {
@@ -52,4 +54,10 @@ export function UserExist(options: UserExistOptions, validationOptions: UserExis
             defaultMessage: () => "User already exist "
         }
     })
+}
+@Injectable()
+export class ValPipe implements PipeTransform {
+    transform(value: any, metadata: ArgumentMetadata) {
+        console.log(value)
+    }
 }
