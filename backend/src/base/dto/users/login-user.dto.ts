@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsUUID } from "class-validator";
+import { NotNull, UserExist } from "src/base/decorators/user-exist.decorator";
 
 export class LoginUserDto {
-    @IsUUID()
-    @IsNotEmpty()
+    @UserExist()
+    @NotNull()
     userId: string;
 }
