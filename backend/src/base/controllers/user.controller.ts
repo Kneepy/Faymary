@@ -56,9 +56,9 @@ export class UserController {
     ) {
         try {
             const currentRefreshToken = req.cookie.refreshToken
-            const decodedCurrentRefreshToken = this.authService.verifyRefreshToken(currentRefreshToken)
+            const decodedCurrentRefreshToken = await this.authService.verifyRefreshToken(currentRefreshToken)
 
-            return await this.userService.findOne({id: decodedCurrentRefreshToken.userId})
+            return await this.userService.findOne({id: decodedCurrentRefreshToken.user.id})
         } catch (e) {
             res.redirect(401, "/tokens/refresh")
         }
