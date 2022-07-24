@@ -3,6 +3,6 @@ import { ConfigService } from "./providers/config.service";
 
 @Module({
     providers: [ConfigService],
-    exports: [ConfigService],
+    exports: [ConfigService]
 })
 export class ConfigModule {}

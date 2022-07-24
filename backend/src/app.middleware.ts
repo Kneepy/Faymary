@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { ICustomRequest, ICustomResponse } from "./common";
-import uaParser from "ua-parser-js"
+import * as uaParser from "ua-parser-js";
 import { ValPipe } from "./base/decorators/user-exist.decorator";
 
 export function middlware(app: INestApplication): INestApplication {
@@ -12,23 +12,22 @@ export function middlware(app: INestApplication): INestApplication {
     app.use(cookieParser());
 
     app.use((req: ICustomRequest, res, next) => {
-        const ua = uaParser(req.headers["user-agent"])
-        req.useragent = ua
-        if (!!req.session) req.session = {}
-        req.session.useragent = JSON.stringify(ua, null, '  ')
+        const ua = uaParser(req.headers["user-agent"]);
+        req.useragent = ua;
+        if (!req.session) req.session = {};
+        req.session.useragent = JSON.stringify(ua, null, "  ");
         return next();
     });
 
     app.use((req: ICustomRequest, res: ICustomResponse, next) => {
-        try {
-            const authorizationHeader = req.headers.authorization.split(" ")
-            if(authorizationHeader[0] === "Bearer") {
-                req.headers.authorization = authorizationHeader[1]
+        if (req.headers.authorization) {
+            const authorizationHeader = req.headers?.authorization.split(" ");
+            if (authorizationHeader[0] === "Bearer") {
+                req.headers.authorization = authorizationHeader[1];
             }
-        } catch (e) {
-            next(e)
         }
-    })
+        next();
+    });
 
     return app;
 }

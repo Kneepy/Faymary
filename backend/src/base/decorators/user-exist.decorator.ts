@@ -1,40 +1,55 @@
-// Необходимо разобраться с тем как делать декораторы для валидации
-
-import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common"
+import {
+    ArgumentMetadata,
+    BadRequestException,
+    Injectable,
+    PipeTransform
+} from "@nestjs/common";
 
 export interface Validator {
-    validate: (value: any) => boolean,
-    defaultMessage: () => string
+    validate: (value: any) => boolean;
+    defaultMessage: () => string;
 }
 
 export interface ValidationOptions {
-    message: string
+    message?: string | ((value: any) => string);
 }
 
 export interface ValidateOptions {
-    name: string
-    validator: Validator
-    options: ValidationOptions
+    name: string;
+    validator: Validator;
+    options: ValidationOptions;
 }
 
 export interface RegisterDecoratorOptions {
-    name: string
-    target: Function
-    propertyName: string
-    validator: Validator
-    options: ValidationOptions
+    name: string;
+    target: Function;
+    propertyName: string;
+    validator: Validator;
+    options: ValidationOptions;
+}
+
+export interface ValidationMetadata {
+    type: string;
+    target: Function;
+    propertyName: string;
+    validator: Validator;
+    options: ValidationOptions;
 }
 
 const registerDecorator = (options: RegisterDecoratorOptions) => {
-    const validationMetadata = {
+    const validationMetadata: ValidationMetadata = {
         target: options.target,
         propertyName: options.propertyName,
         validator: options.validator,
         type: options.name,
         options: options.options
-    }
-    Reflect.defineMetadata(validationMetadata.propertyName, validationMetadata, validationMetadata.target)
-}
+    };
+    Reflect.defineMetadata(
+        validationMetadata.type,
+        validationMetadata,
+        validationMetadata.target
+    );
+};
 
 export function Validate(options: ValidateOptions) {
     return (object: object, propertyName: string) => {
@@ -44,8 +59,8 @@ export function Validate(options: ValidateOptions) {
             propertyName: propertyName,
             validator: options.validator,
             options: options.options
-        })
-    }
+        });
+    };
 }
 
 export function UserExist(options?: ValidationOptions) {
@@ -53,13 +68,12 @@ export function UserExist(options?: ValidationOptions) {
         name: "USER_EXIST",
         validator: {
             validate: (value): boolean => {
-                console.log(value)
-                return true
+                return true;
             },
             defaultMessage: () => "User already exist "
         },
         options
-    })
+    });
 }
 
 export function NotNull(options?: ValidationOptions) {
@@ -67,19 +81,37 @@ export function NotNull(options?: ValidationOptions) {
         name: "NOT_NULL",
         validator: {
             validate: (value): boolean => {
-                console.log(value)
-                return true
+                return false;
             },
             defaultMessage: () => "not null"
         },
         options
-    })
+    });
 }
 
 @Injectable()
 export class ValPipe implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {
-        console.log(metadata)
-        console.log(value)
+        const errors = [];
+        const metadataKeys = Reflect.getMetadataKeys(metadata.metatype);
+
+        metadataKeys.forEach(key => {
+            const constraint: ValidationMetadata = Reflect.getMetadata(key, metadata.metatype);
+
+            if (!constraint.validator.validate(value[constraint.propertyName])) {
+                const message =
+                    (constraint.options?.message instanceof Function
+                        ? (constraint.options?.message)(value[constraint.propertyName])
+                        : constraint.options?.message
+                    ) || constraint.validator.defaultMessage();
+                errors.push(message);
+            }
+        });
+
+        if (errors.length) {
+            throw new BadRequestException(errors);
+        }
+
+        return value;
     }
 }

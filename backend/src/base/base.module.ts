@@ -5,6 +5,6 @@ import * as controllers from "./controllers";
 
 @Module({
     imports: [MySqlModule, AuthModule],
-    controllers: [...Object.values(controllers)],
+    controllers: [...Object.values(controllers)]
 })
 export class BaseModule {}
