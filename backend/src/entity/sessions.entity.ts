@@ -8,7 +8,7 @@ export class Sessions {
     id: string;
 
     @Column({ nullable: false, type: "text" })
-    token: string;
+    fingerprint: string
 
     @Column({ nullable: false })
     ua: string; // user-agent

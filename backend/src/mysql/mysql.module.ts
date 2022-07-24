@@ -1,4 +1,4 @@
-import { Module, Session } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigService } from "src/config/providers/config.service";
 import { ConfigModule } from "src/config/config.module";

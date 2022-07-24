@@ -17,7 +17,7 @@ export class ConfigService {
         username: "root",
         password: "root",
         database: "social_network",
-        synchronize: true,
+        synchronize: false,
         entities: ["dist/**/*.entity{.ts,.js}"],
     });
 

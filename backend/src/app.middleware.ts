@@ -1,21 +1,21 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
-import * as useragent from "express-useragent";
 import { ICustomRequest, ICustomResponse } from "./common";
+import * as uaParser from "ua-parser-js"
+import { ValPipe } from "./base/decorators/user-exist.decorator";
 
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
 
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe(), new ValPipe());
 
     app.use(cookieParser());
 
-    app.use(useragent.express());
     app.use((req: ICustomRequest, res, next) => {
-        if (!req.session?.useragent) {
-            req.session = Object.assign(req.session || {}, {useragent: req.useragent})
-            req.session.useragent = req.useragent;
-        }
+        const ua = uaParser(req.headers["user-agent"])
+        req.useragent = ua
+        if (!req.session) req.session = {}
+        req.session.useragent = JSON.stringify(ua, null, '  ')
         return next();
     });
 
@@ -26,7 +26,7 @@ export function middlware(app: INestApplication): INestApplication {
                 req.headers.authorization = authorizationHeader[1]
             }
         } catch (e) {
-            next(e)
+            next()
         }
     })
 
