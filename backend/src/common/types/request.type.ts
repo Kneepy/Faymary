@@ -4,12 +4,12 @@ import { ICustomHeaders } from "./headers.type";
 export interface ICustomRequest extends Request {
     ip: string;
     cookie: {
-        refreshToken: string,
-    }
+        refreshToken: string;
+    };
     useragent?: useragent.IResult;
     session: {
         useragent?: string;
     };
     socket?: net.Socket;
-    headers: ICustomHeaders
+    headers: ICustomHeaders;
 }

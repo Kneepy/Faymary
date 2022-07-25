@@ -13,11 +13,11 @@ const providers = [...Object.values(allMySQLProviders)];
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) =>
                 configService.getMySqlConnectionData(),
-            inject: [ConfigService],
+            inject: [ConfigService]
         }),
-        TypeOrmModule.forFeature([Users, Files, Dialogs, Messages, Sessions]),
+        TypeOrmModule.forFeature([Users, Files, Dialogs, Messages, Sessions])
     ],
     providers: providers,
-    exports: providers,
+    exports: providers
 })
 export class MySqlModule {}

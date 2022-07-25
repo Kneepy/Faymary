@@ -11,7 +11,7 @@ export class SessionsInput {
     ip: string;
 
     @IsNotEmpty()
-    fingerprint: string    
+    fingerprint: string;
 
     @IsNotEmpty()
     ua: string;

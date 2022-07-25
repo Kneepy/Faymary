@@ -8,6 +8,6 @@ import { UtilService } from "src/common";
 export class FilesService {
     constructor(
         @InjectRepository(Files) private repository: Repository<Files>,
-        private util: UtilService,
+        private util: UtilService
     ) {}
 }

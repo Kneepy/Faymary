@@ -6,6 +6,6 @@ const services = [...Object.values(commonProviders)];
 @Global()
 @Module({
     providers: services,
-    exports: services,
+    exports: services
 })
 export class CommonModule {}

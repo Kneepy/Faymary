@@ -1,6 +1,9 @@
 {
   "singleQuote": false,
-  "trailingComma": "all",
+  "trailingComma": "none",
   "tabWidth": 4,
-  "endOfLine": "auto"
+  "endOfLine": "auto",
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "parser": "typescript"
 }

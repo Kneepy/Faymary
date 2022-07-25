@@ -7,16 +7,16 @@ import { UtilService } from "../../common";
 export class UsersService {
     constructor(
         @InjectRepository(Users) private repository: Repository<Users>,
-        private util: UtilService,
+        private util: UtilService
     ) {}
 
     public async findOne(
         args: UsersArgs,
-        options?: FindOneOptions,
+        options?: FindOneOptions
     ): Promise<Users> {
         return await this.repository.findOne({
             where: this.util.removeUndefined(args),
-            ...options,
+            ...options
         });
     }
 

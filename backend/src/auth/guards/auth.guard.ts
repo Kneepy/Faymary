@@ -1,9 +1,19 @@
-import { ICustomRequest, ICustomHeaders, ICustomResponse } from 'src/common/types';
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
-import { AuthService, USE_AUTH_METADATA } from 'src/auth';
-import { SessionService } from 'src/mysql';
-import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from 'src/config';
-import { Reflector } from '@nestjs/core';
+import {
+    ICustomRequest,
+    ICustomHeaders,
+    ICustomResponse
+} from "src/common/types";
+import {
+    Injectable,
+    CanActivate,
+    ExecutionContext,
+    UnauthorizedException
+} from "@nestjs/common";
+import { USE_AUTH_METADATA } from "src/auth";
+import { SessionService } from "src/mysql";
+import { AuthService } from "../auth.service";
+import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
+import { Reflector } from "@nestjs/core";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -14,38 +24,47 @@ export class AuthGuard implements CanActivate {
     ) {}
 
     async canActivate(context: ExecutionContext) {
-        const http = context.switchToHttp()
-        const res: ICustomResponse = http.getResponse()
-        const req: ICustomRequest = http.getRequest()
-        const headers: ICustomHeaders = req.headers
+        const http = context.switchToHttp();
+        const res: ICustomResponse = http.getResponse();
+        const req: ICustomRequest = http.getRequest();
+        const headers: ICustomHeaders = req.headers;
 
         try {
-            if(!req.cookie.refreshToken) {
-                if(!this.reflector.get(USE_AUTH_METADATA, context.getHandler())) {
-                    return true 
-                }
-                else {
-                    throw new UnauthorizedException()
+            if (!req.cookie.refreshToken) {
+                if (
+                    !this.reflector.get(USE_AUTH_METADATA, context.getHandler())
+                ) {
+                    return true;
+                } else {
+                    throw new UnauthorizedException();
                 }
             }
 
-            this.authService.verifyAccessToken(headers.authorization) && 
-            this.authService.verifyRefreshToken(req.cookie.refreshToken)
+            this.authService.verifyAccessToken(headers.authorization) &&
+                this.authService.verifyRefreshToken(req.cookie.refreshToken);
 
-            return true     
-        } catch (e) {  
-            if(!req.cookie.refreshToken) {
-                throw new UnauthorizedException()
+            return true;
+        } catch (e) {
+            if (!req.cookie.refreshToken) {
+                throw new UnauthorizedException();
             }
-            
-            const session = await this.sessionService.findOne({id: req.cookie.refreshToken}, {relations: ["user"]})
-            const deleteOutdatedSession = await this.sessionService.delete(session.id)
-            
-            const fingerprint = req.headers.fingerprint
-            const ip = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress
-            
-            if(session.fingerprint !== fingerprint || session.ip !== ip) {
-                throw new UnauthorizedException()
+
+            const session = await this.sessionService.findOne(
+                { id: req.cookie.refreshToken },
+                { relations: ["user"] }
+            );
+            const deleteOutdatedSession = await this.sessionService.delete(
+                session.id
+            );
+
+            const fingerprint = req.headers.fingerprint;
+            const ip =
+                req.ip ||
+                req.headers["x-forwarded-for"] ||
+                req.socket.remoteAddress;
+
+            if (session.fingerprint !== fingerprint || session.ip !== ip) {
+                throw new UnauthorizedException();
             }
 
             const accessToken = { userId: session.user.id };
@@ -57,13 +76,17 @@ export class AuthGuard implements CanActivate {
             };
             const tokens = await this.authService.getTokens(
                 accessToken,
-                refreshSession,
+                refreshSession
             );
 
-            res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {httpOnly: true, secure: true, maxAge: EXPIRENS_IN_REFRESH_TOKEN});
-            headers.authorization = tokens.accessToken
+            res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: EXPIRENS_IN_REFRESH_TOKEN
+            });
+            headers.authorization = tokens.accessToken;
 
-            return true
+            return true;
         }
     }
 }

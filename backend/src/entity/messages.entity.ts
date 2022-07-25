@@ -4,7 +4,7 @@ import {
     ManyToOne,
     Column,
     JoinColumn,
-    OneToOne,
+    OneToOne
 } from "typeorm";
 import { Dialogs, Users } from "./";
 

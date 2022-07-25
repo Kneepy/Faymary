@@ -1,3 +1,3 @@
 export * from "./request.type";
 export * from "./response.type";
-export * from "./headers.type"
+export * from "./headers.type";

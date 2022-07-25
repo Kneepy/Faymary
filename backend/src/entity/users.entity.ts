@@ -5,7 +5,7 @@ import {
     ManyToMany,
     ManyToOne,
     OneToMany,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn
 } from "typeorm";
 import { Files, Dialogs } from "./";
 import { Sessions } from "./sessions.entity";
@@ -15,19 +15,19 @@ export class Users {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({nullable: false})
+    @Column({ nullable: false })
     email: string;
 
-    @Column({nullable: false})
+    @Column({ nullable: false })
     firstName: string;
 
-    @Column({nullable: false})
+    @Column({ nullable: false })
     lastName: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     surname: string;
 
-    @Column({nullable: false, default: false})
+    @Column({ nullable: false, default: false })
     isActive: boolean;
 
     @OneToMany(() => Files, (files: Files) => files.user)

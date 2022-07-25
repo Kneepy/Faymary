@@ -5,7 +5,7 @@ import {
     EXPIRENS_IN_ACCESS_TOKEN,
     EXPIRENS_IN_REFRESH_TOKEN,
     SECRET_ACCESS_JWT,
-    SECRET_REFRESH_JWT,
+    SECRET_REFRESH_JWT
 } from "../config.constants";
 
 @Injectable()
@@ -17,19 +17,19 @@ export class ConfigService {
         username: "root",
         password: "root",
         database: "social_network",
-        synchronize: true,
-        entities: ["dist/**/*.entity{.ts,.js}"],
+        synchronize: false,
+        entities: ["dist/**/*.entity{.ts,.js}"]
     });
 
     // access token options
     getJwtOptions = (): JwtModuleOptions => ({
         secret: SECRET_ACCESS_JWT,
-        signOptions: { expiresIn: EXPIRENS_IN_ACCESS_TOKEN },
+        signOptions: { expiresIn: EXPIRENS_IN_ACCESS_TOKEN }
     });
 
     // refresh token options
     getJwtRefreshTokenOptions = (): JwtSignOptions => ({
         secret: SECRET_REFRESH_JWT,
-        expiresIn: EXPIRENS_IN_REFRESH_TOKEN,
+        expiresIn: EXPIRENS_IN_REFRESH_TOKEN
     });
 }
