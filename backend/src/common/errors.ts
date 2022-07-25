@@ -1,0 +1,1 @@
+export const USER_ALREADY_EXIST_EMAIL_ERROR = "Пользователь с такой почтой уже существует"
