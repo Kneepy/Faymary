@@ -10,7 +10,6 @@ import { UsersService } from "src/mysql";
 export class AuthService {
     constructor(
         private jwtService: JwtService,
-        private configService: ConfigService,
         private sessionService: SessionService,
         private userService: UsersService
     ) {}
@@ -36,12 +35,12 @@ export class AuthService {
         });
     }
 
-    verifyAccessToken(access_token): AccessToken {
+    verifyAccessToken(access_token: string): AccessToken {
         return this.jwtService.verify(access_token, {
             secret: SECRET_ACCESS_JWT
         });
     }
-    async verifyRefreshToken(refresh_token): Promise<Sessions> {
+    async verifyRefreshToken(refresh_token: string): Promise<Sessions> {
         const session = await this.sessionService.findOne(
             { id: refresh_token },
             { relations: ["user"] }

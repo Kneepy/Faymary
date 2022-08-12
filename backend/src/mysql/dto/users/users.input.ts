@@ -16,9 +16,5 @@ export class UsersInput {
 
     @IsString()
     @IsNotEmpty()
-    surname: string;
-
-    @IsString()
-    @IsNotEmpty()
-    firstName: string;
+    userName: string
 }

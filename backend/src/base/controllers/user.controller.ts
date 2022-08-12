@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto, LoginUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql";
@@ -7,31 +7,34 @@ import { AuthService } from "src/auth";
 import { ICustomRequest, ICustomResponse } from "src/common/types";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { DisableAuth } from "src/auth";
-import { USER_ALREADY_EXIST_EMAIL_ERROR } from "src/common";
+import { INVALID_PASSWORD, USER_ALREADY_EXIST_EMAIL_ERROR, USER_NOT_FOUND_EMAIL } from "src/common";
+import { MailerService } from "@lib/mailer";
 
 @Controller("user")
 export class UserController {
     constructor(
         private userService: UsersService,
-        private authService: AuthService
+        private authService: AuthService, 
+        private mailerService: MailerService
     ) {}
 
-    @Post("create")
+    @Post("/create")
     @DisableAuth()
     public async createUser(
         @Body() body: CreateUserDto,
         @Req() req: ICustomRequest,
         @Res({ passthrough: true }) res: ICustomResponse
     ): Promise<{ user: Users; token: string }> {
-        body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(2));
-
         const existUser = await this.userService.findOne({email: body.email})
 
         if(!!existUser) {
             throw new BadRequestException(USER_ALREADY_EXIST_EMAIL_ERROR)
         }
 
-        const user = await this.userService.create(body);
+        body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(2));
+        
+        const lastName = body.email.split("@")[0]
+        const user = await this.userService.create({...body, lastName});
         const accessToken = { userId: user.id };
         const refreshToken = {
             userId: user.id,
@@ -60,6 +63,21 @@ export class UserController {
         };
     }
 
-    @Get()
-    public async loginUser(@Body() body: LoginUserDto) {}
+    @Post("/login")
+    @DisableAuth()
+    public async loginUser(@Body() body: LoginUserDto) {
+        const user = await this.userService.findOne({email: body.email})
+
+        if(!!user) {
+            if(bcrypt.compareSync(body.password, user.password)) {
+                return user
+            }
+            else {
+                throw new UnauthorizedException(INVALID_PASSWORD)
+            }
+        }
+        else {
+            throw new NotFoundException(USER_NOT_FOUND_EMAIL)
+        }
+    }
 }

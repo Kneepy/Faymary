@@ -7,7 +7,8 @@ import {
     Injectable,
     CanActivate,
     ExecutionContext,
-    UnauthorizedException
+    UnauthorizedException,
+    Inject
 } from "@nestjs/common";
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql";

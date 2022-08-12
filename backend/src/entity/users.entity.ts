@@ -19,13 +19,13 @@ export class Users {
     email: string;
 
     @Column({ nullable: false })
-    firstName: string;
+    userName: string;
 
     @Column({ nullable: false })
     lastName: string;
 
-    @Column({ nullable: true })
-    surname: string;
+    @Column({nullable: false})
+    password: string
 
     @Column({ nullable: false, default: false })
     isActive: boolean;

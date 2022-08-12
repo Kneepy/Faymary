@@ -2,11 +2,21 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { ICustomRequest, ICustomResponse } from "./common";
 import * as uaParser from "ua-parser-js";
+import { AuthGuard, AuthService } from "./auth";
+import { SessionService } from "./mysql";
+import { Reflector } from "@nestjs/core";
 
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
 
     app.useGlobalPipes(new ValidationPipe());
+
+
+    // костыль для инициации глобального защитника 
+    const sessionService = app.get(SessionService)
+    const authService = app.get(AuthService)
+    const reflector = app.get(Reflector)
+    app.useGlobalGuards(new AuthGuard(sessionService, authService, reflector))
 
     app.use(cookieParser());
 

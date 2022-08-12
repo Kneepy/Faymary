@@ -17,5 +17,10 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-  }
+    "paths": {
+      "@lib/mailer": ["src/libs/mailer/src"],
+      "@lib/mailer/*": ["src/libs/mailer/src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.js"]
 }
