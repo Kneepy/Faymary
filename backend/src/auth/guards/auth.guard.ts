@@ -8,10 +8,11 @@ import {
     CanActivate,
     ExecutionContext,
     UnauthorizedException,
+    forwardRef,
     Inject
 } from "@nestjs/common";
 import { USE_AUTH_METADATA } from "src/auth";
-import { SessionService } from "src/mysql";
+import { SessionService } from "src/mysql/providers/session.service";
 import { AuthService } from "../auth.service";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { Reflector } from "@nestjs/core";

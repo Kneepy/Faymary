@@ -1,21 +1,20 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Inject, NotFoundException, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto, LoginUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
-import { UsersService } from "src/mysql";
-import { Users } from "src/entity";
-import { AuthService } from "src/auth";
+import { UsersService } from "src/mysql/providers/users.service";
+import { AuthService, DisableAuth } from "src/auth";
 import { ICustomRequest, ICustomResponse } from "src/common/types";
-import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
-import { DisableAuth } from "src/auth";
-import { INVALID_PASSWORD, USER_ALREADY_EXIST_EMAIL_ERROR, USER_NOT_FOUND_EMAIL } from "src/common";
+import { INVALID_PASSWORD, USER_ALREADY_EXIST_EMAIL_ERROR, USER_NOT_FOUND_EMAIL, UtilService } from "src/common";
 import { MailerService } from "@lib/mailer";
+import { PayloadAuthUser } from "../interfaces";
+import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 
 @Controller("user")
 export class UserController {
     constructor(
         private userService: UsersService,
-        private authService: AuthService, 
-        private mailerService: MailerService
+        private mailerService: MailerService,
+        private authService: AuthService
     ) {}
 
     @Post("/create")
@@ -24,7 +23,7 @@ export class UserController {
         @Body() body: CreateUserDto,
         @Req() req: ICustomRequest,
         @Res({ passthrough: true }) res: ICustomResponse
-    ): Promise<{ user: Users; token: string }> {
+    ): Promise<PayloadAuthUser> {
         const existUser = await this.userService.findOne({email: body.email})
 
         if(!!existUser) {
@@ -35,6 +34,7 @@ export class UserController {
         
         const lastName = body.email.split("@")[0]
         const user = await this.userService.create({...body, lastName});
+        
         const accessToken = { userId: user.id };
         const refreshToken = {
             userId: user.id,
@@ -65,12 +65,41 @@ export class UserController {
 
     @Post("/login")
     @DisableAuth()
-    public async loginUser(@Body() body: LoginUserDto) {
+    public async loginUser(
+        @Body() body: LoginUserDto,
+        @Req() req: ICustomRequest,
+        @Res({ passthrough: true }) res: ICustomResponse
+    ): Promise<PayloadAuthUser> {
         const user = await this.userService.findOne({email: body.email})
 
         if(!!user) {
             if(bcrypt.compareSync(body.password, user.password)) {
-                return user
+                const accessToken = { userId: user.id };
+                const refreshToken = {
+                    userId: user.id,
+                    ua: req.session.useragent,
+                    ip:
+                        req.ip ||
+                        req.headers["x-forwarded-for"] ||
+                        req.socket.remoteAddress,
+                    fingerprint: req.headers.fingerprint
+                };
+                const tokens = await this.authService.getTokens(
+                    accessToken,
+                    refreshToken
+                );
+
+                res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
+                    httpOnly: true,
+                    secure: true,
+                    maxAge: EXPIRENS_IN_REFRESH_TOKEN
+                });
+                req.headers.authorization = tokens.accessToken
+
+                return {
+                    user,
+                    token: tokens.accessToken
+                };
             }
             else {
                 throw new UnauthorizedException(INVALID_PASSWORD)

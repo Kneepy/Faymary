@@ -1,5 +1,5 @@
-export { UsersService } from "./users.service";
-export { DialogsService } from "./dialogs.service";
-export { MessagesService } from "./messages.service";
-export { FilesService } from "./files.service";
-export { SessionService } from "./session.service";
+export * from "./users.service";
+export * from "./dialogs.service";
+export * from "./messages.service";
+export * from "./files.service";
+export * from "./session.service";

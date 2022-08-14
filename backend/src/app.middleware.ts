@@ -12,11 +12,13 @@ export function middlware(app: INestApplication): INestApplication {
     app.useGlobalPipes(new ValidationPipe());
 
 
-    // костыль для инициации глобального защитника 
+    /* костыль для инициации глобального защитника 
     const sessionService = app.get(SessionService)
     const authService = app.get(AuthService)
     const reflector = app.get(Reflector)
     app.useGlobalGuards(new AuthGuard(sessionService, authService, reflector))
+    */
+    
 
     app.use(cookieParser());
 

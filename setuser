@@ -1,0 +1,28 @@
+async setUser({req, res}: {req: ICustomRequest, res: ICustomResponse}, user: Users): Promise<PayloadAuthUser> {
+        const accessToken = { userId: user.id };
+        const refreshToken = {
+            userId: user.id,
+            ua: req.session.useragent,
+            ip:
+                req.ip ||
+                req.headers["x-forwarded-for"] ||
+                req.socket.remoteAddress,
+            fingerprint: req.headers.fingerprint
+        };
+        const tokens = await this.authService.getTokens(
+            accessToken,
+            refreshToken
+        );
+
+        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
+            httpOnly: true,
+            secure: true,
+            maxAge: EXPIRENS_IN_REFRESH_TOKEN
+        });
+        req.headers.authorization = tokens.accessToken
+
+        return {
+            user,
+            token: tokens.accessToken
+        };
+    }

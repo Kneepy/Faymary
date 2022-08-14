@@ -1,11 +1,11 @@
-import { ConfigService } from "src/config/providers/config.service";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_ACCESS_JWT, SECRET_REFRESH_JWT } from "src/config";
-import { SessionService } from "src/mysql/providers/session.service";
 import { Sessions } from "src/entity";
-import { UsersService } from "src/mysql";
+import { UsersService } from "../mysql/providers/users.service";
+import { SessionService } from "src/mysql/providers/session.service";
+
 @Injectable()
 export class AuthService {
     constructor(
