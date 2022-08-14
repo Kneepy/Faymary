@@ -1,4 +1,4 @@
 export interface ICustomHeaders extends Headers {
-    authorization: string 
-    fingerprint: string
+    authorization: string;
+    fingerprint: string;
 }

@@ -8,7 +8,11 @@ export class Sessions {
     id: string;
 
     @Column({ nullable: false, type: "text" })
+<<<<<<< HEAD
     fingerprint: string
+=======
+    fingerprint: string;
+>>>>>>> hotfix
 
     @Column({ nullable: false })
     ua: string; // user-agent
@@ -19,7 +23,7 @@ export class Sessions {
     @Column({
         nullable: false,
         type: "bigint",
-        default: Date.now() + EXPIRENS_IN_REFRESH_TOKEN,
+        default: Date.now() + EXPIRENS_IN_REFRESH_TOKEN
     })
     expirensIn: number;
 

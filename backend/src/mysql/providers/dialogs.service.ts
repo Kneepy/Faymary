@@ -9,7 +9,7 @@ import { DialogsInput, DialogsArgs, FindOneOptions } from "../dto";
 export class DialogsService {
     constructor(
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>,
-        private util: UtilService,
+        private util: UtilService
     ) {}
 
     public async update(args: DialogsInput): Promise<Dialogs> {
@@ -19,7 +19,7 @@ export class DialogsService {
     public async findOne(args: DialogsArgs, options: FindOneOptions) {
         return await this.repository.findOne({
             where: this.util.removeUndefined(args),
-            ...options,
+            ...options
         });
     }
 }

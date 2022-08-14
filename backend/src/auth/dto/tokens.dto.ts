@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> hotfix
 export interface AccessToken {
     userId: string;
 }
@@ -7,7 +10,7 @@ export interface RefreshToken {
     userId: string;
     ua: string; // user-agent
     ip: string;
-    fingerprint: string
+    fingerprint: string;
 }
 
 export interface Payload {
@@ -16,5 +19,5 @@ export interface Payload {
 }
 
 export interface AccessPayload {
-    token: string 
+    token: string;
 }

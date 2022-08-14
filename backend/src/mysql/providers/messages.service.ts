@@ -14,7 +14,7 @@ import { UtilService } from "src/common";
 export class MessagesService {
     constructor(
         @InjectRepository(Messages) private repository: Repository<Messages>,
-        private util: UtilService,
+        private util: UtilService
     ) {}
 
     public async find(args) {

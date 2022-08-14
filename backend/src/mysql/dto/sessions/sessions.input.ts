@@ -11,7 +11,11 @@ export class SessionsInput {
     ip: string;
 
     @IsNotEmpty()
+<<<<<<< HEAD
     fingerprint: string    
+=======
+    fingerprint: string;
+>>>>>>> hotfix
 
     @IsNotEmpty()
     ua: string;
