@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Body, ConsoleLogger, Controller, Get, Post, Req, Res, UsePipes } from "@nestjs/common";
-=======
 import { BadRequestException, Body, Controller, Get, Inject, NotFoundException, Post, Req, Res, UnauthorizedException } from "@nestjs/common";
->>>>>>> hotfix
 import { CreateUserDto, LoginUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql/providers/users.service";
@@ -17,10 +13,7 @@ import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 export class UserController {
     constructor(
         private userService: UsersService,
-<<<<<<< HEAD
-=======
         private mailerService: MailerService,
->>>>>>> hotfix
         private authService: AuthService
     ) {}
 
@@ -42,6 +35,41 @@ export class UserController {
         const lastName = body.email.split("@")[0]
         const user = await this.userService.create({...body, lastName});
         
+        return await this.setUser({req, res}, user)
+
+        // confirmations service create confirm
+
+        this.mailerService.send({
+            from: "Faymary <ilyafamin4@gmail.com>",
+            to: body.email,
+            subject: "Account Confirmation",
+            text: `${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`,
+        })
+    }
+
+    @Post("/login")
+    @DisableAuth()
+    public async loginUser(
+        @Body() body: LoginUserDto,
+        @Req() req: ICustomRequest,
+        @Res({ passthrough: true }) res: ICustomResponse
+    ): Promise<PayloadAuthUser> {
+        const user = await this.userService.findOne({email: body.email})
+
+        if(!!user) {
+            if(bcrypt.compareSync(body.password, user.password)) {
+                return await this.setUser({req, res}, user)
+            }
+            else {
+                throw new UnauthorizedException(INVALID_PASSWORD)
+            }
+        }
+        else {
+            throw new NotFoundException(USER_NOT_FOUND_EMAIL)
+        }
+    }
+
+    private async setUser({req, res}: {req: ICustomRequest, res: ICustomResponse}, user): Promise<PayloadAuthUser> {
         const accessToken = { userId: user.id };
         const refreshToken = {
             userId: user.id,
@@ -68,61 +96,5 @@ export class UserController {
             user,
             token: tokens.accessToken
         };
-    }
-
-<<<<<<< HEAD
-    @Get("login")
-    //@UsePipes(new ValPipe())
-    public async loginUser(
-        @Body() log: LoginUserDto
-    ) {
-        //console.log(req.body)
-=======
-    @Post("/login")
-    @DisableAuth()
-    public async loginUser(
-        @Body() body: LoginUserDto,
-        @Req() req: ICustomRequest,
-        @Res({ passthrough: true }) res: ICustomResponse
-    ): Promise<PayloadAuthUser> {
-        const user = await this.userService.findOne({email: body.email})
-
-        if(!!user) {
-            if(bcrypt.compareSync(body.password, user.password)) {
-                const accessToken = { userId: user.id };
-                const refreshToken = {
-                    userId: user.id,
-                    ua: req.session.useragent,
-                    ip:
-                        req.ip ||
-                        req.headers["x-forwarded-for"] ||
-                        req.socket.remoteAddress,
-                    fingerprint: req.headers.fingerprint
-                };
-                const tokens = await this.authService.getTokens(
-                    accessToken,
-                    refreshToken
-                );
-
-                res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: EXPIRENS_IN_REFRESH_TOKEN
-                });
-                req.headers.authorization = tokens.accessToken
-
-                return {
-                    user,
-                    token: tokens.accessToken
-                };
-            }
-            else {
-                throw new UnauthorizedException(INVALID_PASSWORD)
-            }
-        }
-        else {
-            throw new NotFoundException(USER_NOT_FOUND_EMAIL)
-        }
->>>>>>> hotfix
     }
 }

@@ -8,11 +8,7 @@ export class Sessions {
     id: string;
 
     @Column({ nullable: false, type: "text" })
-<<<<<<< HEAD
-    fingerprint: string
-=======
     fingerprint: string;
->>>>>>> hotfix
 
     @Column({ nullable: false })
     ua: string; // user-agent

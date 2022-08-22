@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import { ICustomRequest, ICustomHeaders, ICustomResponse } from 'src/common/types';
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
-import { USE_AUTH_METADATA } from 'src/auth';
-import { AuthService } from "../auth.service"
-import { SessionService } from 'src/mysql';
-import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from 'src/config';
-import { Reflector } from '@nestjs/core';
-=======
 import {
     ICustomRequest,
     ICustomHeaders,
@@ -17,15 +8,12 @@ import {
     CanActivate,
     ExecutionContext,
     UnauthorizedException,
-    forwardRef,
-    Inject
 } from "@nestjs/common";
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql/providers/session.service";
 import { AuthService } from "../auth.service";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { Reflector } from "@nestjs/core";
->>>>>>> hotfix
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -52,27 +40,8 @@ export class AuthGuard implements CanActivate {
                 }
             }
 
-<<<<<<< HEAD
-            this.authService.verifyAccessToken(headers.authorization) && 
-            this.authService.verifyRefreshToken(req.cookie.refreshToken)
-
-            return true     
-        } catch (e) {  
-            if(!req.cookie.refreshToken) {
-                throw new UnauthorizedException()
-            }
-            
-            const session = await this.sessionService.findOne({id: req.cookie.refreshToken}, {relations: ["user"]})
-            const deleteOutdatedSession = await this.sessionService.delete(session.id)
-            
-            const fingerprint = req.headers.fingerprint
-            const ip = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress
-            
-            if(session.fingerprint !== fingerprint || session.ip !== ip) {
-                throw new UnauthorizedException()
-=======
             this.authService.verifyAccessToken(headers.authorization) &&
-                this.authService.verifyRefreshToken(req.cookie.refreshToken);
+            this.authService.verifyRefreshToken(req.cookie.refreshToken);
 
             return true;
         } catch (e) {
@@ -84,9 +53,7 @@ export class AuthGuard implements CanActivate {
                 { id: req.cookie.refreshToken },
                 { relations: ["user"] }
             );
-            const deleteOutdatedSession = await this.sessionService.delete(
-                session.id
-            );
+            const deleteOutdatedSession = await this.sessionService.delete(session.id);
 
             const fingerprint = req.headers.fingerprint;
             const ip =
@@ -96,7 +63,6 @@ export class AuthGuard implements CanActivate {
 
             if (session.fingerprint !== fingerprint || session.ip !== ip) {
                 throw new UnauthorizedException();
->>>>>>> hotfix
             }
 
             const accessToken = { userId: session.user.id };
@@ -108,11 +74,7 @@ export class AuthGuard implements CanActivate {
             };
             const tokens = await this.authService.getTokens(
                 accessToken,
-<<<<<<< HEAD
-                refreshSession,
-=======
                 refreshSession
->>>>>>> hotfix
             );
 
             res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {

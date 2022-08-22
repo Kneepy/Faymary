@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> hotfix
 export interface AccessToken {
     userId: string;
 }

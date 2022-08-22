@@ -6,6 +6,8 @@ export const EXPIRENS_IN_REFRESH_TOKEN = 1209600000; // 14d
 export const EXPIRENS_IN_ACCESS_TOKEN = 900000; // 15min
 export const REFRESH_TOKEN_COOKIE = "refreshToken";
 
+export const EXPIRES_IN_CONFORMATION = 300000 // 5 min
+
 export const MAIL_HOST = "smtp.gmail.com"
 export const MAIL_PORT = 465
 export const MAIL_ACCOUNT_PASS = "tgazfbnbvnzjypyg"

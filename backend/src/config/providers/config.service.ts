@@ -31,13 +31,8 @@ export class ConfigService {
         username: "root",
         password: "root",
         database: "social_network",
-<<<<<<< HEAD
         synchronize: false,
-        entities: ["dist/**/*.entity{.ts,.js}"],
-=======
-        synchronize: true,
         entities: ["dist/**/*.entity{.ts,.js}"]
->>>>>>> hotfix
     });
 
     // access token options
