@@ -1,5 +1,6 @@
 import { EXPIRES_IN_CONFORMATION } from "src/config";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Users } from "./users.entity";
 
 @Entity()
 export class Confirmations {
@@ -18,4 +19,8 @@ export class Confirmations {
 
     @Column({ nullable: false, type: "bigint", default: Date.now() })
     createdAt: number;
+
+    @OneToOne(() => Users)
+    @JoinColumn()
+    user: Users
 }

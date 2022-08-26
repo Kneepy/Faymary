@@ -1,5 +1,5 @@
 import { PrimaryGeneratedColumn, Entity, OneToMany, ManyToMany } from "typeorm";
-import { Users, Messages } from "./";
+import { Users, Messages } from ".";
 
 @Entity()
 export class Dialogs {
