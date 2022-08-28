@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, GoneException, Inject, NotFoundException, Post, Query, Req, Res, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, GoneException, Inject, NotFoundException, Patch, Post, Query, Req, Res, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto, LoginUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql/providers/users.service";
@@ -76,6 +76,9 @@ export class UserController {
             throw new GoneException(WAITING_TIME_EXPIRED_CONFIRM)
         }
     }
+
+    @Patch("/add-account")
+    public async addAccount() {}
 
     private async setConfirmation(user: Users): Promise<string> {
         const code = `${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
