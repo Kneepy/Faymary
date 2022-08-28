@@ -2,8 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Confirmations } from "src/entity";
 import { Repository } from "typeorm";
-import { ConfirmationsInput } from "../dto";
-import { ConfirmationsArgs } from "../dto/confirmations/confirmations.args";
+import { ConfirmationsInput, ConfirmationsArgs } from "../dto";
 
 @Injectable()
 export class ConfirmationsService {
