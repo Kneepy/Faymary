@@ -11,7 +11,7 @@ import { ConfigService, ConfigModule } from "src/config";
         MailerModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
-            useFactory: (configService: ConfigService) => configService.getMailerOptions() 
+            useFactory: (configService: ConfigService) => configService.getMailerOptions()
         })
     ],
     controllers: [...Object.values(controllers)]

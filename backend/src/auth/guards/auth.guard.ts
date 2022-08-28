@@ -30,7 +30,7 @@ export class AuthGuard implements CanActivate {
         const headers: ICustomHeaders = req.headers;
 
         try {
-            if (!req.cookie.refreshToken) {
+            if (!req.cookie?.refreshToken) {
                 if (
                     !this.reflector.get(USE_AUTH_METADATA, context.getHandler())
                 ) {

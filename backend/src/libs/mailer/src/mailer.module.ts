@@ -48,7 +48,9 @@ export class MailerModule {
         if(options.useFactory) {
             return {
                 provide: MAILER_MODULE,
-                useFactory: options.useFactory,
+                useFactory: function () {
+                    return nodemailer.createTransport({...options.useFactory, secure: true})
+                },
                 inject: options.inject || []
             }
         }
@@ -56,7 +58,9 @@ export class MailerModule {
         return {
             provide: MAILER_MODULE,
             inject: [options.useClass || options.useExisting],
-            useFactory: async (optionsFactory: MailerOptionsFactory): Promise<MailerModuleOptions> => await optionsFactory.createMailerOptions()
+            useFactory: async (optionsFactory: MailerOptionsFactory) => {
+                return nodemailer.createTransport({...(await optionsFactory.createMailerOptions()), secure: true})
+            }
         }
     }
 }

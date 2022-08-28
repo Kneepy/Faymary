@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Confirmations } from "src/entity";
 import { Repository } from "typeorm";
-import { ConfirmationsInput, ConfirmationsArgs } from "../dto";
+import { ConfirmationsInput, ConfirmationsArgs, FindOneOptions } from "../dto";
 
 @Injectable()
 export class ConfirmationsService {
@@ -14,8 +14,14 @@ export class ConfirmationsService {
         return await this.repository.save(input)
     }
 
-    async findOne(args: ConfirmationsArgs): Promise<Confirmations> {
-        return await this.repository.findOne({where: args})
+    public async findOne(
+        args: ConfirmationsArgs,
+        options: FindOneOptions
+    ): Promise<Confirmations> {
+        return await this.repository.findOne({
+            where: args,
+            ...options
+        });
     }
 
     async delete(id: string) {

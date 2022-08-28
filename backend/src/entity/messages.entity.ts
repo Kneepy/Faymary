@@ -6,7 +6,8 @@ import {
     JoinColumn,
     OneToOne
 } from "typeorm";
-import { Dialogs, Users } from "./";
+import { Users } from "./users.entity";
+import { Dialogs } from "./dialogs.entity";
 
 @Entity()
 export class Messages {

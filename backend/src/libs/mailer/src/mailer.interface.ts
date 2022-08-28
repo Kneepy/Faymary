@@ -1,8 +1,10 @@
 import { ModuleMetadata, Type } from "@nestjs/common"
 
 export interface MailerModuleOptions {
+    service: string 
     host: string
     port: number
+    secure: boolean
     auth: {
         user: string
         pass: string

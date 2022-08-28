@@ -10,5 +10,5 @@ export const EXPIRES_IN_CONFORMATION = 300000 // 5 min
 
 export const MAIL_HOST = "smtp.gmail.com"
 export const MAIL_PORT = 465
-export const MAIL_ACCOUNT_PASS = "tgazfbnbvnzjypyg"
+export const MAIL_ACCOUNT_PASS = "rhwdejvnmlrfgtgn"
 export const MAIL_ACCOUNT_USER = "ilyafamin4@gmail.com"

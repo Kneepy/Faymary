@@ -7,6 +7,7 @@ export class MailerService {
     constructor(@Inject(MAILER_MODULE) private mailer: Mail) {}
 
     async send(options: Mail.Options) {
-        return await this.mailer.sendMail(options)
+        console.log(this.mailer)
+        return await this.mailer.sendMail(options) 
     }
 }

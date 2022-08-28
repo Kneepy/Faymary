@@ -7,8 +7,9 @@ import {
     OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
-import { Files, Dialogs } from "./";
 import { Sessions } from "./sessions.entity";
+import { Dialogs } from "./dialogs.entity"
+import { Files } from "./files.entity"
 
 @Entity()
 export class Users {
