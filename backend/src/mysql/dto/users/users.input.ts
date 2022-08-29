@@ -16,5 +16,5 @@ export class UsersInput {
 
     @IsString()
     @IsNotEmpty()
-    userName: string
+    userName: string;
 }

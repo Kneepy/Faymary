@@ -7,12 +7,13 @@ import { ConfigService, ConfigModule } from "src/config";
 
 @Module({
     imports: [
-        MySqlModule, AuthModule, 
         MailerModule.registerAsync({
             imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => configService.getMailerOptions(),
             inject: [ConfigService],
-            useFactory: (configService: ConfigService) => configService.getMailerOptions()
-        })
+        }),
+        MySqlModule,
+        AuthModule,
     ],
     controllers: [...Object.values(controllers)]
 })

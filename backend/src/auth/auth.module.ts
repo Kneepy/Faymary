@@ -15,7 +15,7 @@ const guards = Object.values(AllGuards);
             useFactory: (configService: ConfigService) =>
                 configService.getJwtOptions(),
             inject: [ConfigService]
-        }),
+        })
     ],
     providers: [AuthService, ...guards],
     exports: [AuthService, ...guards]

@@ -3,28 +3,23 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { JwtModuleOptions } from "@nestjs/jwt";
 import {
     EXPIRENS_IN_ACCESS_TOKEN,
-    MAIL_ACCOUNT_PASS,
-    MAIL_ACCOUNT_USER,
-    MAIL_HOST,
-    MAIL_PORT,
-    SECRET_ACCESS_JWT
+    SECRET_ACCESS_JWT,
+    SMTP
 } from "../config.constants";
 import { MailerModuleOptions } from "@lib/mailer";
 
 @Injectable()
 export class ConfigService {
-
     // mailer connaction data
     getMailerOptions = (): MailerModuleOptions => ({
-        service: MAIL_HOST,
-        host: MAIL_HOST,
-        port: MAIL_PORT,
+        host: SMTP.HOST,
+        port: SMTP.PORT,
         secure: true,
         auth: {
-            user: MAIL_ACCOUNT_USER,
-            pass: MAIL_ACCOUNT_PASS
+            user: SMTP.USER,
+            pass: SMTP.PASS
         }
-    })
+    });
 
     // mysql connaction data
     getMySqlConnectionData = (): TypeOrmModuleOptions => ({

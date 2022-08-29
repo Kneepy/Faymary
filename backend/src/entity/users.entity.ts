@@ -8,8 +8,8 @@ import {
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Sessions } from "./sessions.entity";
-import { Dialogs } from "./dialogs.entity"
-import { Files } from "./files.entity"
+import { Dialogs } from "./dialogs.entity";
+import { Files } from "./files.entity";
 
 @Entity()
 export class Users {
@@ -25,8 +25,8 @@ export class Users {
     @Column({ nullable: false })
     lastName: string;
 
-    @Column({nullable: false})
-    password: string
+    @Column({ nullable: false })
+    password: string;
 
     @Column({ nullable: false, default: false })
     isActive: boolean;

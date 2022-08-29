@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+    forwardRef,
+    Inject,
+    Injectable,
+    UnauthorizedException
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_ACCESS_JWT, SECRET_REFRESH_JWT } from "src/config";

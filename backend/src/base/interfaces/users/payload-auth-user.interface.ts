@@ -1,6 +1,6 @@
-import { Users } from "src/entity"
+import { Users } from "src/entity";
 
 export interface PayloadAuthUser {
-    user: Users
-    token: string   
+    user: Users;
+    token: string;
 }

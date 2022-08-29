@@ -1,10 +1,30 @@
-import { BadRequestException, Body, Controller, Get, GoneException, Inject, NotFoundException, Patch, Post, Query, Req, Res, UnauthorizedException } from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Get,
+    GoneException,
+    Inject,
+    NotFoundException,
+    Patch,
+    Post,
+    Query,
+    Req,
+    Res,
+    UnauthorizedException
+} from "@nestjs/common";
 import { AddUserAccountDto, CreateUserDto, LoginUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql/providers/users.service";
 import { AuthService, DisableAuth } from "src/auth";
 import { ICustomRequest, ICustomResponse } from "src/common/types";
-import { INVALID_PASSWORD, USER_ALREADY_EXIST_EMAIL_ERROR, USER_NOT_FOUND_EMAIL, UtilService, WAITING_TIME_EXPIRED_CONFIRM } from "src/common";
+import {
+    INVALID_PASSWORD,
+    USER_ALREADY_EXIST_EMAIL_ERROR,
+    USER_NOT_FOUND_EMAIL,
+    UtilService,
+    WAITING_TIME_EXPIRED_CONFIRM
+} from "src/common";
 import { MailerService } from "@lib/mailer";
 import { PayloadAuthUser } from "../interfaces";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
@@ -17,45 +37,39 @@ export class UserController {
         private userService: UsersService,
         private confirmationService: ConfirmationsService,
         private mailerService: MailerService,
-        private authService: AuthService,
+        private authService: AuthService
     ) {}
 
     @Post("/create")
     @DisableAuth()
-    public async createUser(
-        @Body() body: CreateUserDto
-    ): Promise<string> {
-        const existUser = await this.userService.findOne({email: body.email})
+    public async createUser(@Body() body: CreateUserDto): Promise<string> {
+        const existUser = await this.userService.findOne({ email: body.email });
 
-        if(!!existUser) {
-            throw new BadRequestException(USER_ALREADY_EXIST_EMAIL_ERROR)
+        if (!!existUser) {
+            throw new BadRequestException(USER_ALREADY_EXIST_EMAIL_ERROR);
         }
 
         body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(2));
-        
-        const lastName = body.email.split("@")[0]
-        const user = await this.userService.create({...body, lastName});
-        
-        return await this.setConfirmation(user)
+
+        const lastName = body.email.split("@")[0];
+        const user = await this.userService.create({ ...body, lastName });
+
+        return await this.setConfirmation(user);
     }
 
     @Post("/login")
     @DisableAuth()
-    public async loginUser(
-        @Body() body: LoginUserDto
-    ): Promise<string> {
-        const user = await this.userService.findOne({email: body.email})
+    public async loginUser(@Body() body: LoginUserDto): Promise<string> {
+        const user = await this.userService.findOne({ email: body.email });
 
-        if(!!user) {
-            if(bcrypt.compareSync(body.password, user.password)) {
-                return await this.setConfirmation(user)
+        if (!!user) {
+            if (bcrypt.compareSync(body.password, user.password)) {
+                return await this.setConfirmation(user);
+            } else {
+                throw new UnauthorizedException(INVALID_PASSWORD);
             }
-            else {
-                throw new UnauthorizedException(INVALID_PASSWORD)
-            }
-        }
-        else {
-            throw new NotFoundException(USER_NOT_FOUND_EMAIL)
+        } else {
+            throw new NotFoundException(USER_NOT_FOUND_EMAIL);
         }
     }
 
@@ -67,13 +81,18 @@ export class UserController {
         @Req() req: ICustomRequest,
         @Res({ passthrough: true }) res: ICustomResponse
     ): Promise<PayloadAuthUser> {
-        const confirmation = await this.confirmationService.findOne({id: confirmationId}, {relations: ["user"]})
+        const confirmation = await this.confirmationService.findOne(
+            { id: confirmationId },
+            { relations: ["user"] }
+        );
 
-        if(confirmation.code === confirmationCode && confirmation.expirensIn <= Date.now()) {
-            return await this.setUser({req, res}, confirmation.user)
-        }
-        else {
-            throw new GoneException(WAITING_TIME_EXPIRED_CONFIRM)
+        if (
+            confirmation.code === confirmationCode &&
+            confirmation.expirensIn <= Date.now()
+        ) {
+            return await this.setUser({ req, res }, confirmation.user);
+        } else {
+            throw new GoneException(WAITING_TIME_EXPIRED_CONFIRM);
         }
     }
 
@@ -88,27 +107,30 @@ export class UserController {
     wd() {
         this.mailerService.send({
             from: "Faymary <ilyafamin4@gmail.com>",
-            to: "ilyafamin4@gmail.com",
+            to: "vadimakovlev79449@gmail.com",
             subject: "Account Confirmation",
-            text: "code",
-        })
+            text: "code"
+        });
     }
 
     private async setConfirmation(user: Users): Promise<string> {
-        const code = `${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
-        const confirm = await this.confirmationService.create({code, user})
+        const code = `${Math.floor(Math.random() * 10000)}`;
+        const confirm = await this.confirmationService.create({ code, user });
 
         this.mailerService.send({
             from: "Faymary <ilyafamin4@gmail.com>",
             to: user.email,
             subject: "Account Confirmation",
-            text: code,
-        })
+            text: code
+        });
 
-        return confirm.id
+        return confirm.id;
     }
 
-    private async setUser({req, res}: {req: ICustomRequest, res: ICustomResponse}, user): Promise<PayloadAuthUser> {
+    private async setUser(
+        { req, res }: { req: ICustomRequest; res: ICustomResponse },
+        user
+    ): Promise<PayloadAuthUser> {
         const accessToken = { userId: user.id };
         const refreshToken = {
             userId: user.id,
@@ -129,7 +151,7 @@ export class UserController {
             secure: true,
             maxAge: EXPIRENS_IN_REFRESH_TOKEN
         });
-        req.headers.authorization = tokens.accessToken
+        req.headers.authorization = tokens.accessToken;
 
         return {
             user,

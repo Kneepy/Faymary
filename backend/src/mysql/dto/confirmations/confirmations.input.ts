@@ -5,9 +5,9 @@ import { Users } from "src/entity";
 export class ConfirmationsInput {
     @IsString()
     @IsNotEmpty()
-    code: string
+    code: string;
 
     @Type(() => Users)
     @IsNotEmpty()
-    user: Users
+    user: Users;
 }

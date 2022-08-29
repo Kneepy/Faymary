@@ -1,14 +1,20 @@
 import { EXPIRES_IN_CONFORMATION } from "src/config";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToOne,
+    PrimaryGeneratedColumn
+} from "typeorm";
 import { Users } from "./users.entity";
 
 @Entity()
 export class Confirmations {
     @PrimaryGeneratedColumn("uuid")
-    id: string
+    id: string;
 
-    @Column({nullable: false})
-    code: string
+    @Column({ nullable: false })
+    code: string;
 
     @Column({
         nullable: false,
@@ -22,5 +28,5 @@ export class Confirmations {
 
     @OneToOne(() => Users)
     @JoinColumn()
-    user: Users
+    user: Users;
 }

@@ -15,7 +15,7 @@ export function middlware(app: INestApplication): INestApplication {
         req.useragent = ua;
         if (!req.session) req.session = {};
         req.session.useragent = JSON.stringify(ua, null, "  ");
-        
+
         next();
     });
 

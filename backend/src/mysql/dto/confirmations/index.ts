@@ -1,2 +1,2 @@
-export * from "./confirmations.input"
-export * from "./confirmations.args"
+export * from "./confirmations.input";
+export * from "./confirmations.args";

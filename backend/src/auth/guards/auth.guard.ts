@@ -7,7 +7,7 @@ import {
     Injectable,
     CanActivate,
     ExecutionContext,
-    UnauthorizedException,
+    UnauthorizedException
 } from "@nestjs/common";
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql/providers/session.service";
@@ -41,7 +41,7 @@ export class AuthGuard implements CanActivate {
             }
 
             this.authService.verifyAccessToken(headers.authorization) &&
-            this.authService.verifyRefreshToken(req.cookie.refreshToken);
+                this.authService.verifyRefreshToken(req.cookie.refreshToken);
 
             return true;
         } catch (e) {
@@ -53,7 +53,9 @@ export class AuthGuard implements CanActivate {
                 { id: req.cookie.refreshToken },
                 { relations: ["user"] }
             );
-            const deleteOutdatedSession = await this.sessionService.delete(session.id);
+            const deleteOutdatedSession = await this.sessionService.delete(
+                session.id
+            );
 
             const fingerprint = req.headers.fingerprint;
             const ip =
