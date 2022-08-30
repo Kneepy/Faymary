@@ -4,10 +4,10 @@ import {
     Controller,
     Get,
     GoneException,
-    Inject,
     NotFoundException,
     Patch,
     Post,
+    Put,
     Query,
     Req,
     Res,
@@ -22,7 +22,6 @@ import {
     INVALID_PASSWORD,
     USER_ALREADY_EXIST_EMAIL_ERROR,
     USER_NOT_FOUND_EMAIL,
-    UtilService,
     WAITING_TIME_EXPIRED_CONFIRM
 } from "src/common";
 import { MailerService } from "@lib/mailer";
@@ -66,7 +65,7 @@ export class UserController {
         return await this.setConfirmation(user);
     }
 
-    @Post("/login")
+    @Put("/login")
     @DisableAuth()
     public async loginUser(@Body() body: LoginUserDto): Promise<string> {
         const user = await this.userService.findOne({ email: body.email });
@@ -105,6 +104,14 @@ export class UserController {
             throw new GoneException(WAITING_TIME_EXPIRED_CONFIRM);
         }
     }
+
+    @Get("/confirmation/generate")
+    public async getConifrmation(@Query("confirmation") confirmationId: string): Promise<string> {
+        const confirmation = await this.confirmationService.findOne({id: confirmationId}, {relations: ["user"]})
+        await this.confirmationService.delete(confirmationId)
+        
+        return await this.setConfirmation(confirmation.user)
+    }   
 
     @Patch("/add-account")
     public async addAccount(
@@ -145,7 +152,7 @@ export class UserController {
     }
 
     private async setConfirmation(user: Users): Promise<string> {
-        const code = `${Math.floor(Math.random() * 10000)}`;
+        const code = `${1000 + Math.floor(Math.random() * 10000)}`;
         const confirm = await this.confirmationService.create({ code, user });
 
         this.mailerService.send({
@@ -159,7 +166,7 @@ export class UserController {
     }
 
     private async logOutUser({req, res}: ReqAndRes) {
-        await this.sessionService.delete(req.cookie[REFRESH_TOKEN_COOKIE])
+        await this.sessionService.delete(req.cookies[REFRESH_TOKEN_COOKIE])
         res.cookie(REFRESH_TOKEN_COOKIE, "", {
             httpOnly: true,
             secure: true,

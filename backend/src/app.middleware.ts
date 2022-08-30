@@ -10,6 +10,7 @@ export function middlware(app: INestApplication): INestApplication {
 
     app.use(cookieParser());
 
+    // user-agent
     app.use((req: ICustomRequest, res, next) => {
         const ua = uaParser(req.headers["user-agent"]);
         req.useragent = ua;
@@ -19,6 +20,7 @@ export function middlware(app: INestApplication): INestApplication {
         next();
     });
 
+    // auth header
     app.use((req: ICustomRequest, res: ICustomResponse, next) => {
         if (req.headers.authorization) {
             const authorizationHeader = req.headers.authorization.split(" ");

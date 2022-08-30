@@ -30,40 +30,41 @@ export class AuthGuard implements CanActivate {
         const headers: ICustomHeaders = req.headers;
 
         try {
-            // req.cookie?.*
-            if (!req.cookie.refreshToken) {
+            // req.cookies?.*
+            if (!req.cookies?.refreshToken || !headers.authorization) {
                 if (
-                    !this.reflector.get(USE_AUTH_METADATA, context.getHandler())
+                    this.reflector.get(USE_AUTH_METADATA, context.getHandler()) === false
                 ) {
                     return true;
                 } else {
                     throw new UnauthorizedException();
                 }
             }
-            req.user = this.authService.verifyAccessToken(headers.authorization) 
             
-            this.authService.verifyRefreshToken(req.cookie.refreshToken);
+            req.user = this.authService.verifyAccessToken(headers.authorization) 
+            this.authService.verifyRefreshToken(req.cookies.refreshToken);
 
             return true;
         } catch (e) {
-            if (!req.cookie.refreshToken) {
+            if (!req.cookies.refreshToken) {
                 throw new UnauthorizedException();
             }
-
+            
             const session = await this.sessionService.findOne(
-                { id: req.cookie.refreshToken },
+                { id: req.cookies.refreshToken },
                 { relations: ["user"] }
             );
+            
             const deleteOutdatedSession = await this.sessionService.delete(
                 session.id
             );
 
-            const fingerprint = req.headers.fingerprint;
+            const fingerprint = req.headers.fingerprint ?? "";
             const ip =
                 req.ip ||
                 req.headers["x-forwarded-for"] ||
                 req.socket.remoteAddress;
-
+            
             if (session.fingerprint !== fingerprint || session.ip !== ip) {
                 throw new UnauthorizedException();
             }
@@ -87,6 +88,8 @@ export class AuthGuard implements CanActivate {
             });
             
             headers.authorization = tokens.accessToken;
+            
+            req.user = this.authService.verifyAccessToken(headers.authorization) 
 
             return true;
         }

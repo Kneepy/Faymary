@@ -1,12 +1,10 @@
 import {
-    forwardRef,
-    Inject,
     Injectable,
     UnauthorizedException
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
-import { SECRET_ACCESS_JWT, SECRET_REFRESH_JWT } from "src/config";
+import { SECRET_ACCESS_JWT } from "src/config";
 import { Sessions } from "src/entity";
 import { UsersService } from "../mysql/providers/users.service";
 import { SessionService } from "src/mysql/providers/session.service";
@@ -51,8 +49,8 @@ export class AuthService {
             { id: refresh_token },
             { relations: ["user"] }
         );
-
-        if (session.expirensIn > Date.now()) {
+        
+        if (session.expirensIn < Date.now()) {
             throw new UnauthorizedException();
         }
 

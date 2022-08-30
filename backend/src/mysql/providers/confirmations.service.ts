@@ -17,7 +17,7 @@ export class ConfirmationsService {
 
     public async findOne(
         args: ConfirmationsArgs,
-        options: FindOneOptions
+        options?: FindOneOptions
     ): Promise<Confirmations> {
         return await this.repository.findOne({
             where: args,
