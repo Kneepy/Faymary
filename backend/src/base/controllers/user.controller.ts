@@ -26,9 +26,9 @@ import {
     WAITING_TIME_EXPIRED_CONFIRM
 } from "src/common";
 import { MailerService } from "@lib/mailer";
-import { PayloadAuthUser } from "../interfaces";
+import { PayloadAuthUser, ReqAndRes } from "../interfaces";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
-import { ConfirmationsService } from "src/mysql";
+import { ConfirmationsService, SessionService } from "src/mysql";
 import { Users } from "src/entity";
 
 @Controller("user")
@@ -36,9 +36,18 @@ export class UserController {
     constructor(
         private userService: UsersService,
         private confirmationService: ConfirmationsService,
+        private sessionService: SessionService,
         private mailerService: MailerService,
         private authService: AuthService
     ) {}
+
+    @Get("/")
+    public async getUser(
+        @Query("relations") rel: string[],
+        @Req() req: ICustomRequest
+    ): Promise<Users> { 
+        return await this.userService.findOne({id: req.user.userId}, {relations: rel})
+    }
 
     @Post("/create")
     @DisableAuth()
@@ -97,22 +106,43 @@ export class UserController {
         }
     }
 
-    @Get("")
-    public async getUser(
-        @Req() req: ICustomRequest,
-        @Res({ passthrough: true }) res: ICustomResponse
-    ) {
-        const user = await this.authService.verifyAccessToken(req.headers.authorization)
-        
-        return await this.userService.findOne({id: user.userId})
-    }
-
     @Patch("/add-account")
     public async addAccount(
         @Req() req: ICustomRequest,
         @Res() res: ICustomResponse,
         @Body() body: AddUserAccountDto
-    ) {}
+    ): Promise<Users> {
+        const addedAccount = await this.userService.findOne({email: body.email})
+
+        if (!!addedAccount) {
+            if (bcrypt.compareSync(body.password, addedAccount.password)) {
+                const user = await this.userService.findOne({id: req.user.userId}, {relations: ["accounts"]})
+                user.accounts.push(addedAccount)
+                return await this.userService.update(user)
+            } else {
+                throw new UnauthorizedException(INVALID_PASSWORD);
+            }
+        } else {
+            throw new NotFoundException(USER_NOT_FOUND_EMAIL);
+        }
+    }
+
+    @Get("/change-account")
+    public async changeAccount(
+        @Req() req: ICustomRequest,
+        @Res() res: ICustomResponse,
+        @Query("account_id") accountId: string
+    ) {
+        const user = await this.userService.findOne({id: req.user.userId}, {relations: ["accounts"]})
+        const account = user.accounts.find((val) => val.id === accountId)
+
+        if(!!account.id) {
+            await this.logOutUser({req, res})
+            return await this.setUser({req, res}, account)        
+        } else {
+            throw new UnauthorizedException()
+        }
+    }
 
     private async setConfirmation(user: Users): Promise<string> {
         const code = `${Math.floor(Math.random() * 10000)}`;
@@ -128,8 +158,17 @@ export class UserController {
         return confirm.id;
     }
 
+    private async logOutUser({req, res}: ReqAndRes) {
+        await this.sessionService.delete(req.cookie[REFRESH_TOKEN_COOKIE])
+        res.cookie(REFRESH_TOKEN_COOKIE, "", {
+            httpOnly: true,
+            secure: true,
+            maxAge: 0
+        });
+    }
+
     private async setUser(
-        { req, res }: { req: ICustomRequest; res: ICustomResponse },
+        { req, res }: ReqAndRes,
         user: Users
     ): Promise<PayloadAuthUser> {
         const accessToken = { userId: user.id };

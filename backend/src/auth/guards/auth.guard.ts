@@ -30,7 +30,8 @@ export class AuthGuard implements CanActivate {
         const headers: ICustomHeaders = req.headers;
 
         try {
-            if (!req.cookie?.refreshToken) {
+            // req.cookie?.*
+            if (!req.cookie.refreshToken) {
                 if (
                     !this.reflector.get(USE_AUTH_METADATA, context.getHandler())
                 ) {
@@ -39,9 +40,9 @@ export class AuthGuard implements CanActivate {
                     throw new UnauthorizedException();
                 }
             }
+            req.user = this.authService.verifyAccessToken(headers.authorization) 
             
-            this.authService.verifyAccessToken(headers.authorization) &&
-                this.authService.verifyRefreshToken(req.cookie.refreshToken);
+            this.authService.verifyRefreshToken(req.cookie.refreshToken);
 
             return true;
         } catch (e) {
@@ -84,6 +85,7 @@ export class AuthGuard implements CanActivate {
                 secure: true,
                 maxAge: EXPIRENS_IN_REFRESH_TOKEN
             });
+            
             headers.authorization = tokens.accessToken;
 
             return true;

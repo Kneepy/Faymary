@@ -1,3 +1,3 @@
 export class FindOneOptions {
-    relations: [string];
+    relations: string[];
 }

@@ -6,7 +6,7 @@ import * as uaParser from "ua-parser-js";
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
 
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({whitelist: true}))
 
     app.use(cookieParser());
 

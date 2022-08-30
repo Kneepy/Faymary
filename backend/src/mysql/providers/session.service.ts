@@ -40,7 +40,7 @@ export class SessionService {
         });
     }
 
-    public async delete(sessionId) {
+    public async delete(sessionId: string) {
         return await this.repository.delete({ id: sessionId });
     }
 }

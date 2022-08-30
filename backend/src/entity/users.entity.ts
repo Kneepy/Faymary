@@ -3,7 +3,6 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
-    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
@@ -28,9 +27,6 @@ export class Users {
     @Column({ nullable: false })
     password: string;
 
-    @Column({ nullable: false, default: false })
-    isActive: boolean;
-
     @OneToMany(() => Files, (files: Files) => files.user)
     files: Files[];
 
@@ -46,4 +42,7 @@ export class Users {
 
     @OneToMany(() => Sessions, (session: Sessions) => session.user)
     sessions: Sessions[];
+
+    @ManyToMany(() => Users, (users: Users) => users.accounts)
+    accounts: Users[]
 }
