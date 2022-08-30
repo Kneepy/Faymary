@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
                     throw new UnauthorizedException();
                 }
             }
-
+            
             this.authService.verifyAccessToken(headers.authorization) &&
                 this.authService.verifyRefreshToken(req.cookie.refreshToken);
 

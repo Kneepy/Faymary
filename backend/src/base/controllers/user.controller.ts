@@ -90,10 +90,21 @@ export class UserController {
             confirmation.code === confirmationCode &&
             confirmation.expirensIn <= Date.now()
         ) {
+            await this.confirmationService.delete(confirmation.id)
             return await this.setUser({ req, res }, confirmation.user);
         } else {
             throw new GoneException(WAITING_TIME_EXPIRED_CONFIRM);
         }
+    }
+
+    @Get("")
+    public async getUser(
+        @Req() req: ICustomRequest,
+        @Res({ passthrough: true }) res: ICustomResponse
+    ) {
+        const user = await this.authService.verifyAccessToken(req.headers.authorization)
+        
+        return await this.userService.findOne({id: user.userId})
     }
 
     @Patch("/add-account")
@@ -102,16 +113,6 @@ export class UserController {
         @Res() res: ICustomResponse,
         @Body() body: AddUserAccountDto
     ) {}
-
-    @Get("/test")
-    wd() {
-        this.mailerService.send({
-            from: "Faymary <ilyafamin4@gmail.com>",
-            to: "vadimakovlev79449@gmail.com",
-            subject: "Account Confirmation",
-            text: "code"
-        });
-    }
 
     private async setConfirmation(user: Users): Promise<string> {
         const code = `${Math.floor(Math.random() * 10000)}`;
@@ -129,7 +130,7 @@ export class UserController {
 
     private async setUser(
         { req, res }: { req: ICustomRequest; res: ICustomResponse },
-        user
+        user: Users
     ): Promise<PayloadAuthUser> {
         const accessToken = { userId: user.id };
         const refreshToken = {
@@ -139,8 +140,9 @@ export class UserController {
                 req.ip ||
                 req.headers["x-forwarded-for"] ||
                 req.socket.remoteAddress,
-            fingerprint: req.headers.fingerprint
+            fingerprint: req.headers.fingerprint || ""
         };
+
         const tokens = await this.authService.getTokens(
             accessToken,
             refreshToken
