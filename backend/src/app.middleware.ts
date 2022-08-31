@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { ICustomRequest, ICustomResponse } from "./common";
 import * as uaParser from "ua-parser-js";
+import { WsAdapter } from "./ws.adapter";
 
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
@@ -9,6 +10,8 @@ export function middlware(app: INestApplication): INestApplication {
     app.useGlobalPipes(new ValidationPipe({whitelist: true}))
 
     app.use(cookieParser());
+    
+    app.useWebSocketAdapter(new WsAdapter())
 
     // user-agent
     app.use((req: ICustomRequest, res, next) => {

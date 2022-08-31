@@ -7,7 +7,7 @@ import {
     Injectable,
     CanActivate,
     ExecutionContext,
-    UnauthorizedException
+    UnauthorizedException,
 } from "@nestjs/common";
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql/providers/session.service";
@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
 
         try {
             // req.cookies?.*
-            if (!req.cookies?.refreshToken || !headers.authorization) {
+            if (!req.cookies.refreshToken || !headers.authorization) {
                 if (
                     this.reflector.get(USE_AUTH_METADATA, context.getHandler()) === false
                 ) {

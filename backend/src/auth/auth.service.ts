@@ -1,13 +1,16 @@
 import {
+    forwardRef,
+    Inject,
     Injectable,
+    Session,
     UnauthorizedException
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_ACCESS_JWT } from "src/config";
-import { Sessions } from "src/entity";
 import { UsersService } from "../mysql/providers/users.service";
 import { SessionService } from "src/mysql/providers/session.service";
+import { Sessions } from "src/entity";
 
 @Injectable()
 export class AuthService {
