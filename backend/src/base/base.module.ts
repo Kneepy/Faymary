@@ -3,6 +3,7 @@ import { AuthModule } from "src/auth";
 import { MailerModule } from "@lib/mailer";
 import { MySqlModule } from "src/mysql";
 import * as controllers from "./controllers";
+import * as gateways from "./gateways"
 import { ConfigService, ConfigModule } from "src/config";
 
 @Module({
@@ -15,6 +16,7 @@ import { ConfigService, ConfigModule } from "src/config";
         MySqlModule,
         AuthModule,
     ],
+    providers: [...Object.values(gateways)],
     controllers: [...Object.values(controllers)]
 })
 export class BaseModule {}
