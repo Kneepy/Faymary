@@ -8,6 +8,7 @@ async function bootstrap(): Promise<string> {
 
     middlware(app);
 
+    await app.startAllMicroservices()
     await app.listen(process.env.PORT || 5000);
 
     return app.getUrl();

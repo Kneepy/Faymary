@@ -2,7 +2,9 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { ICustomRequest, ICustomResponse } from "./common";
 import * as uaParser from "ua-parser-js";
-import { WsAdapter } from "./ws.adapter";
+import { Transport } from "@nestjs/microservices";
+import { WsAdapter } from "@nestjs/platform-ws";
+
 
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
@@ -11,7 +13,14 @@ export function middlware(app: INestApplication): INestApplication {
 
     app.use(cookieParser());
 
-    app.useWebSocketAdapter(new WsAdapter());
+    app.connectMicroservice({
+        transport: Transport.RMQ,
+        options: {
+            urls: [`amqp://localhost:5672`],
+            queue: 'websocket',
+            queueOptions: { durable: false },
+        },
+    })
 
     // user-agent
     app.use((req: ICustomRequest, res, next) => {
