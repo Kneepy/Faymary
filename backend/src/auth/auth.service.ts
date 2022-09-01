@@ -52,7 +52,7 @@ export class AuthService {
             { id: refresh_token },
             { relations: ["user"] }
         );
-        
+
         if (session.expirensIn < Date.now()) {
             throw new UnauthorizedException();
         }

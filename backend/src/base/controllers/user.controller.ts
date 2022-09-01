@@ -44,8 +44,11 @@ export class UserController {
     public async getUser(
         @Query("relations") rel: string[],
         @Req() req: ICustomRequest
-    ): Promise<Users> { 
-        return await this.userService.findOne({id: req.user.userId}, {relations: rel})
+    ): Promise<Users> {
+        return await this.userService.findOne(
+            { id: req.user.userId },
+            { relations: rel }
+        );
     }
 
     @Post("/create")
@@ -98,7 +101,7 @@ export class UserController {
             confirmation.code === confirmationCode &&
             confirmation.expirensIn <= Date.now()
         ) {
-            await this.confirmationService.delete(confirmation.id)
+            await this.confirmationService.delete(confirmation.id);
             return await this.setUser({ req, res }, confirmation.user);
         } else {
             throw new GoneException(WAITING_TIME_EXPIRED_CONFIRM);
@@ -106,12 +109,17 @@ export class UserController {
     }
 
     @Get("/confirmation/generate")
-    public async getConifrmation(@Query("confirmation") confirmationId: string): Promise<string> {
-        const confirmation = await this.confirmationService.findOne({id: confirmationId}, {relations: ["user"]})
-        await this.confirmationService.delete(confirmationId)
-        
-        return await this.setConfirmation(confirmation.user)
-    }   
+    public async getConifrmation(
+        @Query("confirmation") confirmationId: string
+    ): Promise<string> {
+        const confirmation = await this.confirmationService.findOne(
+            { id: confirmationId },
+            { relations: ["user"] }
+        );
+        await this.confirmationService.delete(confirmationId);
+
+        return await this.setConfirmation(confirmation.user);
+    }
 
     @Patch("/add-account")
     public async addAccount(
@@ -119,13 +127,18 @@ export class UserController {
         @Res() res: ICustomResponse,
         @Body() body: AddUserAccountDto
     ): Promise<Users> {
-        const addedAccount = await this.userService.findOne({email: body.email})
+        const addedAccount = await this.userService.findOne({
+            email: body.email
+        });
 
         if (!!addedAccount) {
             if (bcrypt.compareSync(body.password, addedAccount.password)) {
-                const user = await this.userService.findOne({id: req.user.userId}, {relations: ["accounts"]})
-                user.accounts.push(addedAccount)
-                return await this.userService.update(user)
+                const user = await this.userService.findOne(
+                    { id: req.user.userId },
+                    { relations: ["accounts"] }
+                );
+                user.accounts.push(addedAccount);
+                return await this.userService.update(user);
             } else {
                 throw new UnauthorizedException(INVALID_PASSWORD);
             }
@@ -140,14 +153,17 @@ export class UserController {
         @Res() res: ICustomResponse,
         @Query("account_id") accountId: string
     ) {
-        const user = await this.userService.findOne({id: req.user.userId}, {relations: ["accounts"]})
-        const account = user.accounts.find((val) => val.id === accountId)
+        const user = await this.userService.findOne(
+            { id: req.user.userId },
+            { relations: ["accounts"] }
+        );
+        const account = user.accounts.find(val => val.id === accountId);
 
-        if(!!account.id) {
-            await this.logOutUser({req, res})
-            return await this.setUser({req, res}, account)        
+        if (!!account.id) {
+            await this.logOutUser({ req, res });
+            return await this.setUser({ req, res }, account);
         } else {
-            throw new UnauthorizedException()
+            throw new UnauthorizedException();
         }
     }
 
@@ -165,8 +181,8 @@ export class UserController {
         return confirm.id;
     }
 
-    private async logOutUser({req, res}: ReqAndRes) {
-        await this.sessionService.delete(req.cookies[REFRESH_TOKEN_COOKIE])
+    private async logOutUser({ req, res }: ReqAndRes) {
+        await this.sessionService.delete(req.cookies[REFRESH_TOKEN_COOKIE]);
         res.cookie(REFRESH_TOKEN_COOKIE, "", {
             httpOnly: true,
             secure: true,

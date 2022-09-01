@@ -7,7 +7,7 @@ import {
     Injectable,
     CanActivate,
     ExecutionContext,
-    UnauthorizedException,
+    UnauthorizedException
 } from "@nestjs/common";
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql/providers/session.service";
@@ -33,15 +33,20 @@ export class AuthGuard implements CanActivate {
             // req.cookies?.*
             if (!req.cookies.refreshToken || !headers.authorization) {
                 if (
-                    this.reflector.get(USE_AUTH_METADATA, context.getHandler()) === false
+                    this.reflector.get(
+                        USE_AUTH_METADATA,
+                        context.getHandler()
+                    ) === false
                 ) {
                     return true;
                 } else {
                     throw new UnauthorizedException();
                 }
             }
-            
-            req.user = this.authService.verifyAccessToken(headers.authorization) 
+
+            req.user = this.authService.verifyAccessToken(
+                headers.authorization
+            );
             this.authService.verifyRefreshToken(req.cookies.refreshToken);
 
             return true;
@@ -49,12 +54,12 @@ export class AuthGuard implements CanActivate {
             if (!req.cookies.refreshToken) {
                 throw new UnauthorizedException();
             }
-            
+
             const session = await this.sessionService.findOne(
                 { id: req.cookies.refreshToken },
                 { relations: ["user"] }
             );
-            
+
             const deleteOutdatedSession = await this.sessionService.delete(
                 session.id
             );
@@ -64,7 +69,7 @@ export class AuthGuard implements CanActivate {
                 req.ip ||
                 req.headers["x-forwarded-for"] ||
                 req.socket.remoteAddress;
-            
+
             if (session.fingerprint !== fingerprint || session.ip !== ip) {
                 throw new UnauthorizedException();
             }
@@ -86,10 +91,12 @@ export class AuthGuard implements CanActivate {
                 secure: true,
                 maxAge: EXPIRENS_IN_REFRESH_TOKEN
             });
-            
+
             headers.authorization = tokens.accessToken;
-            
-            req.user = this.authService.verifyAccessToken(headers.authorization) 
+
+            req.user = this.authService.verifyAccessToken(
+                headers.authorization
+            );
 
             return true;
         }

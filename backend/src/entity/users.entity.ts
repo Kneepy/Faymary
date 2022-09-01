@@ -44,5 +44,5 @@ export class Users {
     sessions: Sessions[];
 
     @ManyToMany(() => Users, (users: Users) => users.accounts)
-    accounts: Users[]
+    accounts: Users[];
 }

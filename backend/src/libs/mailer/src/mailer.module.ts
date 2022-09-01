@@ -20,10 +20,11 @@ export class MailerModule {
             providers: [
                 {
                     provide: MAILER_MODULE,
-                    useValue: nodemailer.createTransport({
-                        ...mailerOptions,
-                        secure: true
-                    }) as Mail || {}
+                    useValue:
+                        (nodemailer.createTransport({
+                            ...mailerOptions,
+                            secure: true
+                        }) as Mail) || {}
                 }
             ]
         };
@@ -31,42 +32,42 @@ export class MailerModule {
 
     static registerAsync(options: MailerModuleAsyncOptions): DynamicModule {
         return {
-          module: MailerModule,
-          imports: options.imports || [],
-          providers: this.createAsyncProviders(options)
+            module: MailerModule,
+            imports: options.imports || [],
+            providers: this.createAsyncProviders(options)
         };
     }
-    
-      private static createAsyncProviders(
+
+    private static createAsyncProviders(
         options: MailerModuleAsyncOptions
-      ): Provider[] {
+    ): Provider[] {
         if (options.useExisting || options.useFactory) {
-          return [this.createAsyncOptionsProvider(options)];
+            return [this.createAsyncOptionsProvider(options)];
         }
         return [
-          this.createAsyncOptionsProvider(options),
-          {
-            provide: options.useClass,
-            useClass: options.useClass
-          }
+            this.createAsyncOptionsProvider(options),
+            {
+                provide: options.useClass,
+                useClass: options.useClass
+            }
         ];
-      }
-    
-      private static createAsyncOptionsProvider(
+    }
+
+    private static createAsyncOptionsProvider(
         options: MailerModuleAsyncOptions
-      ): Provider {
+    ): Provider {
         if (options.useFactory) {
-          return {
-            provide: MAILER_MODULE,
-            useFactory: options.useFactory,
-            inject: options.inject || []
-          };
+            return {
+                provide: MAILER_MODULE,
+                useFactory: options.useFactory,
+                inject: options.inject || []
+            };
         }
         return {
-          provide: MAILER_MODULE,
-          useFactory: async (optionsFactory: MailerOptionsFactory) =>
-            await optionsFactory.createMailerOptions(),
-          inject: [options.useExisting || options.useClass]
+            provide: MAILER_MODULE,
+            useFactory: async (optionsFactory: MailerOptionsFactory) =>
+                await optionsFactory.createMailerOptions(),
+            inject: [options.useExisting || options.useClass]
         };
-      }
+    }
 }

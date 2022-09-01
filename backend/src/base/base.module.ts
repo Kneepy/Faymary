@@ -3,18 +3,19 @@ import { AuthModule } from "src/auth";
 import { MailerModule } from "@lib/mailer";
 import { MySqlModule } from "src/mysql";
 import * as controllers from "./controllers";
-import * as gateways from "./gateways"
+import * as gateways from "./gateways";
 import { ConfigService, ConfigModule } from "src/config";
 
 @Module({
     imports: [
         MailerModule.registerAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => configService.getMailerOptions(),
-            inject: [ConfigService],
+            useFactory: (configService: ConfigService) =>
+                configService.getMailerOptions(),
+            inject: [ConfigService]
         }),
         MySqlModule,
-        AuthModule,
+        AuthModule
     ],
     providers: [...Object.values(gateways)],
     controllers: [...Object.values(controllers)]

@@ -4,6 +4,6 @@ import { SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 export class UserGateway {
     @SubscribeMessage("test")
     test() {
-        console.log("wfefefwef")
+        console.log("wfefefwef");
     }
 }

@@ -14,6 +14,6 @@ export interface ICustomRequest extends Request {
     socket?: net.Socket;
     headers: ICustomHeaders;
     user: {
-        userId: string
-    }
+        userId: string;
+    };
 }
