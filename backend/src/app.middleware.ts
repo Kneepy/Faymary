@@ -13,6 +13,8 @@ export function middlware(app: INestApplication): INestApplication {
 
     app.use(cookieParser());
 
+    app.useWebSocketAdapter(new WsAdapter(app))
+
     app.connectMicroservice({
         transport: Transport.RMQ,
         options: {

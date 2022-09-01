@@ -2,8 +2,12 @@ import { Module } from "@nestjs/common";
 import { AuthModule } from "src/auth";
 import { MailerModule } from "@lib/mailer";
 import { MySqlModule } from "src/mysql";
-import * as controllers from "./controllers";
+import * as Controllers from "./controllers";
+import * as Gateways from "./gateways";
 import { ConfigService, ConfigModule } from "src/config";
+
+const AllGateways = Object.values(Gateways)
+const AllControllers = Object.values(Controllers)
 
 @Module({
     imports: [
@@ -16,6 +20,7 @@ import { ConfigService, ConfigModule } from "src/config";
         MySqlModule,
         AuthModule
     ],
-    controllers: [...Object.values(controllers)]
+    providers: AllGateways,
+    controllers: AllControllers
 })
 export class BaseModule {}
