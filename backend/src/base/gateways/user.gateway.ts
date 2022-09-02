@@ -1,12 +1,12 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from "@nestjs/websockets";
-import type * as WebSocket from "ws"
+import { ICustomSocket } from "../interfaces";
 
 @WebSocketGateway()
 export class UserGateway {
     @SubscribeMessage("subscribeUser")
-    async subscribeUser(@MessageBody() body, @ConnectedSocket() socket: WebSocket.WebSocket): Promise<WsResponse<any>> {
+    async subscribeUser(@MessageBody() body, @ConnectedSocket() socket: ICustomSocket): Promise<WsResponse<any>> {
         //console.log(socket)
-
+        socket.emit()
         return {
             event: "",
             data: ""
