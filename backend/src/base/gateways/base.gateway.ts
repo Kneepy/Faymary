@@ -1,31 +1,43 @@
-import { UseFilters } from "@nestjs/common";
+import { UseFilters, UseGuards } from "@nestjs/common";
 import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway } from "@nestjs/websockets";
 import { IncomingMessage } from "http";
-import { AuthService } from "src/auth";
+import { AuthService, WsAuthGuard } from "src/auth";
+import { ICustomSocket } from "src/common";
 import { WsExeptionFilter } from "../filters";
-import { ICustomSocket } from "../interfaces";
-import { WsUsersStore } from "./ws-users.store";
 
 @WebSocketGateway({cors: {origin: "*"}})
-@UseFilters(new WsExeptionFilter())
+@UseFilters(WsExeptionFilter)
+@UseGuards(WsAuthGuard)
 export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         private authService: AuthService
     ) {}
 
-    private usersStore: WsUsersStore = new WsUsersStore()
+    private users: Map<string, ICustomSocket> = new Map()
 
-    async handleConnection(@ConnectedSocket() socket: ICustomSocket, ...[args]: [IncomingMessage]) {
+    public findUser(socketId: string): ICustomSocket {
+        return this.users.get(socketId)
+    }
+
+    public setUser(socketId: string, socket: ICustomSocket) {
+        return this.users.set(socketId, socket)
+    }
+
+    public deleteUser(socketId: string) {
+        return this.users.delete(socketId)
+    }
+
+    handleConnection(@ConnectedSocket() socket: ICustomSocket, ...[args]: [IncomingMessage]) {
         // for tests
-        // socket.id = args.headers.authorization?.split(" ")[1] ?? args.headers.authorization
+        socket.id = args.headers.authorization?.split(" ")[1] ?? args.headers.authorization
 
-        const token = args.headers.authorization?.split(" ")[1] ?? args.headers.authorization
-        socket.id = this.authService.verifyAccessToken(token).userId
+        //const token = args.headers.authorization?.split(" ")[1] ?? args.headers.authorization
+        //socket.id = this.authService.verifyAccessToken(token).userId
 
-        this.usersStore.set(socket.id, socket)
+        this.users.set(socket.id, socket)
     }
 
     handleDisconnect(@ConnectedSocket() socket: ICustomSocket) {
-        this.usersStore.delete(socket.id)
+        this.users.delete(socket.id)
     }
 }
