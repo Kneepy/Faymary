@@ -4,11 +4,10 @@ import { ConfigService } from "src/config/providers/config.service";
 import { ConfigModule } from "src/config/config.module";
 import {
     Users,
-    Files,
-    Dialogs,
-    Messages,
     Sessions,
-    Confirmations
+    Confirmations,
+    Activity,
+    Notifications
 } from "src/entity";
 import * as allMySQLProviders from "./providers";
 
@@ -24,11 +23,10 @@ const providers = [...Object.values(allMySQLProviders)];
         }),
         TypeOrmModule.forFeature([
             Users,
-            Files,
-            Dialogs,
-            Messages,
             Sessions,
-            Confirmations
+            Confirmations,
+            Activity,
+            Notifications
         ])
     ],
     providers: providers,

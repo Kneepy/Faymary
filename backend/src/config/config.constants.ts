@@ -7,6 +7,7 @@ export const EXPIRENS_IN_ACCESS_TOKEN = 900000; // 15min
 export const REFRESH_TOKEN_COOKIE = "refreshToken";
 
 export const EXPIRES_IN_CONFORMATION = 300000; // 5 min
+export const EXPIRES_IN_NOTIFICATION = 86400000 * 2 // 2d  
 
 export const SMTP = {
     HOST: "smtp.gmail.com",

@@ -4,11 +4,12 @@ import {
     JoinTable,
     ManyToMany,
     OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Sessions } from "./sessions.entity";
-import { Dialogs } from "./dialogs.entity";
-import { Files } from "./files.entity";
+import { Activity } from "./activity.entity";
+import { Notifications } from "./notifications.entity";
 
 @Entity()
 export class Users {
@@ -27,9 +28,6 @@ export class Users {
     @Column({ nullable: false })
     password: string;
 
-    @OneToMany(() => Files, (files: Files) => files.user)
-    files: Files[];
-
     @ManyToMany(() => Users, (user: Users) => user.subscriptions)
     @JoinTable()
     subscribers: Users[];
@@ -37,12 +35,15 @@ export class Users {
     @ManyToMany(() => Users, (user: Users) => user.subscribers)
     subscriptions: Users[];
 
-    @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.users)
-    dialogs: Dialogs[];
-
     @OneToMany(() => Sessions, (session: Sessions) => session.user)
     sessions: Sessions[];
 
     @ManyToMany(() => Users, (users: Users) => users.accounts)
     accounts: Users[];
+
+    @OneToOne(() => Activity, (activity: Activity) => activity.user)
+    activity: Activity
+
+    @OneToMany(() => Notifications, (notifications: Notifications) => notifications.user)
+    notifications: Notifications[]
 }
