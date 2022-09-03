@@ -1,2 +1,2 @@
-export * from "./user.gateway"
-export * from "./base.gateway"
+export * from "./user.gateway";
+export * from "./base.gateway";

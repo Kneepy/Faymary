@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty } from "class-validator";
-import { Users } from "src/entity";
+import { Users } from "src/entity/users.entity";
 
 export class SessionsInput {
     @IsNotEmpty()

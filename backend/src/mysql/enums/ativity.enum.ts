@@ -1,4 +1,4 @@
 export enum ActivityEnum {
-    OFFLINE = "OFFLINE", 
+    OFFLINE = "OFFLINE",
     ONLINE = "ONLINE"
 }

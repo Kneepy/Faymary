@@ -2,14 +2,12 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigService } from "src/config/providers/config.service";
 import { ConfigModule } from "src/config/config.module";
-import {
-    Users,
-    Sessions,
-    Confirmations,
-    Activity,
-    Notifications
-} from "src/entity";
 import * as allMySQLProviders from "./providers";
+import { Users } from "src/entity/users.entity";
+import { Sessions } from "src/entity/sessions.entity";
+import { Confirmations } from "src/entity/confirmations.entity";
+import { Activity } from "src/entity/activity.entity";
+import { Notifications } from "src/entity/notifications.entity";
 
 const providers = [...Object.values(allMySQLProviders)];
 

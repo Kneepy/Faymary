@@ -42,8 +42,11 @@ export class Users {
     accounts: Users[];
 
     @OneToOne(() => Activity, (activity: Activity) => activity.user)
-    activity: Activity
+    activity: Activity;
 
-    @OneToMany(() => Notifications, (notifications: Notifications) => notifications.user)
-    notifications: Notifications[]
+    @OneToMany(
+        () => Notifications,
+        (notifications: Notifications) => notifications.user
+    )
+    notifications: Notifications[];
 }

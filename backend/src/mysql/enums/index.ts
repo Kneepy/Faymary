@@ -1,2 +1,2 @@
-export * from "./ativity.enum"
-export * from "./notification-type.enum"
+export * from "./ativity.enum";
+export * from "./notification-type.enum";

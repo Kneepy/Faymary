@@ -1,4 +1,4 @@
 export enum NotificationEnumType {
-    SUB = "SUB", 
+    SUB = "SUB",
     UNSUB = "UNSUB"
 }

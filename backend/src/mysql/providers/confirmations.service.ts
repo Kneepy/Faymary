@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Confirmations } from "src/entity";
+import { Confirmations } from "src/entity/confirmations.entity";
 import { Repository } from "typeorm";
 import { ConfirmationsInput, ConfirmationsArgs, FindOneOptions } from "../dto";
 

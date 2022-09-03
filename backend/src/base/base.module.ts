@@ -6,8 +6,8 @@ import * as Controllers from "./controllers";
 import * as Gateways from "./gateways";
 import { ConfigService, ConfigModule } from "src/config";
 
-const AllGateways = Object.values(Gateways)
-const AllControllers = Object.values(Controllers)
+const AllGateways = Object.values(Gateways);
+const AllControllers = Object.values(Controllers);
 
 @Module({
     imports: [

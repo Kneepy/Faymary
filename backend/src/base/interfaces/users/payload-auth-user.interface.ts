@@ -1,4 +1,4 @@
-import { Users } from "src/entity";
+import { Users } from "src/entity/users.entity";
 
 export interface PayloadAuthUser {
     user: Users;

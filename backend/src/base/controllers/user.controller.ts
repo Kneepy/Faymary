@@ -28,7 +28,7 @@ import { MailerService } from "@lib/mailer";
 import { PayloadAuthUser, ReqAndRes } from "../interfaces";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { ConfirmationsService, SessionService } from "src/mysql";
-import { Users } from "src/entity";
+import { Users } from "src/entity/users.entity";
 
 @Controller("user")
 export class UserController {
@@ -98,8 +98,8 @@ export class UserController {
         );
 
         if (
-            confirmation.code === confirmationCode &&
-            confirmation.expirensIn <= Date.now()
+            confirmation.code == confirmationCode &&
+            Number(confirmation.expirensIn) > Date.now()
         ) {
             await this.confirmationService.delete(confirmation.id);
             return await this.setUser({ req, res }, confirmation.user);

@@ -19,7 +19,7 @@ export class Confirmations {
     @Column({
         nullable: false,
         type: "bigint",
-        default: Date.now() + EXPIRES_IN_CONFORMATION
+        default: () => Date.now() + EXPIRES_IN_CONFORMATION
     })
     expirensIn: number;
 

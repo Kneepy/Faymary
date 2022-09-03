@@ -1,5 +1,5 @@
-export * from "./users.service";
-export * from "./session.service";
-export * from "./confirmations.service";
-export * from "./activity.service"
-export * from "./notifcations.service"
+export { NotificationsService } from "./notifcations.service";
+export { SessionService } from "./session.service";
+export { UsersService } from "./users.service";
+export { ConfirmationsService } from "./confirmations.service";
+export { ActivityService } from "./activity.service";

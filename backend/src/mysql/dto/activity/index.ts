@@ -1,2 +1,2 @@
-export * from "./activity.args"
-export * from "./activity.input"
+export * from "./activity.args";
+export * from "./activity.input";

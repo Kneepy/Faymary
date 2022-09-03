@@ -5,24 +5,24 @@ import { Users } from "./users.entity";
 @Entity()
 export class Activity {
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
 
     @Column()
-    state: ActivityEnum
+    state: ActivityEnum;
 
     @Column({
         nullable: false,
         type: "bigint",
         default: Date.now()
     })
-    start: number
+    start: number;
 
     @Column({
         nullable: true,
         type: "bigint"
     })
-    end: number
+    end: number;
 
     @OneToOne(() => Users, (user: Users) => user.activity)
-    user: Users
+    user: Users;
 }

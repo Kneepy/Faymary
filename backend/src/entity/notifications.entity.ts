@@ -6,7 +6,7 @@ import { Users } from "./users.entity";
 @Entity()
 export class Notifications {
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
 
     @Column({
         nullable: false,
@@ -19,11 +19,11 @@ export class Notifications {
     createdAt: number;
 
     @Column()
-    type: NotificationEnumType
+    type: NotificationEnumType;
 
     @ManyToOne(() => Users, (user: Users) => user.notifications)
-    user: Users
+    user: Users;
 
     @ManyToOne(() => Users)
-    sender: Users
+    sender: Users;
 }

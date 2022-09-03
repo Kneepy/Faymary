@@ -1,1 +1,1 @@
-export * from "./notification.input"
+export * from "./notification.input";

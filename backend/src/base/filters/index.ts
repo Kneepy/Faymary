@@ -1,1 +1,1 @@
-export * from "./ws-exeption.filter"
+export * from "./ws-exeption.filter";

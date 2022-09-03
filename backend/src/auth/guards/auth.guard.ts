@@ -28,9 +28,7 @@ export class AuthGuard implements CanActivate {
         const res: ICustomResponse = http.getResponse();
         const req: ICustomRequest = http.getRequest();
         const headers: ICustomHeaders = req.headers;
-
-        console.log(headers)
-
+        
         try {
             // req.cookies?.*
             if (!req.cookies.refreshToken || !headers.authorization) {

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Sessions } from "src/entity";
+import { Sessions } from "src/entity/sessions.entity";
 import { Repository } from "typeorm";
 import {
     FindOneOptions,
@@ -8,6 +8,8 @@ import {
     SessionsArgs,
     SessionsInput
 } from "../dto";
+
+//console.log(Sessions)
 
 @Injectable()
 export class SessionService {
