@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
         const res: ICustomResponse = http.getResponse();
         const req: ICustomRequest = http.getRequest();
         const headers: ICustomHeaders = req.headers;
-        
+
         try {
             // req.cookies?.*
             if (!req.cookies.refreshToken || !headers.authorization) {
@@ -63,8 +63,7 @@ export class AuthGuard implements CanActivate {
             const deleteOutdatedSession = await this.sessionService.delete(
                 session.id
             );
-
-            const fingerprint = req.headers.fingerprint ?? "";
+            const fingerprint = req.headers.fingerprint || "";
             const ip =
                 req.ip ||
                 req.headers["x-forwarded-for"] ||

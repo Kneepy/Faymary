@@ -12,8 +12,7 @@ export class Activity {
 
     @Column({
         nullable: false,
-        type: "bigint",
-        default: Date.now()
+        type: "bigint"
     })
     start: number;
 

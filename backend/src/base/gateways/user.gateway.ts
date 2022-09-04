@@ -33,7 +33,10 @@ export class UserGateway {
         @MessageBody() body: SubscribeUserDto,
         @ConnectedSocket() socket: ICustomSocket
     ): Promise<WsResponse<any>> {
-        const author = await this.usersService.findOne({ id: body.userId }, { relations: ["subscribers", "notifications"] });
+        const author = await this.usersService.findOne(
+            { id: body.userId },
+            { relations: ["subscribers", "notifications"] }
+        );
         const authorSocket = this.baseGateway.findUser(body.userId);
         const subscriber = await this.usersService.findOne({ id: socket.id });
         const subscriberIndex = author.subscribers.indexOf(subscriber);

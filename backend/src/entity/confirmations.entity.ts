@@ -1,4 +1,3 @@
-import { EXPIRES_IN_CONFORMATION } from "src/config";
 import {
     Column,
     Entity,
@@ -19,11 +18,10 @@ export class Confirmations {
     @Column({
         nullable: false,
         type: "bigint",
-        default: () => Date.now() + EXPIRES_IN_CONFORMATION
     })
     expirensIn: number;
 
-    @Column({ nullable: false, type: "bigint", default: Date.now() })
+    @Column({ nullable: false, type: "bigint" })
     createdAt: number;
 
     @OneToOne(() => Users)

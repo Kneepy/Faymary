@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { EXPIRES_IN_CONFORMATION } from "src/config";
 import { Confirmations } from "src/entity/confirmations.entity";
 import { Repository } from "typeorm";
 import { ConfirmationsInput, ConfirmationsArgs, FindOneOptions } from "../dto";
@@ -12,7 +13,7 @@ export class ConfirmationsService {
     ) {}
 
     async create(input: ConfirmationsInput): Promise<Confirmations> {
-        return await this.repository.save(input);
+        return await this.repository.save({...input, createdAt: Date.now(), expiresIn: Date.now() + EXPIRES_IN_CONFORMATION});
     }
 
     public async findOne(

@@ -26,7 +26,7 @@ export class ActivityService {
     }
 
     public async create(input: ActivityInputCreate): Promise<Activity> {
-        return await this.repository.save(input);
+        return await this.repository.save({...input, start: Date.now()});
     }
 
     public async update(input: ActivityInputUpdate): Promise<Activity> {

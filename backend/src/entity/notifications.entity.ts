@@ -10,12 +10,11 @@ export class Notifications {
 
     @Column({
         nullable: false,
-        type: "bigint",
-        default: Date.now() + EXPIRES_IN_NOTIFICATION
+        type: "bigint"
     })
     expirensIn: number;
 
-    @Column({ nullable: false, type: "bigint", default: Date.now() })
+    @Column({ nullable: false, type: "bigint" })
     createdAt: number;
 
     @Column()

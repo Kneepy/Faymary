@@ -18,12 +18,11 @@ export class Sessions {
 
     @Column({
         nullable: false,
-        type: "bigint",
-        default: Date.now() + EXPIRENS_IN_REFRESH_TOKEN
+        type: "bigint"
     })
     expirensIn: number;
 
-    @Column({ nullable: false, type: "bigint", default: Date.now() })
+    @Column({ nullable: false, type: "bigint" })
     createdAt: number;
 
     @ManyToOne(() => Users, (user: Users) => user.sessions)

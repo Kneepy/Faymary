@@ -42,9 +42,9 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
         try {
             const token =
-                args.headers.authorization?.split(" ")[1] ??
+                args.headers.authorization.split(" ")[1] ??
                 args.headers.authorization;
-            socket.id = this.authService.verifyAccessToken(token)?.userId;
+            socket.id = this.authService.verifyAccessToken(token).userId;
 
             const user = await this.usersService.findOne(
                 { id: socket.id },
