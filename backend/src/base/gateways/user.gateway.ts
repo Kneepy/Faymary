@@ -80,7 +80,7 @@ export class UserGateway {
 
         return {
             event: Events.REFRESH_USER,
-            data: "efwefwefwef"
+            data: await this.usersService.findOne({id: socket.id}, {relations: ["subscriptions"]}) // возможно это нужно заменить
         };
     }
 }
