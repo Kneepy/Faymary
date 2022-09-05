@@ -29,7 +29,7 @@ export class ConfigService {
         username: "root",
         password: "root",
         database: "faymary",
-        synchronize: true,
+        synchronize: false,
         entities: ["dist/**/*.entity{.ts,.js}"]
     });
 

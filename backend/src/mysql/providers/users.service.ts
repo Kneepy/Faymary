@@ -16,8 +16,12 @@ export class UsersService {
         args: UsersArgs,
         options?: FindOneOptions
     ): Promise<Users> {
+        console.log({
+            where: args,
+            ...options
+        })
         return await this.repository.findOne({
-            where: this.util.removeUndefined(args),
+            where: args,
             ...options
         });
     }

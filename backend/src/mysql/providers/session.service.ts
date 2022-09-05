@@ -19,7 +19,7 @@ export class SessionService {
     ) {}
 
     public async create(args: SessionsInput): Promise<Sessions> {
-        return await this.repository.save({...args, createdAt: Date.now(), expiresIn: Date.now() + EXPIRENS_IN_REFRESH_TOKEN});
+        return await this.repository.save({...args, createdAt: Date.now(), expirensIn: Date.now() + EXPIRENS_IN_REFRESH_TOKEN});
     }
 
     public async find(

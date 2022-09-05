@@ -66,7 +66,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 });
             }
         } catch (e) {
-            socket.send(new WsException(e));
+            socket.send(JSON.stringify(new WsException(e)));
         }
 
         this.users.set(socket.id, socket);

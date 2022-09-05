@@ -168,7 +168,7 @@ export class UserController {
     }
 
     private async setConfirmation(user: Users): Promise<string> {
-        const code = `${1000 + Math.floor(Math.random() * 10000)}`;
+        const code = `${Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000}`;
         const confirm = await this.confirmationService.create({ code, user });
 
         this.mailerService.send({

@@ -13,7 +13,7 @@ export class ConfirmationsService {
     ) {}
 
     async create(input: ConfirmationsInput): Promise<Confirmations> {
-        return await this.repository.save({...input, createdAt: Date.now(), expiresIn: Date.now() + EXPIRES_IN_CONFORMATION});
+        return await this.repository.save({...input, createdAt: Date.now(), expirensIn: Date.now() + EXPIRES_IN_CONFORMATION});
     }
 
     public async findOne(
