@@ -35,13 +35,13 @@ export class UserGateway {
     ): Promise<WsResponse<any>> {
         const author = await this.usersService.findOne(
             { id: body.userId },
-            { relations: ["subscribers", "notifications"] }
+            { relations: ["subscribers", "notifications", "notifications.sender"] }
         );
         const authorSocket = this.baseGateway.findUser(body.userId);
         const subscriber = await this.usersService.findOne({ id: socket.id });
-        const subscriberIndex = author.subscribers.indexOf(subscriber);
-
-        if (!!subscriberIndex) {
+        const subscriberIndex = author.subscribers.indexOf(author.subscribers.find((e) => e.id === subscriber.id));
+ 
+        if (subscriberIndex !== -1) {
             author.subscribers.splice(subscriberIndex, 1);
         } else {
             author.subscribers.push(subscriber);
@@ -50,7 +50,7 @@ export class UserGateway {
                 !author.notifications.filter(
                     value =>
                         value.expirensIn > Date.now() &&
-                        value.sender === subscriber &&
+                        value.sender.id === subscriber.id &&
                         value.type === NotificationEnumType.SUB
                 ).length
             ) {
@@ -59,21 +59,22 @@ export class UserGateway {
                     sender: subscriber,
                     type: NotificationEnumType.SUB
                 });
+                author.notifications.push(notification)
 
                 if (authorSocket) {
-                    authorSocket.send({
+                    authorSocket.send(JSON.stringify({
                         event: Events.NEW_NOTIFICATION,
                         data: notification
-                    });
+                    }));
                 }
             }
         }
 
         if (authorSocket) {
-            authorSocket.send({
+            authorSocket.send(JSON.stringify({
                 event: Events.REFRESH_USER,
                 data: await this.usersService.update(author)
-            });
+            }));
         } else {
             await this.usersService.update(author);
         }

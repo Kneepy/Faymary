@@ -35,18 +35,19 @@ export class Users {
     @ManyToMany(() => Users, (user: Users) => user.subscribers)
     subscriptions: Users[];
 
-    @OneToMany(() => Sessions, (session: Sessions) => session.user)
+    @OneToMany(() => Sessions, (session: Sessions) => session.user, {cascade: true})
     sessions: Sessions[];
 
     @ManyToMany(() => Users, (users: Users) => users.accounts)
     accounts: Users[];
 
-    @OneToOne(() => Activity, (activity: Activity) => activity.user)
+    @OneToOne(() => Activity, (activity: Activity) => activity.user, {cascade: true})
     activity: Activity;
 
     @OneToMany(
         () => Notifications,
-        (notifications: Notifications) => notifications.user
+        (notifications: Notifications) => notifications.user,
+        {cascade: true}
     )
     notifications: Notifications[];
 }

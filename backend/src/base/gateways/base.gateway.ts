@@ -1,4 +1,4 @@
-import { UseFilters, UseGuards } from "@nestjs/common";
+import { Injectable, UseFilters, UseGuards } from "@nestjs/common";
 import {
     ConnectedSocket,
     OnGatewayConnection,
@@ -12,6 +12,7 @@ import { ICustomSocket } from "src/common";
 import { ActivityEnum, ActivityService, UsersService } from "src/mysql";
 import { WsExeptionFilter } from "../filters";
 
+@Injectable()
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
 @UseFilters(WsExeptionFilter)
 @UseGuards(WsAuthGuard)
