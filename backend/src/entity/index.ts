@@ -3,3 +3,4 @@ export { Sessions } from "./sessions.entity";
 export { Confirmations } from "./confirmations.entity";
 export { Activity } from "./activity.entity";
 export { Notifications } from "./notifications.entity";
+export { UserSettings } from "./user-settings.entity"

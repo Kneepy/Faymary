@@ -1,9 +1,9 @@
-import { EXPIRENS_IN_REFRESH_TOKEN } from "src/config";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Lifetime } from "./common";
 import { Users } from "./users.entity";
 
 @Entity()
-export class Sessions {
+export class Sessions extends Lifetime {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -15,15 +15,6 @@ export class Sessions {
 
     @Column({ nullable: false })
     ip: string;
-
-    @Column({
-        nullable: false,
-        type: "bigint"
-    })
-    expirensIn: number;
-
-    @Column({ nullable: false, type: "bigint" })
-    createdAt: number;
 
     @ManyToOne(() => Users, (user: Users) => user.sessions)
     user: Users;

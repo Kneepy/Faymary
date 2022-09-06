@@ -10,6 +10,7 @@ import {
 import { Sessions } from "./sessions.entity";
 import { Activity } from "./activity.entity";
 import { Notifications } from "./notifications.entity";
+import { UserSettings } from "./user-settings.entity";
 
 @Entity()
 export class Users {
@@ -39,6 +40,7 @@ export class Users {
     sessions: Sessions[];
 
     @ManyToMany(() => Users, (users: Users) => users.accounts)
+    @JoinTable()
     accounts: Users[];
 
     @OneToOne(() => Activity, (activity: Activity) => activity.user, {cascade: true})
@@ -50,4 +52,7 @@ export class Users {
         {cascade: true}
     )
     notifications: Notifications[];
+
+    @OneToOne(() => UserSettings, (settings: UserSettings) => settings.user, {cascade: true})
+    settings: UserSettings
 }

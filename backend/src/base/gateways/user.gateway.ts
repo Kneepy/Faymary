@@ -35,7 +35,7 @@ export class UserGateway {
     ): Promise<WsResponse<any>> {
         const author = await this.usersService.findOne(
             { id: body.userId },
-            { relations: ["subscribers", "notifications", "notifications.sender"] }
+            { relations: ["subscribers", "settings", "notifications", "notifications.sender"] }
         );
         const authorSocket = this.baseGateway.findUser(body.userId);
         const subscriber = await this.usersService.findOne({ id: socket.id });
@@ -47,6 +47,7 @@ export class UserGateway {
             author.subscribers.push(subscriber);
 
             if (
+                author.settings.subscriptionNotifications && 
                 !author.notifications.filter(
                     value =>
                         value.expirensIn > Date.now() &&
