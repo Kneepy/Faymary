@@ -84,6 +84,16 @@ export class UserController {
         }
     }
 
+    @Patch("/update")
+    public async updateUser(
+        @Req() req: ICustomRequest, 
+        @Body() body: Users
+    ): Promise<Users> {
+        // добавить проверки на пароль и т.п
+        const user = await this.userService.findOne({id: req.user.userId})
+        return await this.userService.update(Object.assign(user, body))
+    }
+
     @Get("/confirmation")
     @DisableAuth()
     public async getUserByConfirmation(
