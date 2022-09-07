@@ -1,8 +1,10 @@
 import type useragent from "ua-parser-js";
 import type net from "node:net";
 import { ICustomHeaders } from "./headers.type";
+import { Expose } from "class-transformer";
 
-export interface ICustomRequest extends Request {
+@Expose()
+export class ICustomRequest extends Request {
     ip: string;
     cookies: {
         refreshToken: string;

@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import { ICustomRequest, ICustomResponse } from "./common";
 import * as uaParser from "ua-parser-js";
@@ -8,7 +8,8 @@ import { WsAdapter } from "@nestjs/platform-ws";
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
 
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));  // { whitelist: true } нужно как-то фильтровать входные свойства
+    app.useGlobalInterceptors(new ClassSerializerInterceptor({excludeExtraneousValues: true}))
 
     app.use(cookieParser());
 

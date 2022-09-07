@@ -1,6 +1,7 @@
 import {
     BadRequestException,
     Body,
+    ClassSerializerInterceptor,
     Controller,
     Get,
     GoneException,
@@ -11,9 +12,11 @@ import {
     Query,
     Req,
     Res,
-    UnauthorizedException
+    SerializeOptions,
+    UnauthorizedException,
+    UseInterceptors
 } from "@nestjs/common";
-import { AddUserAccountDto, CreateUserDto, LoginUserDto } from "../dto/users";
+import { AddUserAccountDto, CreateUserDto, LoginUserDto, UpdateUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql/providers/users.service";
 import { AuthService, DisableAuth } from "src/auth";
@@ -29,6 +32,8 @@ import { PayloadAuthUser, ReqAndRes } from "../interfaces";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { ConfirmationsService, SessionService } from "src/mysql";
 import { Users } from "src/entity/users.entity";
+
+// нужно из всех ответов юзеру исключить пароль и т.п 
 
 @Controller("user")
 export class UserController {
@@ -87,10 +92,26 @@ export class UserController {
     @Patch("/update")
     public async updateUser(
         @Req() req: ICustomRequest, 
-        @Body() body: Users
+        @Body() body: UpdateUserDto
     ): Promise<Users> {
-        // добавить проверки на пароль и т.п
         const user = await this.userService.findOne({id: req.user.userId})
+
+        if (body.newPassword && body.oldPassword) {
+            if(bcrypt.compareSync(body.oldPassword, user.password)) {
+                body.password = body.newPassword
+            }
+            else {
+                throw new UnauthorizedException(INVALID_PASSWORD)
+            }
+        }
+        if (body.email !== user.email) {
+            const alredyExistUser = await this.userService.findOne({email: body.email}) 
+
+            if(alredyExistUser) {
+                throw new BadRequestException(USER_ALREADY_EXIST_EMAIL_ERROR)
+            }
+        }
+
         return await this.userService.update(Object.assign(user, body))
     }
 
