@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { ActivityEnum } from "src/mysql";
-import { Users } from "src/entity/users.entity";
+import { Users } from "src/entity/users/users.entity";
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class ActivityInputCreate {

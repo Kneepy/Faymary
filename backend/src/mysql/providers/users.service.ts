@@ -1,5 +1,5 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { Users } from "src/entity/users.entity";
+import { Users } from "src/entity/users/users.entity";
 import { Repository } from "typeorm";
 import { UsersArgs, UsersInput, FindOneOptions } from "../dto";
 import { UtilService } from "../../common";

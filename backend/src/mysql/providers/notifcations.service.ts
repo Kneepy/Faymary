@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EXPIRES_IN_NOTIFICATION } from "src/config";
-import { Notifications } from "src/entity/notifications.entity";
+import { Notifications } from "src/entity/users/notifications.entity";
 import { Repository } from "typeorm";
 import { NotificationInput } from "../dto";
 

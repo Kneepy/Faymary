@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EXPIRENS_IN_REFRESH_TOKEN } from "src/config";
-import { Sessions } from "src/entity/sessions.entity";
+import { Sessions } from "src/entity/users/sessions.entity";
 import { Repository } from "typeorm";
 import {
     FindOneOptions,

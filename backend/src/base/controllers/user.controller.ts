@@ -1,7 +1,6 @@
 import {
     BadRequestException,
     Body,
-    ClassSerializerInterceptor,
     Controller,
     Get,
     GoneException,
@@ -12,9 +11,7 @@ import {
     Query,
     Req,
     Res,
-    SerializeOptions,
     UnauthorizedException,
-    UseInterceptors
 } from "@nestjs/common";
 import { AddUserAccountDto, CreateUserDto, LoginUserDto, UpdateUserDto } from "../dto/users";
 import * as bcrypt from "bcryptjs";
@@ -31,10 +28,9 @@ import { MailerService } from "@lib/mailer";
 import { PayloadAuthUser, ReqAndRes } from "../interfaces";
 import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { ConfirmationsService, SessionService } from "src/mysql";
-import { Users } from "src/entity/users.entity";
+import { Users } from "src/entity/users/users.entity";
 
 // нужно из всех ответов юзеру исключить пароль и т.п 
-
 @Controller("user")
 export class UserController {
     constructor(

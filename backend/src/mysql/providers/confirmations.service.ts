@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EXPIRES_IN_CONFORMATION } from "src/config";
-import { Confirmations } from "src/entity/confirmations.entity";
+import { Confirmations } from "src/entity";
 import { Repository } from "typeorm";
 import { ConfirmationsInput, ConfirmationsArgs, FindOneOptions } from "../dto";
 

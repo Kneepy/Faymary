@@ -7,7 +7,7 @@ import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_ACCESS_JWT } from "src/config";
 import { UsersService } from "../mysql/providers/users.service";
 import { SessionService } from "src/mysql/providers/session.service";
-import { Sessions } from "src/entity/sessions.entity";
+import { Sessions } from "src/entity/users/sessions.entity";
 
 @Injectable()
 export class AuthService {

@@ -1,6 +1,2 @@
-export { Users } from "./users.entity";
-export { Sessions } from "./sessions.entity";
-export { Confirmations } from "./confirmations.entity";
-export { Activity } from "./activity.entity";
-export { Notifications } from "./notifications.entity";
-export { UserSettings } from "./user-settings.entity"
+export * from "./users"
+export * from "./posts"

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Activity } from "src/entity/activity.entity";
+import { Activity } from "src/entity/users/activity.entity";
 import { Repository } from "typeorm";
 import {
     ActivityArgs,

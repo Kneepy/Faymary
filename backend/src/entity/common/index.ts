@@ -1,1 +1,1 @@
-export { Lifetime } from "./lifetime.entity"
+export { Lifetime } from "./lifetime"
