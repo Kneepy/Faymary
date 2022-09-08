@@ -4,3 +4,6 @@ export * from "./confirmations";
 export * from "./activity";
 export * from "./notifications";
 export * from "./find.options";
+export * from "./posts"
+export * from "./files"
+export * from "./comments"

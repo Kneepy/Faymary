@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Files } from "../common";
 import { Users } from "../users";
 import { Posts } from "./post.entity";
@@ -18,7 +18,7 @@ export class Comments {
     @JoinColumn()
     user: Users
 
-    @ManyToMany(() => Comments)
+    @ManyToMany(() => Comments, {cascade: true})
     @JoinTable()
     answers: Comments[]
 

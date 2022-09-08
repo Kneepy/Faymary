@@ -19,7 +19,7 @@ export function middlware(app: INestApplication): INestApplication {
         transport: Transport.RMQ,
         options: {
             urls: [`amqp://localhost:5672`],
-            queue: "websocket",
+            queue: "base_queue",
             queueOptions: { durable: false }
         }
     });
