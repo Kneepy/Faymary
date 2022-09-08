@@ -12,6 +12,7 @@ import { Activity } from "./activity.entity";
 import { Notifications } from "./notifications.entity";
 import { UserSettings } from "./user-settings.entity";
 import { Posts } from "../posts/post.entity";
+import { Files } from "../common";
 
 @Entity()
 export class Users {
@@ -57,6 +58,9 @@ export class Users {
     @OneToOne(() => UserSettings, (settings: UserSettings) => settings.user, {cascade: true})
     settings: UserSettings
 
-    @OneToMany(() => Posts, (posts) => posts.user)
+    @OneToMany(() => Posts, (posts) => posts.user, {cascade: true})
     posts: Posts[]
+
+    @OneToMany(() => Files, (files: Files) => files.user, {cascade: true})
+    files: Files[]
 }
