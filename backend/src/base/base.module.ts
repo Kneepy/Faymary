@@ -5,6 +5,8 @@ import { MySqlModule } from "src/mysql";
 import * as Controllers from "./controllers";
 import * as Gateways from "./gateways";
 import { ConfigService, ConfigModule } from "src/config";
+import { MulterModule } from "@nestjs/platform-express";
+import { WriteFileInterceptor } from "./interceptors";
 
 const AllGateways = Object.values(Gateways);
 const AllControllers = Object.values(Controllers);
@@ -17,10 +19,15 @@ const AllControllers = Object.values(Controllers);
                 configService.getMailerOptions(),
             inject: [ConfigService]
         }),
+        MulterModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => configService.getMulterOptions(),
+            inject: [ConfigService]
+        }),
         MySqlModule,
         AuthModule
     ],
-    providers: AllGateways,
+    providers: [...AllGateways, WriteFileInterceptor],
     controllers: AllControllers
 })
 export class BaseModule {}

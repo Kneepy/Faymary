@@ -5,7 +5,7 @@ import { Repository, FindOneOptions } from "typeorm";
 import { FilesArgs, FilesInput } from "../dto";
 
 @Injectable()
-export class PostsService {
+export class FilesService {
     constructor(
         @InjectRepository(Files) private repository: Repository<Files>
     ) {}

@@ -9,7 +9,6 @@ import { Injectable } from "@nestjs/common";
 export class UsersService {
     constructor(
         @InjectRepository(Users) private repository: Repository<Users>,
-        private util: UtilService
     ) {}
 
     public async findOne(

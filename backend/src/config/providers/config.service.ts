@@ -4,9 +4,12 @@ import { JwtModuleOptions } from "@nestjs/jwt";
 import {
     EXPIRENS_IN_ACCESS_TOKEN,
     SECRET_ACCESS_JWT,
-    SMTP
+    SMTP,
+    STORE_FOLDER
 } from "../config.constants";
 import { MailerModuleOptions } from "@lib/mailer";
+import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
+import path from "path";
 
 @Injectable()
 export class ConfigService {
@@ -20,6 +23,14 @@ export class ConfigService {
             pass: SMTP.PASS
         }
     });
+
+    getStaticOptions = () => ([{
+        rootPath: "fefwfwf"
+    }])
+
+    getMulterOptions = (): MulterOptions => ({
+        dest: path.join(process.cwd(), STORE_FOLDER)
+    })
 
     // mysql connaction data
     getMySqlConnectionData = (): TypeOrmModuleOptions => ({
