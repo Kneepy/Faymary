@@ -50,7 +50,7 @@ export class AuthService {
             { relations: ["user"] }
         );
 
-        if (session.expirensIn < Date.now()) {
+        if (session?.expirensIn < Date.now()) {
             throw new UnauthorizedException();
         }
 

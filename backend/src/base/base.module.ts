@@ -25,7 +25,8 @@ const AllControllers = Object.values(Controllers);
             inject: [ConfigService]
         }),
         MySqlModule,
-        AuthModule
+        AuthModule,
+        ConfigModule
     ],
     providers: [...AllGateways, WriteFileInterceptor],
     controllers: AllControllers

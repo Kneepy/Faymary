@@ -19,10 +19,15 @@ export class PostController {
         @Req() req: ICustomRequest,
         @Body() body: CreatePostDto,
     ): Promise<Posts> {
+
+        console.log(req.user)
+        /*
         return await this.postsService.create({
             ...body,
             files: req.files.map(file => file.savedAs), 
             user: await this.usersService.findOne({id: req.user.userId})
         })
+        */
+        return new Posts()
     }
 }

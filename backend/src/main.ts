@@ -2,10 +2,6 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { middlware } from "./app.middleware";
 import { Logger } from "@nestjs/common";
-import path from "path";
-import { STORE_FOLDER } from "./config";
-
-console.log(path.join(process.cwd(), STORE_FOLDER))
 
 async function bootstrap(): Promise<string> {
     const app = await NestFactory.create(AppModule);

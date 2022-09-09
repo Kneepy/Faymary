@@ -12,13 +12,14 @@ import {
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql/providers/session.service";
 import { AuthService } from "../auth.service";
-import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
+import { ConfigService, EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { Reflector } from "@nestjs/core";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(
         private sessionService: SessionService,
+        private configService: ConfigService,
         private authService: AuthService,
         private reflector: Reflector
     ) {}
@@ -28,7 +29,7 @@ export class AuthGuard implements CanActivate {
         const res: ICustomResponse = http.getResponse();
         const req: ICustomRequest = http.getRequest();
         const headers: ICustomHeaders = req.headers;
- 
+
         try {
             // req.cookies?.*
             if (!req.cookies.refreshToken || !headers.authorization) {
@@ -85,11 +86,7 @@ export class AuthGuard implements CanActivate {
                 refreshSession
             );
 
-            res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
-                httpOnly: true,
-                secure: true,
-                maxAge: EXPIRENS_IN_REFRESH_TOKEN
-            });
+            res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, this.configService.getCookieOptions());
 
             headers.authorization = tokens.accessToken;
 

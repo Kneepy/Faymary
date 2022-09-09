@@ -26,7 +26,7 @@ import {
 } from "src/common";
 import { MailerService } from "@lib/mailer";
 import { PayloadAuthUser, ReqAndRes } from "../interfaces";
-import { EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
+import { ConfigService, EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
 import { ConfirmationsService, SessionService } from "src/mysql";
 import { Users } from "src/entity/users/users.entity";
 
@@ -36,6 +36,7 @@ export class UserController {
     constructor(
         private userService: UsersService,
         private confirmationService: ConfirmationsService,
+        private configService: ConfigService,
         private sessionService: SessionService,
         private mailerService: MailerService,
         private authService: AuthService
@@ -237,11 +238,7 @@ export class UserController {
             refreshToken
         );
 
-        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: EXPIRENS_IN_REFRESH_TOKEN
-        });
+        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, this.configService.getCookieOptions());
         req.headers.authorization = tokens.accessToken;
 
         return {

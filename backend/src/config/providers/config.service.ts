@@ -3,13 +3,15 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { JwtModuleOptions } from "@nestjs/jwt";
 import {
     EXPIRENS_IN_ACCESS_TOKEN,
+    EXPIRENS_IN_REFRESH_TOKEN,
     SECRET_ACCESS_JWT,
     SMTP,
     STORE_FOLDER
 } from "../config.constants";
 import { MailerModuleOptions } from "@lib/mailer";
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
-import path from "path";
+import * as path from "path";
+import * as multer from "multer";
 
 @Injectable()
 export class ConfigService {
@@ -25,11 +27,26 @@ export class ConfigService {
     });
 
     getStaticOptions = () => ([{
-        rootPath: "fefwfwf"
+        rootPath: path.join(process.cwd(), STORE_FOLDER)
     }])
 
     getMulterOptions = (): MulterOptions => ({
-        dest: path.join(process.cwd(), STORE_FOLDER)
+        dest: path.join(process.cwd(), STORE_FOLDER),
+        storage: multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, path.join(process.cwd(), STORE_FOLDER))
+            },
+            filename: (req, file, cb) => {
+                cb(null, Date.now() + path.extname(file.originalname))
+            }
+        })
+    })
+
+    getCookieOptions = () => ({
+        // prodaction all true
+        httpOnly: true, 
+        secure: false,
+        maxAge: EXPIRENS_IN_REFRESH_TOKEN
     })
 
     // mysql connaction data

@@ -10,6 +10,7 @@ const guards = Object.values(AllGuards);
 @Module({
     imports: [
         MySqlModule,
+        ConfigModule,
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) =>
