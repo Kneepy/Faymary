@@ -5,7 +5,7 @@ import {
     OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
-import { Lifetime } from "../common";
+import { Lifetime } from "../common/lifetime";
 import { Users } from "./users.entity";
 
 @Entity()

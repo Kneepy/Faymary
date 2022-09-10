@@ -4,8 +4,8 @@ export class FilesArgs {
     @IsOptional()
     @IsUUID()
     @IsString()
-    id: string
+    id: string;
 
     @IsOptional()
-    path: string
+    path: string;
 }

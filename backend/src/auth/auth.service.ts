@@ -1,7 +1,4 @@
-import {
-    Injectable,
-    UnauthorizedException
-} from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AccessToken, RefreshToken, Payload } from "./dto";
 import { SECRET_ACCESS_JWT } from "src/config";

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Comments } from "src/entity";
+import { Comments } from "src/entity/posts/comments.entity";
 import { Repository } from "typeorm";
 import { CommentsArgs, CommentsInput, FindOneOptions } from "../dto";
 
@@ -26,7 +26,7 @@ export class CommentsService {
         return await this.repository.find({
             where: args,
             ...options
-        })
+        });
     }
 
     public async update(args: Comments): Promise<Comments> {
@@ -34,7 +34,7 @@ export class CommentsService {
     }
 
     public async create(args: CommentsInput): Promise<Comments> {
-        return await this.repository.save({...args, createdAt: Date.now()});
+        return await this.repository.save({ ...args, createdAt: Date.now() });
     }
 
     public async remove(uuid: string): Promise<any> {

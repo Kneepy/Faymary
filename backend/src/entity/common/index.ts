@@ -1,2 +1,2 @@
-export { Lifetime } from "./lifetime"
-export { Files } from "./files.entity"
+export { Lifetime } from "./lifetime";
+export { Files } from "./files.entity";

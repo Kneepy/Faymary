@@ -8,13 +8,15 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectRepository(Users) private repository: Repository<Users>,
+        @InjectRepository(Users) private repository: Repository<Users>
     ) {}
 
     public async findOne(
         args: UsersArgs,
         options?: FindOneOptions
     ): Promise<Users> {
+
+        // delete password
         return await this.repository.findOne({
             where: args,
             ...options

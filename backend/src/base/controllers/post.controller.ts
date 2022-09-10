@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Req, UploadedFiles } from "@nestjs/common";
 import { ICustomFile, ICustomRequest } from "src/common";
-import { Posts } from "src/entity";
+import { Posts } from "src/entity/posts/post.entity";
 import { PostsService, UsersService } from "src/mysql";
 import { SaveFiles } from "../decorators";
 import { CreatePostDto } from "../dto/posts";
@@ -17,12 +17,13 @@ export class PostController {
     public async createPost(
         @UploadedFiles() files: ICustomFile[],
         @Req() req: ICustomRequest,
-        @Body() {title, desc}: CreatePostDto,
+        @Body() { title, desc }: CreatePostDto
     ): Promise<Posts> {
         return await this.postsService.create({
-            title, desc,
-            files: files.map(file => file.savedAs), 
-            user: await this.usersService.findOne({id: req.user.userId})
+            title,
+            desc,
+            files: files.map(file => file.savedAs),
+            user: await this.usersService.findOne({ id: req.user.userId })
         })
     }
 }

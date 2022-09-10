@@ -3,7 +3,7 @@ import type net from "node:net";
 import { ICustomHeaders } from "./headers.type";
 import { Expose } from "class-transformer";
 import { ICustomFile } from "./file.type";
-import { Request } from "express"
+import { Request } from "express";
 
 export interface ICustomRequest extends Request {
     ip: string;

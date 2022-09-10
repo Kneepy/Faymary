@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Files } from "src/entity";
+import { Files } from "src/entity/common/files.entity";
 import { Repository, FindOneOptions } from "typeorm";
 import { FilesArgs, FilesInput } from "../dto";
 
@@ -25,7 +25,7 @@ export class FilesService {
     }
 
     public async create(args: FilesInput): Promise<Files> {
-        return await this.repository.save({...args, createdAt: Date.now()});
+        return await this.repository.save({ ...args, createdAt: Date.now() });
     }
 
     public async remove(uuid: string): Promise<any> {

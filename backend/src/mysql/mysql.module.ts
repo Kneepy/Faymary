@@ -3,7 +3,17 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigService } from "src/config/providers/config.service";
 import { ConfigModule } from "src/config/config.module";
 import * as allMySQLProviders from "./providers";
-import { Users, Sessions, Confirmations, Activity, Notifications, UserSettings, Posts, Comments, Files } from "src/entity";
+import {
+    Users,
+    Sessions,
+    Confirmations,
+    Activity,
+    Notifications,
+    UserSettings,
+    Posts,
+    Comments,
+    Files
+} from "src/entity";
 
 const providers = [...Object.values(allMySQLProviders)];
 
@@ -22,7 +32,7 @@ const providers = [...Object.values(allMySQLProviders)];
             Activity,
             Notifications,
             UserSettings,
-            Posts, 
+            Posts,
             Comments,
             Files
         ])

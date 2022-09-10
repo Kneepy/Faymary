@@ -1,1 +1,1 @@
-export * from "./save-file.decorator"
+export * from "./save-file.decorator";

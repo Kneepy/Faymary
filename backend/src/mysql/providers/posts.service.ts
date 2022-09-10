@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Posts } from "src/entity";
+import { Posts } from "src/entity/posts/post.entity";
 import { FindOneOptions, Repository } from "typeorm";
 import { PostsArgs, PostsInput } from "../dto";
 
@@ -25,7 +25,7 @@ export class PostsService {
     }
 
     public async create(args: PostsInput): Promise<Posts> {
-        return await this.repository.save({...args, createdAt: Date.now()});
+        return await this.repository.save({ ...args, createdAt: Date.now() });
     }
 
     public async remove(uuid: string): Promise<any> {

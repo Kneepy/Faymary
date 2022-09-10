@@ -12,7 +12,11 @@ import {
 import { USE_AUTH_METADATA } from "src/auth";
 import { SessionService } from "src/mysql/providers/session.service";
 import { AuthService } from "../auth.service";
-import { ConfigService, EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
+import {
+    ConfigService,
+    EXPIRENS_IN_REFRESH_TOKEN,
+    REFRESH_TOKEN_COOKIE
+} from "src/config";
 import { Reflector } from "@nestjs/core";
 
 @Injectable()
@@ -65,10 +69,10 @@ export class AuthGuard implements CanActivate {
                 session.id
             );
             const fingerprint = req.headers.fingerprint || "";
-            const ip =
+            const ip = (
                 req.ip ||
                 req.headers["x-forwarded-for"] ||
-                req.socket.remoteAddress;
+                req.socket.remoteAddress) as string;
 
             if (session.fingerprint !== fingerprint || session.ip !== ip) {
                 throw new UnauthorizedException();
@@ -86,8 +90,11 @@ export class AuthGuard implements CanActivate {
                 refreshSession
             );
 
-            res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, this.configService.getCookieOptions());
-
+            res.cookie(
+                REFRESH_TOKEN_COOKIE,
+                tokens.refreshToken,
+                this.configService.getCookieOptions()
+            );
             headers.authorization = tokens.accessToken;
 
             req.user = this.authService.verifyAccessToken(

@@ -1,5 +1,11 @@
 import { ActivityEnum } from "src/mysql";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToOne,
+    PrimaryGeneratedColumn
+} from "typeorm";
 import { Users } from "./users.entity";
 
 @Entity()

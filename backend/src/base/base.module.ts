@@ -21,7 +21,8 @@ const AllControllers = Object.values(Controllers);
         }),
         MulterModule.registerAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => configService.getMulterOptions(),
+            useFactory: (configService: ConfigService) =>
+                configService.getMulterOptions(),
             inject: [ConfigService]
         }),
         MySqlModule,

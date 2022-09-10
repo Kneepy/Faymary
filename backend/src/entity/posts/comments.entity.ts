@@ -1,28 +1,36 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Files } from "../common";
-import { Users } from "../users";
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn
+} from "typeorm";
+import { Files } from "../common/files.entity";
+import { Users } from "../users/users.entity";
 import { Posts } from "./post.entity";
 
 @Entity()
 export class Comments {
     @PrimaryGeneratedColumn("uuid")
-    id: string
+    id: string;
 
     @ManyToMany(() => Files)
-    files: Files[]
+    files: Files[];
 
-    @Column({nullable: false})
-    message: string
+    @Column({ nullable: false })
+    message: string;
 
     @ManyToOne(() => Users)
     @JoinColumn()
-    user: Users
+    user: Users;
 
-    @ManyToMany(() => Comments, {cascade: true})
+    @ManyToMany(() => Comments, { cascade: true })
     @JoinTable()
-    answers: Comments[]
+    answers: Comments[];
 
     @ManyToOne(() => Posts, (post: Posts) => post.comments)
     @JoinColumn()
-    post: Posts
+    post: Posts;
 }

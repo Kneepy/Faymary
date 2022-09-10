@@ -3,7 +3,7 @@ import { Column } from "typeorm";
 export class Lifetime {
     @Column({
         nullable: false,
-        type: "bigint",
+        type: "bigint"
     })
     expirensIn: number;
 

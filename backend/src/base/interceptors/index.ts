@@ -1,1 +1,1 @@
-export * from "./write-file.interceptor"
+export * from "./write-file.interceptor";

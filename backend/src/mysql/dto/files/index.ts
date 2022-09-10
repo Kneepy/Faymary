@@ -1,2 +1,2 @@
-export * from "./files.input"
-export * from "./files.args"
+export * from "./files.input";
+export * from "./files.args";

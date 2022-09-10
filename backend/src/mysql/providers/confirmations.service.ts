@@ -1,19 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EXPIRES_IN_CONFORMATION } from "src/config";
-import { Confirmations } from "src/entity";
+import { EXPIRES_IN_CONFORMATION } from "src/config/config.constants";
+import { Confirmations } from "src/entity/users/confirmations.entity";
 import { Repository } from "typeorm";
 import { ConfirmationsInput, ConfirmationsArgs, FindOneOptions } from "../dto";
 
 @Injectable()
 export class ConfirmationsService {
     constructor(
-        @InjectRepository(Confirmations)
-        private repository: Repository<Confirmations>
+        @InjectRepository(Confirmations) private repository: Repository<Confirmations>
     ) {}
 
     async create(input: ConfirmationsInput): Promise<Confirmations> {
-        return await this.repository.save({...input, createdAt: Date.now(), expirensIn: Date.now() + EXPIRES_IN_CONFORMATION});
+        return await this.repository.save({
+            ...input,
+            createdAt: Date.now(),
+            expirensIn: Date.now() + EXPIRES_IN_CONFORMATION
+        });
     }
 
     public async findOne(

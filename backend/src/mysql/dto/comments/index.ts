@@ -1,2 +1,2 @@
-export * from "./comments.input"
-export * from "./comments.args"
+export * from "./comments.input";
+export * from "./comments.args";

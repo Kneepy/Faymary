@@ -1,12 +1,12 @@
-import { Type } from "class-transformer"
-import { IsNotEmpty, IsString } from "class-validator"
-import { Users } from "src/entity"
+import { Type } from "class-transformer";
+import { IsNotEmpty, IsString } from "class-validator";
+import { Users } from "src/entity";
 
 export class FilesInput {
     @IsNotEmpty()
-    path: string
+    path: string;
 
     @Type(() => Users)
     @IsNotEmpty()
-    user: Users
+    user: Users;
 }

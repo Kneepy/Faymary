@@ -1,2 +1,2 @@
-export * from "./posts.input"
-export * from "./posts.args"
+export * from "./posts.input";
+export * from "./posts.args";

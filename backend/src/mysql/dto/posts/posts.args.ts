@@ -4,5 +4,5 @@ export class PostsArgs {
     @IsOptional()
     @IsUUID()
     @IsString()
-    id: string
+    id: string;
 }

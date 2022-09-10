@@ -5,18 +5,23 @@ import { BaseModule } from "./base/base.module";
 import { ConfigModule } from "./config/config.module";
 import { AuthModule } from "./auth/auth.module";
 import { APP_GUARD } from "@nestjs/core";
-import { ServeStaticModule } from '@nestjs/serve-static';
+import { ServeStaticModule } from "@nestjs/serve-static";
 import { AuthGuard } from "./auth";
 import { ConfigService } from "./config";
 
 @Module({
     imports: [
-        MySqlModule, CommonModule, AuthModule, BaseModule, ConfigModule,
+        MySqlModule,
+        CommonModule,
+        AuthModule,
+        BaseModule,
+        ConfigModule,
         ServeStaticModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => configService.getStaticOptions(),
+            useFactory: (configService: ConfigService) =>
+                configService.getStaticOptions(),
             inject: [ConfigService]
-        }),
+        })
     ],
     providers: [
         {

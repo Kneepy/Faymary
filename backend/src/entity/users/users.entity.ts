@@ -12,7 +12,7 @@ import { Activity } from "./activity.entity";
 import { Notifications } from "./notifications.entity";
 import { UserSettings } from "./user-settings.entity";
 import { Posts } from "../posts/post.entity";
-import { Files } from "../common";
+import { Files } from "../common/files.entity";
 
 @Entity()
 export class Users {
@@ -38,29 +38,35 @@ export class Users {
     @ManyToMany(() => Users, (user: Users) => user.subscribers)
     subscriptions: Users[];
 
-    @OneToMany(() => Sessions, (session: Sessions) => session.user, {cascade: true})
+    @OneToMany(() => Sessions, (session: Sessions) => session.user, {
+        cascade: true
+    })
     sessions: Sessions[];
 
     @ManyToMany(() => Users, (users: Users) => users.accounts)
     @JoinTable()
     accounts: Users[];
 
-    @OneToOne(() => Activity, (activity: Activity) => activity.user, {cascade: true})
+    @OneToOne(() => Activity, (activity: Activity) => activity.user, {
+        cascade: true
+    })
     activity: Activity;
 
     @OneToMany(
         () => Notifications,
         (notifications: Notifications) => notifications.user,
-        {cascade: true}
+        { cascade: true }
     )
     notifications: Notifications[];
 
-    @OneToOne(() => UserSettings, (settings: UserSettings) => settings.user, {cascade: true})
-    settings: UserSettings
+    @OneToOne(() => UserSettings, (settings: UserSettings) => settings.user, {
+        cascade: true
+    })
+    settings: UserSettings;
 
-    @OneToMany(() => Posts, (posts) => posts.user, {cascade: true})
-    posts: Posts[]
+    @OneToMany(() => Posts, posts => posts.user, { cascade: true })
+    posts: Posts[];
 
-    @OneToMany(() => Files, (files: Files) => files.user, {cascade: true})
-    files: Files[]
+    @OneToMany(() => Files, (files: Files) => files.user, { cascade: true })
+    files: Files[];
 }

@@ -12,6 +12,7 @@ import { MailerModuleOptions } from "@lib/mailer";
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 import * as path from "path";
 import * as multer from "multer";
+import { ICustomRequest } from "src/common/types/request.type";
 
 @Injectable()
 export class ConfigService {
@@ -26,28 +27,30 @@ export class ConfigService {
         }
     });
 
-    getStaticOptions = () => ([{
-        rootPath: path.join(process.cwd(), STORE_FOLDER)
-    }])
+    getStaticOptions = () => [
+        {
+            rootPath: path.join(process.cwd(), STORE_FOLDER)
+        }
+    ];
 
     getMulterOptions = (): MulterOptions => ({
         dest: path.join(process.cwd(), STORE_FOLDER),
         storage: multer.diskStorage({
-            destination: (req, file, cb) => {
-                cb(null, path.join(process.cwd(), STORE_FOLDER))
+            destination: (req: ICustomRequest, file, cb) => {
+                cb(null, path.join(process.cwd(), STORE_FOLDER));
             },
             filename: (req, file, cb) => {
-                cb(null, Date.now() + path.extname(file.originalname))
+                cb(null, Date.now() + path.extname(file.originalname));
             }
         })
-    })
+    });
 
     getCookieOptions = () => ({
         // prodaction all true
-        httpOnly: true, 
+        httpOnly: true,
         secure: false,
         maxAge: EXPIRENS_IN_REFRESH_TOKEN
-    })
+    });
 
     // mysql connaction data
     getMySqlConnectionData = (): TypeOrmModuleOptions => ({

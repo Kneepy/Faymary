@@ -11,9 +11,14 @@ import {
     Query,
     Req,
     Res,
-    UnauthorizedException,
+    UnauthorizedException
 } from "@nestjs/common";
-import { AddUserAccountDto, CreateUserDto, LoginUserDto, UpdateUserDto } from "../dto/users";
+import {
+    AddUserAccountDto,
+    CreateUserDto,
+    LoginUserDto,
+    UpdateUserDto
+} from "../dto/users";
 import * as bcrypt from "bcryptjs";
 import { UsersService } from "src/mysql/providers/users.service";
 import { AuthService, DisableAuth } from "src/auth";
@@ -26,11 +31,15 @@ import {
 } from "src/common";
 import { MailerService } from "@lib/mailer";
 import { PayloadAuthUser, ReqAndRes } from "../interfaces";
-import { ConfigService, EXPIRENS_IN_REFRESH_TOKEN, REFRESH_TOKEN_COOKIE } from "src/config";
+import {
+    ConfigService,
+    EXPIRENS_IN_REFRESH_TOKEN,
+    REFRESH_TOKEN_COOKIE
+} from "src/config";
 import { ConfirmationsService, SessionService } from "src/mysql";
 import { Users } from "src/entity/users/users.entity";
 
-// нужно из всех ответов юзеру исключить пароль и т.п 
+// нужно из всех ответов юзеру исключить пароль и т.п
 @Controller("user")
 export class UserController {
     constructor(
@@ -88,28 +97,29 @@ export class UserController {
 
     @Patch("/update")
     public async updateUser(
-        @Req() req: ICustomRequest, 
+        @Req() req: ICustomRequest,
         @Body() body: UpdateUserDto
     ): Promise<Users> {
-        const user = await this.userService.findOne({id: req.user.userId})
+        const user = await this.userService.findOne({ id: req.user.userId });
 
         if (body.newPassword && body.oldPassword) {
-            if(bcrypt.compareSync(body.oldPassword, user.password)) {
-                body.password = body.newPassword
-            }
-            else {
-                throw new UnauthorizedException(INVALID_PASSWORD)
+            if (bcrypt.compareSync(body.oldPassword, user.password)) {
+                body.password = body.newPassword;
+            } else {
+                throw new UnauthorizedException(INVALID_PASSWORD);
             }
         }
         if (body.email !== user.email) {
-            const alredyExistUser = await this.userService.findOne({email: body.email}) 
+            const alredyExistUser = await this.userService.findOne({
+                email: body.email
+            });
 
-            if(alredyExistUser) {
-                throw new BadRequestException(USER_ALREADY_EXIST_EMAIL_ERROR)
+            if (alredyExistUser) {
+                throw new BadRequestException(USER_ALREADY_EXIST_EMAIL_ERROR);
             }
         }
 
-        return await this.userService.update(Object.assign(user, body))
+        return await this.userService.update(Object.assign(user, body));
     }
 
     @Get("/confirmation")
@@ -226,10 +236,9 @@ export class UserController {
         const refreshToken = {
             userId: user.id,
             ua: req.session.useragent,
-            ip:
-                req.ip ||
-                req.headers["x-forwarded-for"] ||
-                req.socket.remoteAddress,
+            ip: (req.ip ??
+                req.headers["x-forwarded-for"] ??
+                req.socket.remoteAddress) as string,
             fingerprint: req.headers.fingerprint || ""
         };
 
@@ -238,7 +247,11 @@ export class UserController {
             refreshToken
         );
 
-        res.cookie(REFRESH_TOKEN_COOKIE, tokens.refreshToken, this.configService.getCookieOptions());
+        res.cookie(
+            REFRESH_TOKEN_COOKIE,
+            tokens.refreshToken,
+            this.configService.getCookieOptions()
+        );
         req.headers.authorization = tokens.accessToken;
 
         return {

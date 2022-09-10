@@ -13,7 +13,11 @@ export class NotificationsService {
     ) {}
 
     async create(input: NotificationInput): Promise<Notifications> {
-        return await this.repository.save({...input, createdAt: Date.now(), expirensIn: Date.now() + EXPIRES_IN_NOTIFICATION});
+        return await this.repository.save({
+            ...input,
+            createdAt: Date.now(),
+            expirensIn: Date.now() + EXPIRES_IN_NOTIFICATION
+        });
     }
 
     async delete(notificationId: number): Promise<any> {
