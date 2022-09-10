@@ -1,10 +1,8 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
-import * as path from "path";
 import * as url from "url"
 import { Observable } from "rxjs";
-import { ICustomRequest } from "src/common";
-import { ConfigService } from "src/config";
 import { FilesService, UsersService } from "src/mysql";
+import { ICustomRequest } from "src/common";
 
 @Injectable()
 export class WriteFileInterceptor implements NestInterceptor {
@@ -15,24 +13,19 @@ export class WriteFileInterceptor implements NestInterceptor {
 
     async intercept(context: ExecutionContext, next: CallHandler<any>): Promise<Observable<any>> {
         const ctx = context.switchToHttp()
-        const req = ctx.getRequest()
+        const req = ctx.getRequest<ICustomRequest>()
         const user = await this.usersServive.findOne({id: req.user.userId})
-        const saveFile = () => {
-            //await this.filesService.create({user, })
-        }
-        const files = []
+        const getPath = (file) => url.format({
+            protocol: req.protocol,
+            host: req.get("host"),
+            pathname: file.filename
+        })
 
         if(req.file) {
-
+            req.file.savedAs = await this.filesService.create({path: getPath(req.file), user})
         }
         if(req.files) {
-            req.files.forEach((file) => {
-                files.push(url.format({
-                    protocol: req.protocol,
-                    host: req.get("host"),
-                    pathname: file.filename
-                }))
-            })
+            req.files.forEach(async file => file.savedAs = await this.filesService.create({path: getPath(file), user}))
         }
 
         return next.handle()

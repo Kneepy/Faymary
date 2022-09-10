@@ -8,7 +8,7 @@ import { WsAdapter } from "@nestjs/platform-ws";
 export function middlware(app: INestApplication): INestApplication {
     app.enableCors();
 
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));  // { whitelist: true } нужно как-то фильтровать входные свойства
+    app.useGlobalPipes(new ValidationPipe());  // { whitelist: true } нужно как-то фильтровать входные свойства
     //app.useGlobalInterceptors(new ClassSerializerInterceptor({excludeExtraneousValues: true}))
 
     app.use(cookieParser());

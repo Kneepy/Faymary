@@ -15,19 +15,14 @@ export class PostController {
     @Post("/create")
     @SaveFiles("files")
     public async createPost(
-        @UploadedFiles() files: ICustomFile,
+        @UploadedFiles() files: ICustomFile[],
         @Req() req: ICustomRequest,
-        @Body() body: CreatePostDto,
+        @Body() {title, desc}: CreatePostDto,
     ): Promise<Posts> {
-
-        console.log(req.user)
-        /*
         return await this.postsService.create({
-            ...body,
-            files: req.files.map(file => file.savedAs), 
+            title, desc,
+            files: files.map(file => file.savedAs), 
             user: await this.usersService.findOne({id: req.user.userId})
         })
-        */
-        return new Posts()
     }
 }
