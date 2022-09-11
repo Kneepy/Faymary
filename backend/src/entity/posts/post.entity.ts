@@ -24,7 +24,7 @@ export class Posts {
 
     @ManyToMany(() => Files)
     @JoinTable()
-    files: Files[] | unknown;
+    files?: Files[] | unknown;
 
     @Column()
     desc: string;
