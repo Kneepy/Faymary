@@ -38,6 +38,7 @@ import {
 } from "src/config";
 import { ConfirmationsService, SessionService } from "src/mysql";
 import { Users } from "src/entity/users/users.entity";
+import { FindOptionsRelations } from "typeorm";
 
 // нужно из всех ответов юзеру исключить пароль и т.п
 @Controller("user")
@@ -53,7 +54,7 @@ export class UserController {
 
     @Get("/")
     public async getUser(
-        @Query("relations") rel: string[],
+        @Query("relations") rel: FindOptionsRelations<Users>,
         @Req() req: ICustomRequest
     ): Promise<Users> {
         return await this.userService.findOne(

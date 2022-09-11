@@ -14,9 +14,7 @@ export class AuthService {
         private userService: UsersService
     ) {}
 
-    async setUser() {
-        
-    }
+    async setUser() {}
 
     async getTokens(
         access_token: AccessToken,

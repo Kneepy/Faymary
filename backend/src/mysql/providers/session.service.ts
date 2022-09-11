@@ -2,13 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EXPIRENS_IN_REFRESH_TOKEN } from "src/config";
 import { Sessions } from "src/entity/users/sessions.entity";
-import { Repository } from "typeorm";
-import {
-    FindOneOptions,
-    ManySessionsArgs,
-    SessionsArgs,
-    SessionsInput
-} from "../dto";
+import { FindOneOptions, Repository } from "typeorm";
+import { ManySessionsArgs, SessionsArgs, SessionsInput } from "../dto";
 
 //console.log(Sessions)
 
@@ -28,7 +23,7 @@ export class SessionService {
 
     public async find(
         args: ManySessionsArgs,
-        options: FindOneOptions
+        options: FindOneOptions<Sessions>
     ): Promise<Sessions[]> {
         return await this.repository.find({
             where: args,
@@ -38,7 +33,7 @@ export class SessionService {
 
     public async findOne(
         args: SessionsArgs,
-        options: FindOneOptions
+        options: FindOneOptions<Sessions>
     ): Promise<Sessions> {
         return await this.repository.findOne({
             where: args,

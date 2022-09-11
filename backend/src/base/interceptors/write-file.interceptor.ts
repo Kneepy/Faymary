@@ -23,13 +23,13 @@ export class WriteFileInterceptor implements NestInterceptor {
         const ctx = context.switchToHttp();
         const req = ctx.getRequest<ICustomRequest>();
         const user = await this.usersServive.findOne({ id: req.user.userId });
-        const getPath = (file) =>
+        const getPath = file =>
             url.format({
                 protocol: req.protocol,
                 host: req.get("host"),
                 pathname: file.filename
             });
-   
+
         if (req.file) {
             req.file.savedAs = await this.filesService.create({
                 path: getPath(req.file),
@@ -37,7 +37,16 @@ export class WriteFileInterceptor implements NestInterceptor {
             });
         }
         if (req.files) {
-            req.files = await Promise.all(req.files.map(async file => Object.assign(file, {savedAs: await this.filesService.create({path: getPath(file), user})})))
+            req.files = await Promise.all(
+                req.files.map(async file =>
+                    Object.assign(file, {
+                        savedAs: await this.filesService.create({
+                            path: getPath(file),
+                            user
+                        })
+                    })
+                )
+            );
         }
 
         return next.handle();

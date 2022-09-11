@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Comments } from "src/entity/posts/comments.entity";
-import { Repository } from "typeorm";
-import { CommentsArgs, CommentsInput, FindOneOptions } from "../dto";
+import { FindOneOptions, Repository } from "typeorm";
+import { CommentsArgs, CommentsInput } from "../dto";
 
 @Injectable()
 export class CommentsService {
@@ -12,7 +12,7 @@ export class CommentsService {
 
     public async findOne(
         args: CommentsArgs,
-        options?: FindOneOptions
+        options?: FindOneOptions<Comments>
     ): Promise<Comments> {
         return await this.repository.findOne({
             where: args,
@@ -21,7 +21,7 @@ export class CommentsService {
     }
     public async find(
         args: CommentsArgs,
-        options?: FindOneOptions
+        options?: FindOneOptions<Comments>
     ): Promise<Comments[]> {
         return await this.repository.find({
             where: args,

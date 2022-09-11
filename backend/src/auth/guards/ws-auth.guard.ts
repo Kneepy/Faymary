@@ -5,10 +5,10 @@ import { ICustomSocket } from "src/common";
 @Injectable()
 export class WsAuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const ctx = context.switchToWs()
+        const ctx = context.switchToWs();
         const client: ICustomSocket = ctx.getClient();
-        const data: IncomingMessage = ctx.getData()
-        console.log(ctx.getData().headers)
+        const data: IncomingMessage = ctx.getData();
+        console.log(ctx.getData().headers);
         return true;
     }
 }

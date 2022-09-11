@@ -1,7 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "src/entity/users/users.entity";
-import { Repository } from "typeorm";
-import { UsersArgs, UsersInput, FindOneOptions } from "../dto";
+import { FindOneOptions, Repository } from "typeorm";
+import { UsersArgs, UsersInput } from "../dto";
 import { UtilService } from "../../common";
 import { Injectable } from "@nestjs/common";
 
@@ -13,9 +13,8 @@ export class UsersService {
 
     public async findOne(
         args: UsersArgs,
-        options?: FindOneOptions
+        options?: FindOneOptions<Users>
     ): Promise<Users> {
-
         // delete password
         return await this.repository.findOne({
             where: args,

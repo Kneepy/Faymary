@@ -2,13 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EXPIRES_IN_CONFORMATION } from "src/config/config.constants";
 import { Confirmations } from "src/entity/users/confirmations.entity";
-import { Repository } from "typeorm";
-import { ConfirmationsInput, ConfirmationsArgs, FindOneOptions } from "../dto";
+import { FindOneOptions, Repository } from "typeorm";
+import { ConfirmationsInput, ConfirmationsArgs } from "../dto";
 
 @Injectable()
 export class ConfirmationsService {
     constructor(
-        @InjectRepository(Confirmations) private repository: Repository<Confirmations>
+        @InjectRepository(Confirmations)
+        private repository: Repository<Confirmations>
     ) {}
 
     async create(input: ConfirmationsInput): Promise<Confirmations> {
@@ -21,7 +22,7 @@ export class ConfirmationsService {
 
     public async findOne(
         args: ConfirmationsArgs,
-        options?: FindOneOptions
+        options?: FindOneOptions<Confirmations>
     ): Promise<Confirmations> {
         return await this.repository.findOne({
             where: args,

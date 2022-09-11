@@ -1,13 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Activity } from "src/entity/users/activity.entity";
-import { Repository } from "typeorm";
-import {
-    ActivityArgs,
-    ActivityInputCreate,
-    ActivityInputUpdate,
-    FindOneOptions
-} from "../dto";
+import { FindOneOptions, Repository } from "typeorm";
+import { ActivityArgs, ActivityInputCreate, ActivityInputUpdate } from "../dto";
 
 @Injectable()
 export class ActivityService {
@@ -17,7 +12,7 @@ export class ActivityService {
 
     public async findOne(
         args: ActivityArgs,
-        options: FindOneOptions
+        options: FindOneOptions<Activity>
     ): Promise<Activity> {
         return await this.repository.findOne({
             where: args,
