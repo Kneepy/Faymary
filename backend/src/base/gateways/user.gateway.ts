@@ -70,27 +70,18 @@ export class UserGateway {
                     type: NotificationEnumType.SUB
                 });
                 author.notifications.push(notification);
-
-                if (authorSocket) {
-                    authorSocket.send(
-                        JSON.stringify({
-                            event: Events.NEW_NOTIFICATION,
-                            data: notification
-                        })
-                    );
-                }
             }
         }
+
+        const updatedAuthor = await this.usersService.update(author)
 
         if (authorSocket) {
             authorSocket.send(
                 JSON.stringify({
                     event: Events.REFRESH_USER,
-                    data: await this.usersService.update(author)
+                    data: updatedAuthor
                 })
             );
-        } else {
-            await this.usersService.update(author);
         }
 
         return {

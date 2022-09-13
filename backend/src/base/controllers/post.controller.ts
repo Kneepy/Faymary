@@ -15,7 +15,7 @@ import { Posts } from "src/entity";
 import { PostsService, UsersService } from "src/mysql";
 import { FindOptionsRelations } from "typeorm";
 import { SaveFiles } from "../decorators";
-import { CreatePostDto, GetPostDto } from "../dto/posts";
+import { CreatePostDto, GetPostDto, UpdatePostDto } from "../dto/posts";
 
 @Controller("post")
 export class PostController {
@@ -49,8 +49,9 @@ export class PostController {
     }
 
     @Put("/update")
+    @SaveFiles("files")
     public async updatePost(
-        @Body() body: Omit<Posts, "files">
+        @Body() body: UpdatePostDto
     ): Promise<Posts> {
         const post = await this.postsService.findOne({ id: body.id });
         return await this.postsService.update(Object.assign(post, body));
