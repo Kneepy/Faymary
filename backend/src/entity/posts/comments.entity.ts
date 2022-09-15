@@ -17,6 +17,7 @@ export class Comments {
     id: string;
 
     @ManyToMany(() => Files)
+    @JoinTable()
     files: Files[];
 
     @Column({ nullable: false })

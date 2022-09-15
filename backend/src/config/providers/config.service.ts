@@ -37,8 +37,7 @@ export class ConfigService {
         dest: path.join(process.cwd(), STORE_FOLDER),
         storage: multer.diskStorage({
             destination: (req: ICustomRequest, file, cb) => {
-                console.log(req)
-                cb(null, path.join(process.cwd(), STORE_FOLDER));
+                cb(null, this.getStaticOptions()[0].rootPath);
             },
             filename: (req, file, cb) => {
                 cb(null, Date.now() + path.extname(file.originalname));

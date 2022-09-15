@@ -29,7 +29,6 @@ export class WriteFileInterceptor implements NestInterceptor {
                 host: req.get("host"),
                 pathname: file.filename
             });
-
         if (req.file) {
             req.file.savedAs = await this.filesService.create({
                 path: getPath(req.file),

@@ -1,6 +1,7 @@
 import {
     Column,
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToMany,
     ManyToOne,
@@ -32,6 +33,6 @@ export class Posts {
     @ManyToOne(() => Users, (user: Users) => user.posts)
     user: Users;
 
-    @OneToMany(() => Comments, (comments: Comments) => comments.post)
+    @OneToMany(() => Comments, (comments: Comments) => comments.post, {cascade: true})
     comments: Comments[];
 }

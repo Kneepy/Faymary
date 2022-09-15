@@ -51,7 +51,6 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 { id: socket.id },
                 { relations: ["activity"] }
             );
-
             if (user.activity) {
                 user.activity = Object.assign(user.activity, {
                     state: ActivityEnum.ONLINE,
@@ -69,7 +68,6 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         } catch (e) {
             socket.send(JSON.stringify(new WsException(e)));
         }
-
         this.users.set(socket.id, socket);
     }
 

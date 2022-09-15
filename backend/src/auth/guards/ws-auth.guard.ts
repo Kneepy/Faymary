@@ -6,9 +6,8 @@ import { ICustomSocket } from "src/common";
 export class WsAuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const ctx = context.switchToWs();
-        const client: ICustomSocket = ctx.getClient();
-        const data: IncomingMessage = ctx.getData();
-        console.log(ctx.getData().headers);
+        const client = ctx.getClient();
+        const data = ctx.getData();
         return true;
     }
 }
