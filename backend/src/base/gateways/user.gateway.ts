@@ -59,9 +59,8 @@ export class UserGateway {
                 author.settings.subscriptionNotifications &&
                 !author.notifications.filter(
                     value =>
-                        value.expirensIn > Date.now() &&
-                        value.sender.id === subscriber.id &&
-                        value.type === NotificationEnumType.SUB
+                        value.expirensIn < Date.now() &&
+                        value.sender.id === subscriber.id
                 ).length
             ) {
                 const notification = await this.notificationService.create({

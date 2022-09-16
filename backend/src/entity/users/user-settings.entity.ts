@@ -18,6 +18,9 @@ export class UserSettings {
     @Column({nullable: false, default: true})
     commentsOnPostNotifications: boolean
 
+    @Column({nullable: false, default: true})
+    likeOnPostNotifications: true
+
     @OneToOne(() => Users, (user: Users) => user.settings)
     @JoinColumn()
     user: Users;
