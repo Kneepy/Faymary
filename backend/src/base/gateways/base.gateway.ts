@@ -10,7 +10,13 @@ import { IncomingMessage } from "http";
 import { AuthService, WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Notifications, Users, UserSettings } from "src/entity";
-import { ActivityEnum, ActivityService, NotificationEnumType, NotificationsService, UsersService } from "src/mysql";
+import {
+    ActivityEnum,
+    ActivityService,
+    NotificationEnumType,
+    NotificationsService,
+    UsersService
+} from "src/mysql";
 import { WsExeptionFilter } from "../filters";
 
 @Injectable()
@@ -38,22 +44,25 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return this.users.delete(socketId);
     }
 
-    async setNotification(type: NotificationEnumType, {sender, user}: {sender: Users, user: Users}, criteriaUserSettings: boolean = true): Promise<Notifications | undefined> {
-        if(
+    async setNotification(
+        type: NotificationEnumType,
+        { sender, user }: { sender: Users; user: Users },
+        criteriaUserSettings: boolean = true
+    ): Promise<Notifications | undefined> {
+        if (
             criteriaUserSettings &&
             !user.notifications.filter(
                 value =>
-                    value.expirensIn < Date.now() &&
-                    value.sender.id === user.id
+                    value.expirensIn < Date.now() && value.sender.id === user.id
             ).length
         ) {
             const notification = await this.notificationService.create({
                 user: user,
                 sender: sender,
                 type: type
-            })
+            });
 
-            return notification
+            return notification;
         }
     }
 

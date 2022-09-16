@@ -50,9 +50,7 @@ export class PostController {
 
     @Put("/update")
     @SaveFiles("files")
-    public async updatePost(
-        @Body() body: UpdatePostDto
-    ): Promise<Posts> {
+    public async updatePost(@Body() body: UpdatePostDto): Promise<Posts> {
         const post = await this.postsService.findOne({ id: body.id });
         return await this.postsService.update(Object.assign(post, body));
     }

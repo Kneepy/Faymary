@@ -34,10 +34,12 @@ export class Posts {
     @ManyToOne(() => Users, (user: Users) => user.posts)
     user: Users;
 
-    @OneToMany(() => Comments, (comments: Comments) => comments.post, {cascade: true})
+    @OneToMany(() => Comments, (comments: Comments) => comments.post, {
+        cascade: true
+    })
     comments: Comments[];
 
-    @ManyToMany(() => Likes, {cascade: true})
+    @ManyToMany(() => Likes, { cascade: true })
     @JoinTable()
-    likes: Likes[]
+    likes: Likes[];
 }

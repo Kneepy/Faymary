@@ -55,7 +55,7 @@ export class UserGateway {
         } else {
             author.subscribers.push(subscriber);
 
-            if (
+            /*if (
                 author.settings.subscriptionNotifications &&
                 !author.notifications.filter(
                     value =>
@@ -69,10 +69,20 @@ export class UserGateway {
                     type: NotificationEnumType.SUB
                 });
                 author.notifications.push(notification);
+            }*/
+
+            const notification = await this.baseGateway.setNotification(
+                NotificationEnumType.SUB,
+                { user: author, sender: subscriber },
+                author.settings.subscriptionNotifications
+            );
+
+            if (notification) {
+                author.notifications.push(notification);
             }
         }
 
-        const updatedAuthor = await this.usersService.update(author)
+        const updatedAuthor = await this.usersService.update(author);
 
         if (authorSocket) {
             authorSocket.send(

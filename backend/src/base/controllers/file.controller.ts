@@ -10,7 +10,7 @@ export class FileController {
     public async uploadOneFile(
         @UploadedFile() file: ICustomFile
     ): Promise<Files> {
-        return file.savedAs
+        return file.savedAs;
     }
 
     @Post("/upload/multiply")
@@ -18,6 +18,6 @@ export class FileController {
     public async uploadManyFiles(
         @UploadedFiles() files: ICustomFile[]
     ): Promise<Files[]> {
-        return files.map(file => file.savedAs)
+        return files.map(file => file.savedAs);
     }
 }

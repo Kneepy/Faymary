@@ -3,5 +3,5 @@ import { Posts } from "src/entity";
 
 export class UpdatePostDto extends Posts {
     @IsNotEmpty()
-    id: string
+    id: string;
 }

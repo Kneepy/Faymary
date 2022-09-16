@@ -3,9 +3,19 @@ import { IsNotEmpty, IsString } from "class-validator";
 export class AddLikeToPostDto {
     @IsString()
     @IsNotEmpty()
-    userId: string
+    userId: string;
 
     @IsNotEmpty()
     @IsString()
-    postId: string
+    postId: string;
+}
+
+export class AddLikeToCommentDto {
+    @IsString()
+    @IsNotEmpty()
+    userId: string;
+
+    @IsNotEmpty()
+    @IsString()
+    commentId: string;
 }
