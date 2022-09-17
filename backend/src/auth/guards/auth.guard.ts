@@ -31,18 +31,17 @@ export class AuthGuard implements CanActivate {
         const headers: ICustomHeaders = req.headers;
 
         try {
+            if (
+                this.reflector.get(
+                    USE_AUTH_METADATA,
+                    context.getHandler()
+                ) === false
+            ) {
+                return true;
+            }
             // req.cookies?.*
             if (!req.cookies.refreshToken || !headers.authorization) {
-                if (
-                    this.reflector.get(
-                        USE_AUTH_METADATA,
-                        context.getHandler()
-                    ) === false
-                ) {
-                    return true;
-                } else {
-                    throw new UnauthorizedException();
-                }
+                throw new UnauthorizedException();
             }
 
             req.user = this.authService.verifyAccessToken(

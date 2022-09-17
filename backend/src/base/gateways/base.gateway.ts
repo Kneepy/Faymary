@@ -52,8 +52,8 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (
             criteriaUserSettings &&
             !user.notifications.filter(
-                value =>
-                    value.expirensIn < Date.now() && value.sender.id === user.id
+                notfication =>
+                notfication.expirensIn > Date.now() && notfication.sender.id === sender.id && notfication.type === type
             ).length
         ) {
             const notification = await this.notificationService.create({

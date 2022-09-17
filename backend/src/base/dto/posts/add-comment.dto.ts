@@ -1,11 +1,13 @@
 import { Type } from "class-transformer";
-import { IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import { Comments } from "src/entity";
 
 export class AddCommentToPostDto {
+    @IsNotEmpty()
     @IsString()
     postId: string;
 
+    @IsNotEmpty()
     @Type(() => Comments)
     comment: Comments;
 }

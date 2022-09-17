@@ -25,7 +25,6 @@ export class UserGateway {
     constructor(
         private baseGateway: BaseGateway,
         private usersService: UsersService,
-        private notificationService: NotificationsService
     ) {}
 
     @SubscribeMessage(Events.SUB_USER)
@@ -54,22 +53,6 @@ export class UserGateway {
             author.subscribers.splice(subscriberIndex, 1);
         } else {
             author.subscribers.push(subscriber);
-
-            /*if (
-                author.settings.subscriptionNotifications &&
-                !author.notifications.filter(
-                    value =>
-                        value.expirensIn < Date.now() &&
-                        value.sender.id === subscriber.id
-                ).length
-            ) {
-                const notification = await this.notificationService.create({
-                    user: author,
-                    sender: subscriber,
-                    type: NotificationEnumType.SUB
-                });
-                author.notifications.push(notification);
-            }*/
 
             const notification = await this.baseGateway.setNotification(
                 NotificationEnumType.SUB,

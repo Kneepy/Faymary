@@ -34,22 +34,19 @@ export class PostController {
     }
 
     @Post("/create")
-    @SaveFiles("files")
     public async createPost(
-        @UploadedFiles() files: ICustomFile[],
         @Req() req: ICustomRequest,
-        @Body() { title, desc }: CreatePostDto
+        @Body() body: CreatePostDto
     ): Promise<Posts> {
         return await this.postsService.create({
-            title,
-            desc,
-            files: files.map(file => file.savedAs),
+            title: body.title,
+            desc: body.desc,
+            files: body.files,
             user: await this.usersService.findOne({ id: req.user.userId })
         });
     }
 
     @Put("/update")
-    @SaveFiles("files")
     public async updatePost(@Body() body: UpdatePostDto): Promise<Posts> {
         const post = await this.postsService.findOne({ id: body.id });
         return await this.postsService.update(Object.assign(post, body));

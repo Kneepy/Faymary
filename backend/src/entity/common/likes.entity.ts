@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Users } from "../users";
 
 @Entity()
@@ -6,7 +6,7 @@ export class Likes {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @OneToOne(() => Users)
+    @ManyToOne(() => Users)
     @JoinColumn()
     user: Users;
 }

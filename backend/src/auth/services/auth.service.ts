@@ -14,8 +14,6 @@ export class AuthService {
         private userService: UsersService
     ) {}
 
-    async setUser() {}
-
     async getTokens(
         access_token: AccessToken,
         refresh_token: RefreshToken

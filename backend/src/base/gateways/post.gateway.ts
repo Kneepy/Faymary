@@ -1,4 +1,4 @@
-import { UseFilters, UseGuards } from "@nestjs/common";
+import { UseFilters, UseGuards, UsePipes } from "@nestjs/common";
 import {
     ConnectedSocket,
     MessageBody,
@@ -9,7 +9,7 @@ import {
 import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Likes } from "src/entity";
-import { NotificationEnumType, PostsService, UsersService } from "src/mysql";
+import { NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
@@ -27,7 +27,7 @@ export class PostGateway {
     constructor(
         private postsService: PostsService,
         private baseGateway: BaseGateway,
-        private usersService: UsersService
+        private usersService: UsersService,
     ) {}
 
     @SubscribeMessage(Events.ADD_ANSWER_COMMENT)
@@ -60,24 +60,6 @@ export class PostGateway {
         }
 
         post.comments.push(body.comment);
-
-        /*
-        if(
-            post.user.settings.commentsOnPostNotifications &&
-            !post.user.notifications.filter(
-                value =>
-                    value.expirensIn < Date.now() &&
-                    value.sender.id === user.id
-            ).length
-        ) {
-            const notification = await this.notificationService.create({
-                user: post.user,
-                sender: user,
-                type: NotificationEnumType.COMMENT
-            })
-            post.user.notifications.push(notification)
-        }
-        */
 
         const notification = await this.baseGateway.setNotification(
             NotificationEnumType.COMMENT,
@@ -117,6 +99,7 @@ export class PostGateway {
             {
                 relations: [
                     "likes",
+                    "likes.user",
                     "user",
                     "user.settings",
                     "user.notifications",
@@ -124,7 +107,7 @@ export class PostGateway {
                 ]
             }
         );
-        const like: Likes | any = { user };
+
         const postContainsLike = post.likes.findIndex(
             like => like.user.id === socket.id
         );
@@ -132,25 +115,7 @@ export class PostGateway {
         if (postContainsLike !== -1) {
             post.likes.splice(postContainsLike, 1);
         } else {
-            post.likes.push(like);
-
-            /*
-            if(
-                post.user.settings.likeOnPostNotifications && 
-                !post.user.notifications.filter(
-                    value =>
-                        value.expirensIn < Date.now() &&
-                        value.sender.id === user.id
-                ).length
-            ) {
-                const notification = await this.notificationService.create({
-                    user: post.user,
-                    sender: user,
-                    type: NotificationEnumType.LIKE_POST
-                })
-                post.user.notifications.push(notification)
-            }
-            */
+            post.likes.push({user} as Likes);
 
             const notification = await this.baseGateway.setNotification(
                 NotificationEnumType.LIKE_POST,

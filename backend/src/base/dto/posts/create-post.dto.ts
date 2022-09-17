@@ -1,4 +1,6 @@
+import { Type } from "class-transformer";
 import { IsNotEmpty, IsString } from "class-validator";
+import { Files } from "src/entity";
 
 export class CreatePostDto {
     @IsNotEmpty()
@@ -8,4 +10,8 @@ export class CreatePostDto {
     @IsNotEmpty()
     @IsString()
     desc: string;
+
+    @IsNotEmpty()
+    @Type(() => Files)
+    files: Files[]
 }
