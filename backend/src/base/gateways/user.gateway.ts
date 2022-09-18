@@ -10,7 +10,6 @@ import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import {
     NotificationEnumType,
-    NotificationsService,
     UsersService
 } from "src/mysql";
 import { SubscribeUserDto } from "../dto";
@@ -44,7 +43,7 @@ export class UserGateway {
             }
         );
         const authorSocket = this.baseGateway.findUser(body.userId);
-        const subscriber = await this.usersService.findOne({ id: socket.id });
+        const subscriber = socket.user;
         const subscriberIndex = author.subscribers.indexOf(
             author.subscribers.find(e => e.id === subscriber.id)
         );

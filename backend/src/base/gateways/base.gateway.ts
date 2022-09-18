@@ -55,6 +55,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 notfication =>
                 notfication.expirensIn > Date.now() && notfication.sender.id === sender.id && notfication.type === type
             ).length
+            && sender.id !== user.id 
         ) {
             const notification = await this.notificationService.create({
                 user: user,
@@ -76,21 +77,22 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 args.headers.authorization;
             socket.id = this.authService.verifyAccessToken(token).userId;
 
-            const user = await this.usersService.findOne(
+            socket.user = await this.usersService.findOne(
                 { id: socket.id },
                 { relations: ["activity"] }
             );
-            if (user.activity) {
-                user.activity = Object.assign(user.activity, {
+
+            if (socket.user.activity) {
+                socket.user.activity = Object.assign(socket.user.activity, {
                     state: ActivityEnum.ONLINE,
                     start: Date.now()
                 });
 
-                socket.state = user.activity;
-                await this.usersService.update(user);
+                socket.state = socket.user.activity;
+                await this.usersService.update(socket.user);
             } else {
                 socket.state = await this.activityService.create({
-                    user,
+                    user: socket.user,
                     state: ActivityEnum.ONLINE
                 });
             }

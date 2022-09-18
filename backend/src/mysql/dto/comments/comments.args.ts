@@ -6,13 +6,13 @@ export class CommentsArgs {
     @IsOptional()
     @IsUUID()
     @IsString()
-    id: string;
+    id?: string;
 
     @Type(() => Users)
     @IsOptional()
-    user: Users;
+    user?: Users;
 
     @Type(() => Posts)
     @IsOptional()
-    post: Posts;
+    post?: Posts;
 }

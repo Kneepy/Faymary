@@ -1,22 +1,21 @@
 import { Type } from "class-transformer";
-import { ArrayMinSize, IsNotEmpty, IsString } from "class-validator";
-import { Files, Users } from "src/entity";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Files, Posts, Users } from "src/entity";
 
 export class CommentsInput {
-    @IsNotEmpty()
-    @IsString()
-    title: string;
-
     @Type(() => Files)
-    @ArrayMinSize(1)
-    @IsNotEmpty()
+    @IsOptional()
     files: Files[];
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    desc: string;
+    message: string;
 
     @Type(() => Users)
     @IsNotEmpty()
     user: Users;
+
+    @Type(() => Posts)
+    @IsNotEmpty()
+    post: Posts
 }

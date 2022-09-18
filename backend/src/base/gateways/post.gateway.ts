@@ -9,7 +9,7 @@ import {
 import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Likes } from "src/entity";
-import { NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
+import { CommentsService, NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
@@ -28,13 +28,49 @@ export class PostGateway {
         private postsService: PostsService,
         private baseGateway: BaseGateway,
         private usersService: UsersService,
+        private commentsService: CommentsService
     ) {}
 
     @SubscribeMessage(Events.ADD_ANSWER_COMMENT)
     public async addAnswerToComment(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddAnswerToComment
-    ) {}
+    ) {
+        const comment = await this.commentsService.findOne({id: body.commentId}, {relations: ["answers", "user", "user.notifications", "user.notifications.sender", "user.settings"]})
+
+        if(!body.answer.user) {
+            body.answer.user = socket.user
+        }
+
+        comment.answers.push(body.answer)
+
+        const notfication = await this.baseGateway.setNotification(
+            NotificationEnumType.ANSWER_COMMENT,
+            {sender: body.answer.user, user: comment.user},
+            comment.user.settings.answersOnCommentNotification
+        )
+
+        if(notfication) {
+            comment.user.notifications.push(notfication)
+        }
+
+        const updatedComment = await this.commentsService.update(comment)
+        const creatorCommentSocket = await this.baseGateway.findUser(updatedComment.user.id)
+
+        if(creatorCommentSocket && creatorCommentSocket.id !== body.answer.user.id) {
+            creatorCommentSocket.send(JSON.stringify({
+                event: Events.REFRESH_USER,
+                data: updatedComment.user
+            }))
+        }
+
+        delete updatedComment.user
+        
+        return {
+            event: Events.REFRESH_USER,
+            data: updatedComment
+        }
+    }
 
     @SubscribeMessage(Events.ADD_COMMENT_POST)
     public async addCommentToPost(
@@ -53,7 +89,7 @@ export class PostGateway {
                 ]
             }
         );
-        const user = await this.usersService.findOne({ id: socket.id });
+        const user = socket.user;
 
         if (!body.comment.user) {
             body.comment.user = user;
@@ -93,7 +129,7 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToPostDto
     ) {
-        const user = await this.usersService.findOne({ id: socket.id });
+        const user = socket.user;
         const post = await this.postsService.findOne(
             { id: body.postId },
             {
@@ -109,7 +145,7 @@ export class PostGateway {
         );
 
         const postContainsLike = post.likes.findIndex(
-            like => like.user.id === socket.id
+            like => like.user.id === socket.user.id
         );
 
         if (postContainsLike !== -1) {
@@ -133,7 +169,7 @@ export class PostGateway {
             updatedPost.user.id
         );
 
-        if (creatorPostSocket && creatorPostSocket.id !== user.id) {
+        if (creatorPostSocket) {
             creatorPostSocket.send(
                 JSON.stringify({
                     event: Events.REFRESH_USER,
@@ -151,5 +187,32 @@ export class PostGateway {
     public async addLikeToComment(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToCommentDto
-    ) {}
+    ) {
+        const comment = await this.commentsService.findOne({id: body.commentId}, {relations: ["likes", "user", "user.notifications", "user.notifications.sender", "user.settings"]})
+
+        comment.likes.push({user: socket.user} as Likes)
+
+        const notification = await this.baseGateway.setNotification(NotificationEnumType.LIKE_COMMENT, {sender: socket.user, user: comment.user}, comment.user.settings.likeOnCommentNotification)
+    
+        if(notification) {
+            comment.user.notifications.push(notification)
+        }
+        
+        const updatedComment = await this.commentsService.update(comment)
+        const creatorCommentSocket = await this.baseGateway.findUser(comment.user.id)
+
+        if(creatorCommentSocket) {
+            creatorCommentSocket.send(JSON.stringify({
+                event: Events.REFRESH_USER,
+                data: updatedComment.user
+            }))
+        }
+
+        delete updatedComment.user
+
+        return {
+            event: Events.REFRESH_USER,
+            data: updatedComment
+        }
+    }
 }

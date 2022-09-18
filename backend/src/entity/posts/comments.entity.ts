@@ -7,6 +7,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
+import { Likes } from "../common";
 import { Files } from "../common/files.entity";
 import { Users } from "../users/users.entity";
 import { Posts } from "./post.entity";
@@ -34,4 +35,8 @@ export class Comments {
     @ManyToOne(() => Posts, (post: Posts) => post.comments)
     @JoinColumn()
     post: Posts;
+
+    @ManyToMany(() => Likes, {cascade: true})
+    @JoinTable()
+    likes: Likes[]
 }

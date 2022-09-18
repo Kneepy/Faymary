@@ -3,5 +3,7 @@ export enum NotificationEnumType {
     UNSUB = "UNSUB",
 
     COMMENT = "COMMENT",
-    LIKE_POST = "LIKE_POST"
+    LIKE_POST = "LIKE_POST",
+    ANSWER_COMMENT = "ANSWER_COMMENT",
+    LIKE_COMMENT = "LIKE_COMMENT"
 }
