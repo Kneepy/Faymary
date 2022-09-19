@@ -32,10 +32,8 @@ export class AuthGuard implements CanActivate {
 
         try {
             if (
-                this.reflector.get(
-                    USE_AUTH_METADATA,
-                    context.getHandler()
-                ) === false
+                this.reflector.get(USE_AUTH_METADATA, context.getHandler()) ===
+                false
             ) {
                 return true;
             }

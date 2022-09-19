@@ -9,7 +9,7 @@ import {
 import { IncomingMessage } from "http";
 import { AuthService, WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
-import { Notifications, Users, UserSettings } from "src/entity";
+import { Notifications, Users } from "src/entity";
 import {
     ActivityEnum,
     ActivityService,
@@ -53,9 +53,11 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             criteriaUserSettings &&
             !user.notifications.filter(
                 notfication =>
-                notfication.expirensIn > Date.now() && notfication.sender.id === sender.id && notfication.type === type
-            ).length
-            && sender.id !== user.id 
+                    notfication.expirensIn > Date.now() &&
+                    notfication.sender.id === sender.id &&
+                    notfication.type === type
+            ).length &&
+            sender.id !== user.id
         ) {
             const notification = await this.notificationService.create({
                 user: user,

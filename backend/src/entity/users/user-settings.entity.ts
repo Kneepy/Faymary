@@ -18,14 +18,14 @@ export class UserSettings {
     @Column({ nullable: false, default: true })
     commentsOnPostNotifications: boolean;
 
-    @Column({nullable: false, default: true})
-    answersOnCommentNotification: boolean
+    @Column({ nullable: false, default: true })
+    answersOnCommentNotification: boolean;
 
     @Column({ nullable: false, default: true })
     likeOnPostNotifications: boolean;
 
-    @Column({nullable: false, default: true})
-    likeOnCommentNotification: boolean
+    @Column({ nullable: false, default: true })
+    likeOnCommentNotification: boolean;
 
     @OneToOne(() => Users, (user: Users) => user.settings)
     @JoinColumn()

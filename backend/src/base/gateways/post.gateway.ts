@@ -9,7 +9,7 @@ import {
 import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Likes } from "src/entity";
-import { CommentsService, NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
+import { CommentsService, NotificationEnumType, PostsService } from "src/mysql";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
@@ -27,7 +27,6 @@ export class PostGateway {
     constructor(
         private postsService: PostsService,
         private baseGateway: BaseGateway,
-        private usersService: UsersService,
         private commentsService: CommentsService
     ) {}
 
@@ -36,40 +35,58 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddAnswerToComment
     ) {
-        const comment = await this.commentsService.findOne({id: body.commentId}, {relations: ["answers", "user", "user.notifications", "user.notifications.sender", "user.settings"]})
+        const comment = await this.commentsService.findOne(
+            { id: body.commentId },
+            {
+                relations: [
+                    "answers",
+                    "user",
+                    "user.notifications",
+                    "user.notifications.sender",
+                    "user.settings"
+                ]
+            }
+        );
 
-        if(!body.answer.user) {
-            body.answer.user = socket.user
+        if (!body.answer.user) {
+            body.answer.user = socket.user;
         }
 
-        comment.answers.push(body.answer)
+        comment.answers.push(body.answer);
 
         const notfication = await this.baseGateway.setNotification(
             NotificationEnumType.ANSWER_COMMENT,
-            {sender: body.answer.user, user: comment.user},
+            { sender: body.answer.user, user: comment.user },
             comment.user.settings.answersOnCommentNotification
-        )
+        );
 
-        if(notfication) {
-            comment.user.notifications.push(notfication)
+        if (notfication) {
+            comment.user.notifications.push(notfication);
         }
 
-        const updatedComment = await this.commentsService.update(comment)
-        const creatorCommentSocket = await this.baseGateway.findUser(updatedComment.user.id)
+        const updatedComment = await this.commentsService.update(comment);
+        const creatorCommentSocket = await this.baseGateway.findUser(
+            updatedComment.user.id
+        );
 
-        if(creatorCommentSocket && creatorCommentSocket.id !== body.answer.user.id) {
-            creatorCommentSocket.send(JSON.stringify({
-                event: Events.REFRESH_USER,
-                data: updatedComment.user
-            }))
+        if (
+            creatorCommentSocket &&
+            creatorCommentSocket.id !== body.answer.user.id
+        ) {
+            creatorCommentSocket.send(
+                JSON.stringify({
+                    event: Events.REFRESH_USER,
+                    data: updatedComment.user
+                })
+            );
         }
 
-        delete updatedComment.user
-        
+        delete updatedComment.user;
+
         return {
             event: Events.REFRESH_USER,
             data: updatedComment
-        }
+        };
     }
 
     @SubscribeMessage(Events.ADD_COMMENT_POST)
@@ -151,7 +168,7 @@ export class PostGateway {
         if (postContainsLike !== -1) {
             post.likes.splice(postContainsLike, 1);
         } else {
-            post.likes.push({user} as Likes);
+            post.likes.push({ user } as Likes);
 
             const notification = await this.baseGateway.setNotification(
                 NotificationEnumType.LIKE_POST,
@@ -188,31 +205,50 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToCommentDto
     ) {
-        const comment = await this.commentsService.findOne({id: body.commentId}, {relations: ["likes", "user", "user.notifications", "user.notifications.sender", "user.settings"]})
+        const comment = await this.commentsService.findOne(
+            { id: body.commentId },
+            {
+                relations: [
+                    "likes",
+                    "user",
+                    "user.notifications",
+                    "user.notifications.sender",
+                    "user.settings"
+                ]
+            }
+        );
 
-        comment.likes.push({user: socket.user} as Likes)
+        comment.likes.push({ user: socket.user } as Likes);
 
-        const notification = await this.baseGateway.setNotification(NotificationEnumType.LIKE_COMMENT, {sender: socket.user, user: comment.user}, comment.user.settings.likeOnCommentNotification)
-    
-        if(notification) {
-            comment.user.notifications.push(notification)
+        const notification = await this.baseGateway.setNotification(
+            NotificationEnumType.LIKE_COMMENT,
+            { sender: socket.user, user: comment.user },
+            comment.user.settings.likeOnCommentNotification
+        );
+
+        if (notification) {
+            comment.user.notifications.push(notification);
         }
-        
-        const updatedComment = await this.commentsService.update(comment)
-        const creatorCommentSocket = await this.baseGateway.findUser(comment.user.id)
 
-        if(creatorCommentSocket) {
-            creatorCommentSocket.send(JSON.stringify({
-                event: Events.REFRESH_USER,
-                data: updatedComment.user
-            }))
+        const updatedComment = await this.commentsService.update(comment);
+        const creatorCommentSocket = await this.baseGateway.findUser(
+            comment.user.id
+        );
+
+        if (creatorCommentSocket) {
+            creatorCommentSocket.send(
+                JSON.stringify({
+                    event: Events.REFRESH_USER,
+                    data: updatedComment.user
+                })
+            );
         }
 
-        delete updatedComment.user
+        delete updatedComment.user;
 
         return {
             event: Events.REFRESH_USER,
             data: updatedComment
-        }
+        };
     }
 }

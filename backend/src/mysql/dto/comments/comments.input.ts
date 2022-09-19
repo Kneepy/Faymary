@@ -17,5 +17,5 @@ export class CommentsInput {
 
     @Type(() => Posts)
     @IsNotEmpty()
-    post: Posts
+    post: Posts;
 }

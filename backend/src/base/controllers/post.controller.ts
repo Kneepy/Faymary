@@ -13,7 +13,6 @@ import {
 import { ICustomFile, ICustomRequest } from "src/common";
 import { Posts } from "src/entity";
 import { PostsService, UsersService } from "src/mysql";
-import { FindOptionsRelations } from "typeorm";
 import { SaveFiles } from "../decorators";
 import { CreatePostDto, GetPostDto, UpdatePostDto } from "../dto/posts";
 

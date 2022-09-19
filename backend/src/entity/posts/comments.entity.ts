@@ -36,7 +36,7 @@ export class Comments {
     @JoinColumn()
     post: Posts;
 
-    @ManyToMany(() => Likes, {cascade: true})
+    @ManyToMany(() => Likes, { cascade: true })
     @JoinTable()
-    likes: Likes[]
+    likes: Likes[];
 }

@@ -14,5 +14,5 @@ export class CommentsArgs {
 
     @Type(() => Posts)
     @IsOptional()
-    post?: Posts;
+    post?: Partial<Posts>;
 }

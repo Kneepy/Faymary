@@ -3,6 +3,7 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
+    ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn
@@ -13,6 +14,7 @@ import { Notifications } from "./notifications.entity";
 import { UserSettings } from "./user-settings.entity";
 import { Posts } from "../posts/post.entity";
 import { Files } from "../common/files.entity";
+import { Dialogs, Messages } from "../conversation";
 
 @Entity()
 export class Users {
@@ -69,4 +71,10 @@ export class Users {
 
     @OneToMany(() => Files, (files: Files) => files.user, { cascade: true })
     files: Files[];
+
+    @ManyToMany(() => Dialogs, (dialogs: Dialogs) => dialogs.users)
+    dialogs: Dialogs;
+
+    @ManyToOne(() => Messages, (messages: Messages) => messages.user)
+    messages: Messages[];
 }

@@ -8,10 +8,7 @@ import {
 } from "@nestjs/websockets";
 import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
-import {
-    NotificationEnumType,
-    UsersService
-} from "src/mysql";
+import { NotificationEnumType, UsersService } from "src/mysql";
 import { SubscribeUserDto } from "../dto";
 import { Events } from "../enums";
 import { WsExeptionFilter } from "../filters";
@@ -23,7 +20,7 @@ import { BaseGateway } from "./base.gateway";
 export class UserGateway {
     constructor(
         private baseGateway: BaseGateway,
-        private usersService: UsersService,
+        private usersService: UsersService
     ) {}
 
     @SubscribeMessage(Events.SUB_USER)

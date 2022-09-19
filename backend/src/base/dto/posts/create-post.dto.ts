@@ -13,5 +13,5 @@ export class CreatePostDto {
 
     @IsNotEmpty()
     @Type(() => Files)
-    files: Files[]
+    files: Files[];
 }

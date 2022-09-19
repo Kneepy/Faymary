@@ -27,7 +27,7 @@ export class UsersService {
     }
 
     public async create(args: UsersInput): Promise<Users> {
-        return await this.repository.save({args, settings: {}});
+        return await this.repository.save({ args, settings: {} });
     }
 
     public async remove(uuid: string): Promise<any> {
