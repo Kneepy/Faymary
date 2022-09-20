@@ -31,6 +31,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private notificationService: NotificationsService
     ) {}
     private users: Map<string, ICustomSocket> = new Map();
+    
 
     public findUser(socketId: string): ICustomSocket {
         return this.users.get(socketId);

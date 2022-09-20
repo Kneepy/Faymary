@@ -27,7 +27,7 @@ export class Messages {
     @JoinColumn()
     user: Users;
 
-    @ManyToMany(() => Files)
+    @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.files, {cascade: true})
     @JoinTable()
-    files: Files;
+    files: Files[];
 }

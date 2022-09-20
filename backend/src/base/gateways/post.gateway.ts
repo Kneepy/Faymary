@@ -1,4 +1,4 @@
-import { UseFilters, UseGuards, UsePipes } from "@nestjs/common";
+import { UseFilters, UseGuards } from "@nestjs/common";
 import {
     ConnectedSocket,
     MessageBody,
@@ -35,6 +35,7 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddAnswerToComment
     ) {
+        const returnedEvent = Events.REFRESH_COMMENT
         const comment = await this.commentsService.findOne(
             { id: body.commentId },
             {
@@ -75,7 +76,7 @@ export class PostGateway {
         ) {
             creatorCommentSocket.send(
                 JSON.stringify({
-                    event: Events.REFRESH_USER,
+                    event: returnedEvent,
                     data: updatedComment.user
                 })
             );
@@ -84,7 +85,7 @@ export class PostGateway {
         delete updatedComment.user;
 
         return {
-            event: Events.REFRESH_USER,
+            event: returnedEvent,
             data: updatedComment
         };
     }
@@ -94,6 +95,7 @@ export class PostGateway {
         @MessageBody() body: AddCommentToPostDto,
         @ConnectedSocket() socket: ICustomSocket
     ): Promise<WsResponse<any>> {
+        const returnedEvent = Events.REFRESH_POST
         const post = await this.postsService.findOne(
             { id: body.postId },
             {
@@ -130,7 +132,7 @@ export class PostGateway {
         if (creatorPostSocket && creatorPostSocket.id !== user.id) {
             creatorPostSocket.send(
                 JSON.stringify({
-                    event: Events.REFRESH_USER,
+                    event: returnedEvent,
                     data: updatedPost.user
                 })
             );
@@ -138,7 +140,7 @@ export class PostGateway {
 
         delete updatedPost.user;
 
-        return { data: updatedPost, event: Events.REFRESH_USER };
+        return { data: updatedPost, event: returnedEvent };
     }
 
     @SubscribeMessage(Events.ADD_LIKE_POST)
@@ -146,6 +148,7 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToPostDto
     ) {
+        const returnedEvent = Events.REFRESH_POST
         const user = socket.user;
         const post = await this.postsService.findOne(
             { id: body.postId },
@@ -186,10 +189,10 @@ export class PostGateway {
             updatedPost.user.id
         );
 
-        if (creatorPostSocket) {
+        if (creatorPostSocket && creatorPostSocket.id !== socket.user.id) {
             creatorPostSocket.send(
                 JSON.stringify({
-                    event: Events.REFRESH_USER,
+                    event: returnedEvent,
                     data: updatedPost.user
                 })
             );
@@ -197,7 +200,7 @@ export class PostGateway {
 
         delete updatedPost.user;
 
-        return { event: Events.REFRESH_USER, data: updatedPost };
+        return { event: returnedEvent, data: updatedPost };
     }
 
     @SubscribeMessage(Events.ADD_LIKE_COMMENT)
@@ -205,6 +208,7 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToCommentDto
     ) {
+        const returnedEvent = Events.REFRESH_COMMENT
         const comment = await this.commentsService.findOne(
             { id: body.commentId },
             {
@@ -235,10 +239,10 @@ export class PostGateway {
             comment.user.id
         );
 
-        if (creatorCommentSocket) {
+        if (creatorCommentSocket && creatorCommentSocket.id !== socket.user.id) {
             creatorCommentSocket.send(
                 JSON.stringify({
-                    event: Events.REFRESH_USER,
+                    event: returnedEvent,
                     data: updatedComment.user
                 })
             );
@@ -247,7 +251,7 @@ export class PostGateway {
         delete updatedComment.user;
 
         return {
-            event: Events.REFRESH_USER,
+            event: returnedEvent,
             data: updatedComment
         };
     }

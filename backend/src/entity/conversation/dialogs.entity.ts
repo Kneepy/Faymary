@@ -5,6 +5,7 @@ import {
     OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
+import { Files } from "../common";
 import { Users } from "../users";
 import { Messages } from "./messages.entity";
 
@@ -19,4 +20,8 @@ export class Dialogs {
 
     @OneToMany(() => Messages, (message: Messages) => message.dialog)
     messages: Messages[];
+
+    @ManyToMany(() => Files)
+    @JoinTable()
+    files: Files[]
 }
