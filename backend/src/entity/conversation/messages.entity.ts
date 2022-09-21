@@ -4,6 +4,7 @@ import {
     JoinColumn,
     JoinTable,
     ManyToMany,
+    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
@@ -19,8 +20,7 @@ export class Messages {
     @Column({ nullable: false })
     message: string;
 
-    @OneToMany(() => Dialogs, (dialog: Dialogs) => dialog.messages)
-    @JoinColumn()
+    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.messages)
     dialog: Dialogs;
 
     @OneToMany(() => Users, (user: Users) => user.messages)

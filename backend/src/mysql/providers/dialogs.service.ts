@@ -10,7 +10,7 @@ export class DialogsService {
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>
     ) {}
 
-    public async findOne(args: DialogsArgs, options: FindOneOptions<Dialogs>): Promise<Dialogs> {
+    public async findOne(args: DialogsArgs, options?: FindOneOptions<Dialogs>): Promise<Dialogs> {
         return await this.repository.findOne({
             where: args,
             ...options
@@ -22,6 +22,10 @@ export class DialogsService {
             where: args,
             ...options
         })
+    }
+
+    public async update(args: Dialogs): Promise<Dialogs> {
+        return await this.repository.save(args)
     }
 
     public async create(input: DialogsInput): Promise<Dialogs> {

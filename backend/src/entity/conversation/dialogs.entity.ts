@@ -1,5 +1,6 @@
 import {
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToMany,
     OneToMany,
@@ -19,6 +20,7 @@ export class Dialogs {
     users: Users[];
 
     @OneToMany(() => Messages, (message: Messages) => message.dialog)
+    @JoinColumn()
     messages: Messages[];
 
     @ManyToMany(() => Files)

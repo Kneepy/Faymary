@@ -1,6 +1,7 @@
 export enum Events {
     NEW_NOTIFICATION = "notification.new",
     SUB_USER = "user.subscribe",
+    CREATE_DIALOG = "dialog.create",
 
     // create data
     ADD_COMMENT_POST = "post.add.comment",
@@ -15,5 +16,5 @@ export enum Events {
     // update data
     REFRESH_USER = "user.refresh",
     REFRESH_POST = "post.refresh",
-    REFRESH_COMMENT = "post.comment.refresh"
+    REFRESH_COMMENT = "post.comment.refresh",
 }
