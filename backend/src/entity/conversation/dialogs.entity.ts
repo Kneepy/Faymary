@@ -1,9 +1,9 @@
 import {
+    Column,
     Entity,
-    JoinColumn,
     JoinTable,
     ManyToMany,
-    OneToMany,
+    OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Files } from "../common";
@@ -15,11 +15,14 @@ export class Dialogs {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Column({nullable: true})
+    title?: string
+
     @ManyToMany(() => Users, (users: Users) => users.dialogs)
     @JoinTable()
     users: Users[];
 
-    @ManyToMany(() => Messages, (message: Messages) => message.dialog, {cascade: true})
+    @ManyToMany(() => Messages, (message: Messages) => message.dialog)
     @JoinTable()
     messages: Messages[];
 }

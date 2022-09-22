@@ -25,6 +25,7 @@ export class MessagesService {
     }
 
     public async create(input: MessagesInput): Promise<Messages> {
+        console.log(input)
         return await this.repository.save(input)
     }
 

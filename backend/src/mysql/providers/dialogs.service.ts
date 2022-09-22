@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Dialogs } from "src/entity";
+import { Dialogs, Messages } from "src/entity";
 import { FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { DialogsArgs, DialogsInput, ManyDialogsArgs } from "../dto";
 
@@ -10,6 +10,10 @@ export class DialogsService {
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>
     ) {}
     
+    public async addMessage(message: Messages) {
+        return await this.repository.createQueryBuilder().relation(Dialogs, "messages").of(message.dialog).add(message)
+    }
+
     public async findOne(args: DialogsArgs, options?: FindOneOptions<Dialogs>): Promise<Dialogs> {
         return await this.repository.findOne({
             where: args,

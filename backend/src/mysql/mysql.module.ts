@@ -15,7 +15,7 @@ import {
     Files,
     Likes,
     Messages,
-    Dialogs
+    Dialogs,
 } from "src/entity";
 
 const providers = [...Object.values(allMySQLProviders)];

@@ -2,14 +2,18 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "src/entity/users/users.entity";
 import { FindOneOptions, Repository } from "typeorm";
 import { UsersArgs, UsersInput } from "../dto";
-import { UtilService } from "../../common";
 import { Injectable } from "@nestjs/common";
+import { Notifications } from "src/entity";
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(Users) private repository: Repository<Users>
     ) {}
+
+    public async addNotification(notification: Notifications) {
+        return await this.repository.createQueryBuilder().relation(Users, "notifications").of(notification.sender).add(notification)
+    }
 
     public async findOne(
         args: UsersArgs,

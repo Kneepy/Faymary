@@ -37,6 +37,17 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return this.users.get(socketId);
     }
 
+    public findUsers(socketIds: string[]): ICustomSocket[] {
+        const sockets = []
+        socketIds.forEach(socketId => {
+            const socket = this.findUser(socketId)
+            if(socket) {
+                sockets.push(socket)
+            }
+        })
+        return sockets
+    }
+
     public setUser(socketId: string, socket: ICustomSocket) {
         return this.users.set(socketId, socket);
     }
@@ -67,6 +78,15 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             });
 
             return notification;
+        }
+    }
+
+    public sendNotification(socket: ICustomSocket, notification: Notifications, event: NotificationEnumType) {
+        if(notification.user.id !== notification.sender.id) {
+            socket.send(JSON.stringify({
+                event: event,
+                data: notification
+            }))
         }
     }
 

@@ -5,7 +5,6 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Files } from "../common";
@@ -28,6 +27,5 @@ export class Messages {
     user: Users;
 
     @ManyToMany(() => Files)
-    @JoinTable()
     files: Files[];
 }
