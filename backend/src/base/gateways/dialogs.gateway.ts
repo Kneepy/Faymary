@@ -1,7 +1,7 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from "@nestjs/websockets";
 import { ICustomSocket } from "src/common";
 import { Dialogs, Messages } from "src/entity";
-import { DialogsService } from "src/mysql";
+import { DialogsService, MessagesService } from "src/mysql";
 import { AddUserToDialogDto, CreateMessageDto, TransmitMessageToDialogDto } from "../dto/conversation";
 import { Events } from "../enums";
 import { BaseGateway } from "./base.gateway";
@@ -10,7 +10,8 @@ import { BaseGateway } from "./base.gateway";
 export class DialogsGateway {
     constructor(
         private baseGateway: BaseGateway,
-        private dialogsService: DialogsService
+        private dialogsService: DialogsService,
+        private messagesService: MessagesService
     ) {}
 
     @SubscribeMessage(Events.CREATE_DIALOG)
@@ -25,17 +26,16 @@ export class DialogsGateway {
     public async addMessageToDialog(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: CreateMessageDto
-    ): Promise<WsResponse<Dialogs>> {
+    ): Promise<WsResponse<Messages>> {
         try {
-            const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: ["messages"]})
-            dialog.messages = [...dialog.messages, {message: body.message, files: body.files, user: socket.user} as Messages]
-            console.log(dialog)
-            await this.dialogsService.update(dialog)
+            const dialog = await this.dialogsService.findOne({id: body.dialogId})
 
-            console.log(await this.dialogsService.findOne({id: body.dialogId}, {relations: ["messages", "files"]}))
             return {
                 event: "test",
-                data: await this.dialogsService.update(dialog)
+                data: await this.messagesService.create({
+                    dialog, user: socket.user, message: body.message,
+                    files: body.files
+                })
             }
         } catch (error) {
             console.log(error)

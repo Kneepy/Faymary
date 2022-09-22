@@ -9,7 +9,7 @@ export class DialogsService {
     constructor(
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>
     ) {}
-
+    
     public async findOne(args: DialogsArgs, options?: FindOneOptions<Dialogs>): Promise<Dialogs> {
         return await this.repository.findOne({
             where: args,

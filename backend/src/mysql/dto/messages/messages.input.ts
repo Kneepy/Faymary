@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Users, Files } from "src/entity";
+import { Users, Files, Dialogs } from "src/entity";
 
 export class MessagesInput {
     @IsString()
@@ -10,6 +10,10 @@ export class MessagesInput {
     @IsNotEmpty()
     @Type(() => Users)
     user: Users
+
+    @IsNotEmpty()
+    @Type(() => Dialogs)
+    dialog: Dialogs
 
     @Type(() => Files)
     @IsOptional()

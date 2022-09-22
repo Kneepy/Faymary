@@ -19,11 +19,7 @@ export class Dialogs {
     @JoinTable()
     users: Users[];
 
-    @OneToMany(() => Messages, (message: Messages) => message.dialog)
-    @JoinColumn()
-    messages: Messages[];
-
-    @ManyToMany(() => Files)
+    @ManyToMany(() => Messages, (message: Messages) => message.dialog, {cascade: true})
     @JoinTable()
-    files: Files[]
+    messages: Messages[];
 }

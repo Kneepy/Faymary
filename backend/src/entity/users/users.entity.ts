@@ -75,6 +75,6 @@ export class Users {
     @ManyToMany(() => Dialogs, (dialogs: Dialogs) => dialogs.users)
     dialogs: Dialogs;
 
-    @ManyToOne(() => Messages, (messages: Messages) => messages.user)
+    @OneToMany(() => Messages, (messages: Messages) => messages.user)
     messages: Messages[];
 }

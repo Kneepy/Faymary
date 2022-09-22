@@ -20,14 +20,14 @@ export class Messages {
     @Column({ nullable: false })
     message: string;
 
-    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.messages)
+    @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.messages)
     dialog: Dialogs;
 
-    @OneToMany(() => Users, (user: Users) => user.messages)
+    @ManyToOne(() => Users, (user: Users) => user.messages)
     @JoinColumn()
     user: Users;
 
-    @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.files, {cascade: true})
+    @ManyToMany(() => Files)
     @JoinTable()
     files: Files[];
 }
