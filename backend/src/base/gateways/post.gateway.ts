@@ -8,8 +8,8 @@ import {
 } from "@nestjs/websockets";
 import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
-import { Likes } from "src/entity";
-import { CommentsService, NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
+import { Comments, Likes, Posts } from "src/entity";
+import { CommentsService, LikesService, NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
@@ -29,52 +29,38 @@ export class PostGateway {
         private baseGateway: BaseGateway,
         private usersService: UsersService,
         private commentsService: CommentsService,
-        private notificationsService: NotificationsService
+        private notificationsService: NotificationsService,
+        private likesService: LikesService
     ) {}
 
     @SubscribeMessage(Events.ADD_ANSWER_COMMENT)
     public async addAnswerToComment(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddAnswerToComment
-    ) {
-        const returnedEvent = Events.REFRESH_COMMENT
-        const comment = await this.commentsService.findOne(
-            { id: body.commentId },
-            {
-                relations: [
-                    "answers",
-                    "user",
-                    "user.notifications",
-                    "user.notifications.sender",
-                    "user.settings"
-                ]
-            }
-        );
-
+    ): Promise<WsResponse<Comments>> {
         if (!body.answer.user) {
             body.answer.user = socket.user;
         }
 
-        comment.answers.push(body.answer);
-
-        const notfication = await this.baseGateway.setNotification(
-            NotificationEnumType.ANSWER_COMMENT,
-            { from: body.answer.user, to: comment.user },
-            comment.user.settings.answersOnCommentNotification
-        );
-
-        /*
-        const similarNotification = await this.notificationsService.findOne({from: socket.user, type: NotificationEnumType.ANSWER_COMMENT})
+        const comment = await this.commentsService.findOne({id: body.commentId}, {relations: {user: true}})
         const answer = await this.commentsService.create(body.answer)
         
-        if(!similarNotification) {
-            const notification = await this.notificationsService.create({to: answer.user, from: socket.user, type: NotificationEnumType.ANSWER_COMMENT})
-            const notificationSocket = await this.baseGateway.findUser(notification.to.id)
+        await this.commentsService.setAnswer(answer, comment)
 
-            await this.usersService.addNotification(notification)
-            await this.baseGateway.sendNotification(notificationSocket, notfication, NotificationEnumType.ANSWER_COMMENT)   
+        const notification = await this.baseGateway.setNotification(
+            { from: body.answer.user, to: comment.user, type: NotificationEnumType.ANSWER_COMMENT },
+            { answersOnCommentNotification: true }
+        );
+        await this.baseGateway.sendNotification(this.baseGateway.findUser(notification.to.id), notification, answer)
+
+        comment.answers = [answer]
+
+        return {
+            event: Events.REFRESH_COMMENT,
+            data: comment
         }
-        */
+        /*
+
 
         if (notfication) {
             comment.user.notifications.push(notfication);
@@ -103,14 +89,35 @@ export class PostGateway {
             event: returnedEvent,
             data: updatedComment
         };
+        */
     }
 
     @SubscribeMessage(Events.ADD_COMMENT_POST)
     public async addCommentToPost(
         @MessageBody() body: AddCommentToPostDto,
         @ConnectedSocket() socket: ICustomSocket
-    ): Promise<WsResponse<any>> {
-        const returnedEvent = Events.REFRESH_POST
+    ): Promise<WsResponse<Posts>> {
+        if(!body.comment.user) {
+            body.comment.user = socket.user
+        }
+
+        const post = await this.postsService.findOne({id: body.postId}, {relations: {user: true}})
+        const comment = await this.commentsService.create({...body.comment, post})
+
+        await this.postsService.setComment(comment)
+
+        const notfication = await this.baseGateway.setNotification({from: socket.user, to: post.user, type: NotificationEnumType.COMMENT}, {commentsOnPostNotifications: true})
+
+        this.baseGateway.sendNotification(this.baseGateway.findUser(notfication.to.id), notfication, comment)
+
+        post.comments = [comment]
+
+        return {
+            event: Events.REFRESH_POST,
+            data: post
+        }
+
+        /*const returnedEvent = Events.REFRESH_POST
         const post = await this.postsService.findOne(
             { id: body.postId },
             {
@@ -156,6 +163,7 @@ export class PostGateway {
         delete updatedPost.user;
 
         return { data: updatedPost, event: returnedEvent };
+        */
     }
 
     @SubscribeMessage(Events.ADD_LIKE_POST)
@@ -163,6 +171,16 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToPostDto
     ) {
+        const post = await this.postsService.findOne({id: body.postId}, {relations: {user: true}})
+        const isContainsLike = await this.postsService.findOne({
+            id: post.id,
+            likes: {user: {id: socket.id}}
+        })
+
+        if(isContainsLike) {
+            await this.postsService.unsetLike()
+        }
+        /*
         const returnedEvent = Events.REFRESH_POST
         const user = socket.user;
         const post = await this.postsService.findOne(
@@ -216,6 +234,7 @@ export class PostGateway {
         delete updatedPost.user;
 
         return { event: returnedEvent, data: updatedPost };
+        */
     }
 
     @SubscribeMessage(Events.ADD_LIKE_COMMENT)

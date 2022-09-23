@@ -9,7 +9,7 @@ import {
 import { IncomingMessage } from "http";
 import { AuthService, WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
-import { Notifications, Users } from "src/entity";
+import { Notifications, Users, UserSettings } from "src/entity";
 import {
     ActivityEnum,
     ActivityService,
@@ -17,6 +17,8 @@ import {
     NotificationsService,
     UsersService
 } from "src/mysql";
+import { FindOptionsRelations } from "typeorm";
+import { Events } from "../enums";
 import { WsExeptionFilter } from "../filters";
 
 @Injectable()
@@ -57,21 +59,20 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     async setNotification(
-        type: NotificationEnumType,
-        { from, to }: { from: Users; to: Users },
-        criteriaUserSettings: boolean = true
+        { from, to, type }: { from: Users; to: Users, type: NotificationEnumType },
+        criteriaUserSettings: FindOptionsRelations<UserSettings>
     ): Promise<Notifications | undefined> {
-        /*
-        const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT})
+        const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT}, {relations: {from: true}})
+        const complianceCreiterias = Object.keys(criteriaUserSettings).map(v => to.settings[v]).every(v => v === true)
 
-        if(!similarNotification) {
+        if(!similarNotification && complianceCreiterias) {
             const notification = await this.notificationService.create({from, to, type})
 
             await this.usersService.addNotification(notification)
 
             return notification
         }
-        */
+        /*
         if (
             criteriaUserSettings &&
             !to.notifications.filter(
@@ -90,13 +91,14 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             return notification;
         }
+        */
     }
 
-    public sendNotification(socket: ICustomSocket, notification: Notifications, event: NotificationEnumType) {
-        if(notification.to.id !== notification.from.id) {
+    public sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
+        if(socket && notification.to.id !== notification.from.id) {
             socket.send(JSON.stringify({
-                event: event,
-                data: notification
+                event: Events.NEW_NOTIFICATION,
+                data: {notification, payload}
             }))
         }
     }
@@ -113,7 +115,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             socket.user = await this.usersService.findOne(
                 { id: socket.id },
-                { relations: ["activity"] }
+                { relations: ["activity", "settings"] }
             );
 
             if (socket.user.activity) {

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Posts } from "src/entity";
 import { Comments } from "src/entity/posts/comments.entity";
 import { FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { CommentsArgs, CommentsInput } from "../dto";
@@ -9,6 +10,10 @@ export class CommentsService {
     constructor(
         @InjectRepository(Comments) private repository: Repository<Comments>
     ) {}
+
+    public async setAnswer(answer: Comments, on: Comments) {
+        await this.repository.createQueryBuilder().relation(Comments, "answers").of(on).add(answer)
+    }
 
     public async findOne(
         args: CommentsArgs,
