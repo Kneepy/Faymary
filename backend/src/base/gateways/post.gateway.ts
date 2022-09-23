@@ -9,7 +9,7 @@ import {
 import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Likes } from "src/entity";
-import { CommentsService, NotificationEnumType, PostsService } from "src/mysql";
+import { CommentsService, NotificationEnumType, NotificationsService, PostsService, UsersService } from "src/mysql";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
@@ -27,7 +27,9 @@ export class PostGateway {
     constructor(
         private postsService: PostsService,
         private baseGateway: BaseGateway,
-        private commentsService: CommentsService
+        private usersService: UsersService,
+        private commentsService: CommentsService,
+        private notificationsService: NotificationsService
     ) {}
 
     @SubscribeMessage(Events.ADD_ANSWER_COMMENT)
@@ -57,9 +59,22 @@ export class PostGateway {
 
         const notfication = await this.baseGateway.setNotification(
             NotificationEnumType.ANSWER_COMMENT,
-            { sender: body.answer.user, user: comment.user },
+            { from: body.answer.user, to: comment.user },
             comment.user.settings.answersOnCommentNotification
         );
+
+        /*
+        const similarNotification = await this.notificationsService.findOne({from: socket.user, type: NotificationEnumType.ANSWER_COMMENT})
+        const answer = await this.commentsService.create(body.answer)
+        
+        if(!similarNotification) {
+            const notification = await this.notificationsService.create({to: answer.user, from: socket.user, type: NotificationEnumType.ANSWER_COMMENT})
+            const notificationSocket = await this.baseGateway.findUser(notification.to.id)
+
+            await this.usersService.addNotification(notification)
+            await this.baseGateway.sendNotification(notificationSocket, notfication, NotificationEnumType.ANSWER_COMMENT)   
+        }
+        */
 
         if (notfication) {
             comment.user.notifications.push(notfication);
@@ -118,7 +133,7 @@ export class PostGateway {
 
         const notification = await this.baseGateway.setNotification(
             NotificationEnumType.COMMENT,
-            { user: post.user, sender: user },
+            { to: post.user, from: user },
             post.user.settings.commentsOnPostNotifications
         );
 
@@ -175,7 +190,7 @@ export class PostGateway {
 
             const notification = await this.baseGateway.setNotification(
                 NotificationEnumType.LIKE_POST,
-                { user: post.user, sender: user },
+                { to: post.user, from: user },
                 post.user.settings.likeOnPostNotifications
             );
 
@@ -226,7 +241,7 @@ export class PostGateway {
 
         const notification = await this.baseGateway.setNotification(
             NotificationEnumType.LIKE_COMMENT,
-            { sender: socket.user, user: comment.user },
+            { from: socket.user, to: comment.user },
             comment.user.settings.likeOnCommentNotification
         );
 

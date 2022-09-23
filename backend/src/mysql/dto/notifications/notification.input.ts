@@ -6,11 +6,11 @@ import { NotificationEnumType } from "src/mysql/enums";
 export class NotificationInput {
     @Type(() => Users)
     @IsNotEmpty()
-    user: Users;
+    to: Users;
 
     @Type(() => Users)
     @IsNotEmpty()
-    sender: Users;
+    from: Users;
 
     @IsNotEmpty()
     type: NotificationEnumType;

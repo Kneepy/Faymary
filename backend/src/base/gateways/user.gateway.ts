@@ -52,7 +52,7 @@ export class UserGateway {
 
             const notification = await this.baseGateway.setNotification(
                 NotificationEnumType.SUB,
-                { user: author, sender: subscriber },
+                { to: author, from: subscriber },
                 author.settings.subscriptionNotifications
             );
 

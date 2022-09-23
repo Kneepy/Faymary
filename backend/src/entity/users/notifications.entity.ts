@@ -5,17 +5,17 @@ import { Users } from "./users.entity";
 
 @Entity()
 export class Notifications extends Lifetime {
-    @PrimaryGeneratedColumn()
-    id?: number;
+    @PrimaryGeneratedColumn("uuid")
+    id?: string;
 
     @Column()
     type: NotificationEnumType;
 
     @ManyToOne(() => Users, (user: Users) => user.notifications)
     @JoinColumn()
-    user: Users;
+    to: Users;
 
     @ManyToOne(() => Users)
     @JoinColumn()
-    sender: Users;
+    from: Users;
 }

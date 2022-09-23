@@ -58,22 +58,33 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     async setNotification(
         type: NotificationEnumType,
-        { sender, user }: { sender: Users; user: Users },
+        { from, to }: { from: Users; to: Users },
         criteriaUserSettings: boolean = true
     ): Promise<Notifications | undefined> {
+        /*
+        const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT})
+
+        if(!similarNotification) {
+            const notification = await this.notificationService.create({from, to, type})
+
+            await this.usersService.addNotification(notification)
+
+            return notification
+        }
+        */
         if (
             criteriaUserSettings &&
-            !user.notifications.filter(
+            !to.notifications.filter(
                 notfication =>
                     notfication.expirensIn > Date.now() &&
-                    notfication.sender.id === sender.id &&
+                    notfication.from.id === from.id &&
                     notfication.type === type
             ).length &&
-            sender.id !== user.id
+            from.id !== to.id
         ) {
             const notification = await this.notificationService.create({
-                user: user,
-                sender: sender,
+                to: to,
+                from: from,
                 type: type
             });
 
@@ -82,7 +93,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     public sendNotification(socket: ICustomSocket, notification: Notifications, event: NotificationEnumType) {
-        if(notification.user.id !== notification.sender.id) {
+        if(notification.to.id !== notification.from.id) {
             socket.send(JSON.stringify({
                 event: event,
                 data: notification

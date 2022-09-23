@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EXPIRES_IN_NOTIFICATION } from "src/config";
 import { Notifications } from "src/entity/users/notifications.entity";
-import { Repository } from "typeorm";
-import { NotificationInput } from "../dto";
+import { FindOneOptions, MoreThan, Repository } from "typeorm";
+import { NotificationArgs, NotificationInput } from "../dto";
 
 @Injectable()
 export class NotificationsService {
@@ -18,6 +18,17 @@ export class NotificationsService {
             createdAt: Date.now(),
             expirensIn: Date.now() + EXPIRES_IN_NOTIFICATION
         });
+    }
+
+    async findOne(args: Partial<NotificationArgs>, options?: FindOneOptions<Notifications>): Promise<Notifications> {
+        return await this.repository.findOne({
+            where: {
+                ...args,
+                expirensIn: MoreThan(Date.now())
+            },
+            
+            ...options
+        })
     }
 
     async delete(notificationId: number): Promise<any> {

@@ -17,7 +17,7 @@ export class DialogsGateway {
     ) {}
 
     @SubscribeMessage(Events.CREATE_DIALOG)
-    public async test(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: CreateDialgDto) {
+    public async createDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: CreateDialgDto) {
         body.users.filter(user => user.id !== socket.user.id)
         const dialog = await this.dialogsService.create({users: [...(body.users), socket.user]})
 
@@ -25,7 +25,7 @@ export class DialogsGateway {
         const notficationType = NotificationEnumType.ADD_DIALOG
         
         userDialogSockets.forEach(async userSocket => {
-            const notification = await this.notificationsService.create({user: socket.user, sender: userSocket.user, type: NotificationEnumType.ADD_DIALOG})
+            const notification = await this.notificationsService.create({from: socket.user, to: userSocket.user, type: NotificationEnumType.ADD_DIALOG})
             await this.usersService.addNotification(notification)
             
             this.baseGateway.sendNotification(userSocket, notification, notficationType)

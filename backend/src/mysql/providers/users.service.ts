@@ -12,7 +12,7 @@ export class UsersService {
     ) {}
 
     public async addNotification(notification: Notifications) {
-        return await this.repository.createQueryBuilder().relation(Users, "notifications").of(notification.sender).add(notification)
+        return await this.repository.createQueryBuilder().relation(Users, "notifications").of(notification.to).add(notification)
     }
 
     public async findOne(

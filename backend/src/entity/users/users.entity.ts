@@ -56,7 +56,7 @@ export class Users {
 
     @OneToMany(
         () => Notifications,
-        (notifications: Notifications) => notifications.user,
+        (notifications: Notifications) => notifications.to,
         { cascade: true }
     )
     notifications: Notifications[];
