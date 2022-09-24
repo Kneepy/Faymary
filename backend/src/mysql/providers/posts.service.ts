@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Comments, Likes } from "src/entity";
+import { Comments, Users } from "src/entity";
 import { Posts } from "src/entity/posts/post.entity";
 import { FindOneOptions, Repository } from "typeorm";
 import { PostsArgs, PostsInput } from "../dto";
@@ -15,12 +15,12 @@ export class PostsService {
         await this.repository.createQueryBuilder().relation(Posts, "comments").of(comment.post).add(comment)
     }
 
-    public async setLike(like: Likes, post: Posts) {
-        await this.repository.createQueryBuilder().relation(Posts, "likes").of(post).add(like)
+    public async setLike(user: Users, post: Posts) {
+        await this.repository.createQueryBuilder().relation(Posts, "likes").of(post).add(user)
     }
 
-    public async unsetLike(like: Likes, post: Posts) {
-        await this.repository.createQueryBuilder().relation(Posts, "likes").of(post).remove(like)
+    public async unsetLike(user: Users, post: Posts) {
+        await this.repository.createQueryBuilder().relation(Posts, "likes").of(post).remove(user)
     }
 
     public async findOne(

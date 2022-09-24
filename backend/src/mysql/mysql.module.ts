@@ -13,7 +13,6 @@ import {
     Posts,
     Comments,
     Files,
-    Likes,
     Messages,
     Dialogs,
 } from "src/entity";
@@ -38,7 +37,6 @@ const providers = [...Object.values(allMySQLProviders)];
             Posts,
             Comments,
             Files,
-            Likes,
             Messages,
             Dialogs
         ])

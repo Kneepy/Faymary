@@ -15,6 +15,14 @@ export class UsersService {
         return await this.repository.createQueryBuilder().relation(Users, "notifications").of(notification.to).add(notification)
     }
 
+    public async setSubscriber(subscriber: Users, author: Users) {
+        await this.repository.createQueryBuilder().relation(Users, "subscribers").of(author).add(subscriber)
+    }
+
+    public async unsetSubscriber(subscriber: Users, author: Users) {
+        await this.repository.createQueryBuilder().relation(Users, "subscribers").of(author).remove(subscriber)
+    }
+
     public async findOne(
         args: UsersArgs,
         options?: FindOneOptions<Users>

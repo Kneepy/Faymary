@@ -28,56 +28,24 @@ export class UserGateway {
         @MessageBody() body: SubscribeUserDto,
         @ConnectedSocket() socket: ICustomSocket
     ): Promise<WsResponse<any>> {
-        const author = await this.usersService.findOne(
-            { id: body.userId },
-            {
-                relations: [
-                    "subscribers",
-                    "settings",
-                    "notifications",
-                    "notifications.sender"
-                ]
-            }
-        );
-        const authorSocket = this.baseGateway.findUser(body.userId);
-        const subscriber = socket.user;
-        const subscriberIndex = author.subscribers.indexOf(
-            author.subscribers.find(e => e.id === subscriber.id)
-        );
+        const author = await this.usersService.findOne({id: body.userId}, {relations: {subscribers: true}})
+        const subscriber = await this.usersService.findOne({id: socket.id}, {relations: {subscriptions: true}})
+        const subscriberContainsIndex = author.subscribers.findIndex(user => user.id === subscriber.id)
 
-        if (subscriberIndex !== -1) {
-            author.subscribers.splice(subscriberIndex, 1);
-        } else {
-            author.subscribers.push(subscriber);
-
-            const notification = await this.baseGateway.setNotification(
-                NotificationEnumType.SUB,
-                { to: author, from: subscriber },
-                author.settings.subscriptionNotifications
-            );
-
-            if (notification) {
-                author.notifications.push(notification);
-            }
+        if(subscriberContainsIndex === -1) {
+            await this.usersService.unsetSubscriber(subscriber, author)
         }
+        else {
+            await this.usersService.setSubscriber(subscriber, author)
 
-        const updatedAuthor = await this.usersService.update(author);
+            const notification = await this.baseGateway.setNotification({to: author, from: subscriber, type: NotificationEnumType.SUB}, {subscriptionNotifications: true})
 
-        if (authorSocket) {
-            authorSocket.send(
-                JSON.stringify({
-                    event: Events.REFRESH_USER,
-                    data: updatedAuthor
-                })
-            );
+            await this.baseGateway.sendNotification(this.baseGateway.findUser(author.id), notification, {...subscriber, subscriptions: undefined})
         }
 
         return {
             event: Events.REFRESH_USER,
-            data: await this.usersService.findOne(
-                { id: socket.id },
-                { relations: ["subscriptions"] }
-            ) // возможно это нужно заменить
-        };
+            data: subscriber
+        }
     }
 }

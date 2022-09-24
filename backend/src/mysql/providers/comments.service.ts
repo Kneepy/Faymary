@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Posts } from "src/entity";
+import { Posts, Users } from "src/entity";
 import { Comments } from "src/entity/posts/comments.entity";
 import { FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { CommentsArgs, CommentsInput } from "../dto";
@@ -13,6 +13,14 @@ export class CommentsService {
 
     public async setAnswer(answer: Comments, on: Comments) {
         await this.repository.createQueryBuilder().relation(Comments, "answers").of(on).add(answer)
+    }
+
+    public async setLike(user: Users, comment: Comments) {
+        await this.repository.createQueryBuilder().relation(Comments, "likes").of(comment).add(user)
+    }
+
+    public async unsetLike(user: Users, comment: Comments) {
+        await this.repository.createQueryBuilder().relation(Comments, "likes").of(comment).remove(user)
     }
 
     public async findOne(

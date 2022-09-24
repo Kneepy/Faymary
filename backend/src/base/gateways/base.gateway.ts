@@ -62,36 +62,18 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         { from, to, type }: { from: Users; to: Users, type: NotificationEnumType },
         criteriaUserSettings: FindOptionsRelations<UserSettings>
     ): Promise<Notifications | undefined> {
-        const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT}, {relations: {from: true}})
-        const complianceCreiterias = Object.keys(criteriaUserSettings).map(v => to.settings[v]).every(v => v === true)
+        if(from.id !== to.id) {
+            const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT}, {relations: {from: true}})
+            const complianceCreiterias = Object.keys(criteriaUserSettings).map(v => to.settings[v]).every(v => v === true)
 
-        if(!similarNotification && complianceCreiterias) {
-            const notification = await this.notificationService.create({from, to, type})
+            if(!similarNotification && complianceCreiterias) {
+                const notification = await this.notificationService.create({from, to, type})
 
-            await this.usersService.addNotification(notification)
+                await this.usersService.addNotification(notification)
 
-            return notification
+                return notification
+            }
         }
-        /*
-        if (
-            criteriaUserSettings &&
-            !to.notifications.filter(
-                notfication =>
-                    notfication.expirensIn > Date.now() &&
-                    notfication.from.id === from.id &&
-                    notfication.type === type
-            ).length &&
-            from.id !== to.id
-        ) {
-            const notification = await this.notificationService.create({
-                to: to,
-                from: from,
-                type: type
-            });
-
-            return notification;
-        }
-        */
     }
 
     public sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
