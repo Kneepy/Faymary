@@ -38,7 +38,7 @@ export class UserGateway {
         else {
             await this.usersService.setSubscriber(subscriber, author)
 
-            const notification = await this.baseGateway.setNotification({to: author, from: subscriber, type: NotificationEnumType.SUB}, {subscriptionNotifications: true})
+            const notification = await this.baseGateway.setNotification({to: author, from: subscriber, type: NotificationEnumType.SUB})
 
             await this.baseGateway.sendNotification(this.baseGateway.findUser(author.id), notification, {...subscriber, subscriptions: undefined})
         }

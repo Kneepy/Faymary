@@ -27,6 +27,9 @@ export class UserSettings {
     @Column({ nullable: false, default: true })
     likeOnCommentNotification: boolean;
 
+    @Column({ nullable: false, default: true })
+    addMeToDialogNotification: boolean;
+
     @OneToOne(() => Users, (user: Users) => user.settings)
     @JoinColumn()
     user: Users;

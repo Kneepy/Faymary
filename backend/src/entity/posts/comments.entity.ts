@@ -31,8 +31,8 @@ export class Comments {
     @JoinTable()
     answers: Comments[];
 
-    @ManyToOne(() => Posts, (post: Posts) => post.comments)
-    @JoinColumn()
+    @ManyToMany(() => Posts, (post: Posts) => post.comments)
+    @JoinTable()
     post: Posts;
 
     @ManyToMany(() => Users)

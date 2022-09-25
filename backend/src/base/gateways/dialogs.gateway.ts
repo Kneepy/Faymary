@@ -12,8 +12,7 @@ export class DialogsGateway {
         private baseGateway: BaseGateway,
         private dialogsService: DialogsService,
         private messagesService: MessagesService,
-        private usersService: UsersService,
-        private notificationsService: NotificationsService
+        private usersService: UsersService
     ) {}
 
     @SubscribeMessage(Events.CREATE_DIALOG)
@@ -25,7 +24,7 @@ export class DialogsGateway {
         const notficationType = NotificationEnumType.ADD_DIALOG
         
         userDialogSockets.forEach(async userSocket => {
-            const notification = await this.notificationsService.create({from: socket.user, to: userSocket.user, type: NotificationEnumType.ADD_DIALOG})
+            const notification = await this.baseGateway.setNotification({from: socket.user, to: userSocket.user, type: NotificationEnumType.ADD_DIALOG})
             await this.usersService.addNotification(notification)
             
             this.baseGateway.sendNotification(userSocket, notification, notficationType)

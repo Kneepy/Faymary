@@ -45,10 +45,12 @@ export class PostGateway {
         await this.commentsService.setAnswer(answer, comment)
 
         const notification = await this.baseGateway.setNotification(
-            { from: body.answer.user, to: comment.user, type: NotificationEnumType.ANSWER_COMMENT },
-            { answersOnCommentNotification: true }
+            { from: body.answer.user, to: comment.user, type: NotificationEnumType.ANSWER_COMMENT }
         );
-        await this.baseGateway.sendNotification(this.baseGateway.findUser(notification.to.id), notification, answer)
+        
+        if(notification) {
+            this.baseGateway.sendNotification(this.baseGateway.findUser(notification.to.id), notification, answer)
+        }
 
         comment.answers = [answer]
 
@@ -62,7 +64,7 @@ export class PostGateway {
     public async addCommentToPost(
         @MessageBody() body: AddCommentToPostDto,
         @ConnectedSocket() socket: ICustomSocket
-    ): Promise<WsResponse<Posts>> {
+    ): Promise<WsResponse<Comments>> {
         if(!body.comment.user) {
             body.comment.user = socket.user
         }
@@ -72,14 +74,15 @@ export class PostGateway {
 
         await this.postsService.setComment(comment)
 
-        const notfication = await this.baseGateway.setNotification({from: socket.user, to: post.user, type: NotificationEnumType.COMMENT}, {commentsOnPostNotifications: true})
+        const notfication = await this.baseGateway.setNotification({from: socket.user, to: post.user, type: NotificationEnumType.COMMENT})
         
-        this.baseGateway.sendNotification(this.baseGateway.findUser(notfication.to.id), notfication, comment)
-        post.comments = [comment]
+        if(notfication) {
+            this.baseGateway.sendNotification(this.baseGateway.findUser(notfication.to.id), notfication, comment)
+        }
 
         return {
-            event: Events.REFRESH_POST,
-            data: post
+            event: Events.REFRESH_COMMENT,
+            data: comment
         }
     }
 
@@ -97,7 +100,7 @@ export class PostGateway {
         else {
             await this.postsService.setLike(socket.user, post)
 
-            const notfication = await this.baseGateway.setNotification({from: socket.user, to: post.user, type: NotificationEnumType.LIKE_POST}, {likeOnPostNotifications: true})
+            const notfication = await this.baseGateway.setNotification({from: socket.user, to: post.user, type: NotificationEnumType.LIKE_POST})
 
             if(notfication) {
                 delete post.likes
@@ -118,7 +121,9 @@ export class PostGateway {
     public async addLikeToComment(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToCommentDto
-    ) {
+    ): Promise<WsResponse<{comment: Comments, likeMe: boolean}>> {
+        const dn = Date.now()
+
         const comment = await this.commentsService.findOne({id: body.commentId}, {relations: {user: true, likes: true}})
         const likeContainsIndex = comment.likes.findIndex(like => like.id === socket.user.id)
 
@@ -128,15 +133,17 @@ export class PostGateway {
         else {
             await this.commentsService.setLike(socket.user, comment)
 
-            const notfication = await this.baseGateway.setNotification({from: socket.user, to: comment.user, type: NotificationEnumType.LIKE_COMMENT}, {likeOnCommentNotification: true})
-
-            delete comment.likes
-            this.baseGateway.sendNotification(this.baseGateway.findUser(comment.user.id), notfication, comment)
+            const notfication = await this.baseGateway.setNotification({from: socket.user, to: comment.user, type: NotificationEnumType.LIKE_COMMENT})
+    
+            if(notfication) {
+                delete comment.likes
+                this.baseGateway.sendNotification(this.baseGateway.findUser(comment.user.id), notfication, comment)
+            }
         }
-
+        
         return {
             event: Events.REFRESH_COMMENT,
-            data: {...comment, likeMe: likeContainsIndex !== -1}
+            data: {comment, likeMe: likeContainsIndex !== -1}
         }
     }
 }

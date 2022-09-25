@@ -59,26 +59,21 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     async setNotification(
-        { from, to, type }: { from: Users; to: Users, type: NotificationEnumType },
-        criteriaUserSettings: FindOptionsRelations<UserSettings>
+        { from, to, type }: { from: Users; to: Users, type: NotificationEnumType }
     ): Promise<Notifications | undefined> {
         if(from.id !== to.id) {
-            const socketTo = this.findUser(to.id)
-            const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT}, {relations: {from: true}})
-            const complianceCreiterias = socketTo ? Object.keys(criteriaUserSettings).map(v => socketTo.user.settings[v]).every(v => v === true) : true
+            const similarNotification = await this.notificationService.findOne({from, type}, {relations: {from: true}})
 
-            if(!similarNotification && complianceCreiterias) {
+            if(!similarNotification) {
                 const notification = await this.notificationService.create({from, to, type})
 
                 await this.usersService.addNotification(notification)
-
                 return notification
             }
         }
     }
 
-    public sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
-        console.log(notification)
+    public async sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
         if(socket && notification.to.id !== notification.from.id) {
             socket.send(JSON.stringify({
                 event: Events.NEW_NOTIFICATION,
@@ -105,7 +100,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (socket.user.activity) {
                 socket.user.activity = Object.assign(socket.user.activity, {
                     state: ActivityEnum.ONLINE,
-                    start: Date.now()
+                     start: Date.now()
                 });
 
                 socket.state = socket.user.activity;

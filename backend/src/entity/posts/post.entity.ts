@@ -33,7 +33,7 @@ export class Posts {
     @ManyToOne(() => Users, (user: Users) => user.posts)
     user: Users;
 
-    @OneToMany(() => Comments, (comments: Comments) => comments.post, {
+    @ManyToMany(() => Comments, (comments: Comments) => comments.post, {
         cascade: true
     })
     comments: Comments[];
