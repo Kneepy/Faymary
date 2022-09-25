@@ -74,7 +74,30 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     public async sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
-        if(socket && notification.to.id !== notification.from.id) {
+        let toSendNotification: boolean;
+        // очень страшная конструкция надо что-то придумать...
+        switch (notification.type) {
+            case NotificationEnumType.SUB:
+                toSendNotification = socket.user.settings.subscriptionNotifications
+                break;
+            case NotificationEnumType.LIKE_POST:
+                toSendNotification = socket.user.settings.likeOnPostNotifications
+                break;
+            case NotificationEnumType.LIKE_COMMENT:
+                toSendNotification = socket.user.settings.likeOnCommentNotification
+                break;
+            case NotificationEnumType.COMMENT:
+                toSendNotification = socket.user.settings.commentsOnPostNotifications
+                break;
+            case NotificationEnumType.ANSWER_COMMENT:
+                toSendNotification = socket.user.settings.answersOnCommentNotification
+                break;
+            case NotificationEnumType.ADD_DIALOG:
+                toSendNotification = socket.user.settings.addMeToDialogNotification
+                break;
+        }
+
+        if(socket && notification.to.id !== notification.from.id && toSendNotification) {
             socket.send(JSON.stringify({
                 event: Events.NEW_NOTIFICATION,
                 data: {notification, payload}
