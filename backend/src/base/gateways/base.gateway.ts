@@ -63,8 +63,9 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         criteriaUserSettings: FindOptionsRelations<UserSettings>
     ): Promise<Notifications | undefined> {
         if(from.id !== to.id) {
+            const socketTo = this.findUser(to.id)
             const similarNotification = await this.notificationService.findOne({from: from, type: NotificationEnumType.ANSWER_COMMENT}, {relations: {from: true}})
-            const complianceCreiterias = Object.keys(criteriaUserSettings).map(v => to.settings[v]).every(v => v === true)
+            const complianceCreiterias = socketTo ? Object.keys(criteriaUserSettings).map(v => socketTo.user.settings[v]).every(v => v === true) : true
 
             if(!similarNotification && complianceCreiterias) {
                 const notification = await this.notificationService.create({from, to, type})
@@ -77,6 +78,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     public sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
+        console.log(notification)
         if(socket && notification.to.id !== notification.from.id) {
             socket.send(JSON.stringify({
                 event: Events.NEW_NOTIFICATION,

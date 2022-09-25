@@ -87,10 +87,10 @@ export class PostGateway {
     public async addLikeToPost(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToPostDto
-    ) {
+    ): Promise<WsResponse<{post: Posts, likeMe: boolean}>> {
         const post = await this.postsService.findOne({id: body.postId}, {relations: {user: true, likes: true}})
         const indexContainsLike = post.likes.findIndex(like => like.id === socket.user.id)
-        
+
         if(indexContainsLike !== -1) {
             await this.postsService.unsetLike(socket.user, post)
         }
@@ -99,8 +99,10 @@ export class PostGateway {
 
             const notfication = await this.baseGateway.setNotification({from: socket.user, to: post.user, type: NotificationEnumType.LIKE_POST}, {likeOnPostNotifications: true})
 
-            delete post.likes
-            this.baseGateway.sendNotification(this.baseGateway.findUser(post.user.id), notfication, post)
+            if(notfication) {
+                delete post.likes
+                this.baseGateway.sendNotification(this.baseGateway.findUser(post.user.id), notfication, post)
+            }
         }
 
         delete post?.likes
@@ -108,7 +110,7 @@ export class PostGateway {
 
         return {
             event: Events.REFRESH_POST,
-            data: {...post, likeMe: indexContainsLike === -1}
+            data: {post, likeMe: indexContainsLike === -1}
         }
     }
 
