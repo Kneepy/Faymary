@@ -122,8 +122,6 @@ export class PostGateway {
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: AddLikeToCommentDto
     ): Promise<WsResponse<{comment: Comments, likeMe: boolean}>> {
-        const dn = Date.now()
-
         const comment = await this.commentsService.findOne({id: body.commentId}, {relations: {user: true, likes: true}})
         const likeContainsIndex = comment.likes.findIndex(like => like.id === socket.user.id)
 

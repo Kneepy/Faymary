@@ -95,6 +95,9 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             case NotificationEnumType.ADD_DIALOG:
                 toSendNotification = socket.user.settings.addMeToDialogNotification
                 break;
+            default: 
+                toSendNotification = true
+                break;
         }
 
         if(socket && notification.to.id !== notification.from.id && toSendNotification) {
@@ -113,8 +116,8 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const token =
                 args.headers.authorization.split(" ")[1] ??
                 args.headers.authorization;
-            socket.id = this.authService.verifyAccessToken(token).userId;
 
+            socket.id = this.authService.verifyAccessToken(token).userId;
             socket.user = await this.usersService.findOne(
                 { id: socket.id },
                 { relations: ["activity", "settings"] }

@@ -6,3 +6,5 @@ export const USER_NOT_FOUND_EMAIL =
 
 export const WAITING_TIME_EXPIRED_CONFIRM =
     "Время ожидания подтверждения истекло!";
+
+export const DIALOG_NOT_FOUND = "Диалога с таким id не существует!"

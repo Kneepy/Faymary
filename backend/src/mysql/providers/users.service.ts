@@ -3,7 +3,7 @@ import { Users } from "src/entity/users/users.entity";
 import { FindOneOptions, Repository } from "typeorm";
 import { UsersArgs, UsersInput } from "../dto";
 import { Injectable } from "@nestjs/common";
-import { Notifications, UserSettings } from "src/entity";
+import { Notifications } from "src/entity";
 
 @Injectable()
 export class UsersService {

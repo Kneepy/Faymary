@@ -7,8 +7,8 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
-import { Files } from "../common";
-import { Users } from "../users";
+import { Files } from "../../entity/common";
+import { Users } from "../../entity/users";
 import { Dialogs } from "./dialogs.entity";
 
 @Entity()

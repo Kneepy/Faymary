@@ -1,3 +1,4 @@
+import { NotificationEnumType } from "src/mysql";
 import {
     Column,
     Entity,
@@ -13,6 +14,7 @@ export class UserSettings {
     id: string;
 
     @Column({ nullable: false, default: true })
+    @Reflect.metadata("notificationType", () => NotificationEnumType.SUB)
     subscriptionNotifications: boolean;
 
     @Column({ nullable: false, default: true })

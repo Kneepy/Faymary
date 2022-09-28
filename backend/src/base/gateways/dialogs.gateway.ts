@@ -1,5 +1,6 @@
+import { NotFoundException } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
-import { ICustomSocket } from "src/common";
+import { DIALOG_NOT_FOUND, ICustomSocket } from "src/common";
 import { Dialogs, Messages } from "src/entity";
 import { DialogsService, MessagesService, NotificationEnumType, NotificationsService, UsersService } from "src/mysql";
 import { AddUserToDialogDto, CreateDialgDto, CreateMessageDto, TransmitMessageToDialogDto } from "../dto/conversation";
@@ -16,7 +17,7 @@ export class DialogsGateway {
     ) {}
 
     @SubscribeMessage(Events.CREATE_DIALOG)
-    public async createDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: CreateDialgDto) {
+    public async createDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: CreateDialgDto): Promise<WsResponse<Dialogs>> {
         body.users.filter(user => user.id !== socket.user.id)
         const dialog = await this.dialogsService.create({users: [...(body.users), socket.user]})
 
@@ -24,14 +25,14 @@ export class DialogsGateway {
         const notficationType = NotificationEnumType.ADD_DIALOG
         
         userDialogSockets.forEach(async userSocket => {
-            const notification = await this.baseGateway.setNotification({from: socket.user, to: userSocket.user, type: NotificationEnumType.ADD_DIALOG})
+            const notification = await this.baseGateway.setNotification({from: socket.user, to: userSocket.user, type: notficationType})
             await this.usersService.addNotification(notification)
             
             this.baseGateway.sendNotification(userSocket, notification, notficationType)
         })
 
         return {
-            event: Events.REFRECH_DIALOG,
+            event: Events.REFRESH_DIALOG,
             data: dialog
         }
     }
@@ -42,29 +43,28 @@ export class DialogsGateway {
         @MessageBody() body: CreateMessageDto
     ): Promise<WsResponse<Messages>> {
         try {
-            const dialog = await this.dialogsService.findOne({id: body.dialogId})
-        
+            const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {users: true}})
+            
             if(dialog) {
-                const message = await this.messagesService.create({
-                    dialog, user: socket.user, message: body.message,
-                    files: body.files
-                })
+                const message = await this.messagesService.create({message: body.message, files: body.files, dialog, user: socket.user})
 
                 await this.dialogsService.addMessage(message)
-    
-                const userIds = dialog.users.map(user => user.id)
-                const userSockets = this.baseGateway.findUsers(userIds)
-                userSockets.forEach(userSocket => (userSocket.id !== socket.id) && userSocket.send(JSON.stringify(
-                    {
-                        event: Events.REFRESH_MESSAGES,
-                        data: message
-                    }
-                )))
+                
+                delete message.user.settings
+                delete message.user.activity
+
+                this.baseGateway.findUsers(dialog.users.map(user => user.id)).forEach(userSocket => userSocket.id !== socket.id && userSocket.send(JSON.stringify({
+                    data: message,
+                    event: Events.REFRESH_MESSAGES
+                })))
 
                 return {
-                    event: Events.REFRESH_MESSAGES,
-                    data: message
+                    data: message, 
+                    event: Events.REFRESH_MESSAGES
                 }
+            }
+            else {
+                throw new NotFoundException(DIALOG_NOT_FOUND)
             }
         } catch (error) {
             throw new WsException(error)

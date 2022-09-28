@@ -17,6 +17,6 @@ export enum Events {
     REFRESH_USER = "user.refresh",
     REFRESH_POST = "post.refresh",
     REFRESH_COMMENT = "post.comment.refresh",
-    REFRECH_DIALOG = "dialog.refresh",
+    REFRESH_DIALOG = "dialog.refresh",
     REFRESH_MESSAGES = "dialogs.messages.refresh"
 }
