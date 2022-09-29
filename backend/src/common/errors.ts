@@ -3,7 +3,7 @@ export const USER_ALREADY_EXIST_EMAIL_ERROR =
 export const INVALID_PASSWORD = "Неверный пароль!";
 export const USER_NOT_FOUND_EMAIL =
     "Пользователя с такой почтой не существует!";
-
+export const USER_NOT_FOUND_ID = "Пользователя с таким id не существует!"
 export const WAITING_TIME_EXPIRED_CONFIRM =
     "Время ожидания подтверждения истекло!";
 

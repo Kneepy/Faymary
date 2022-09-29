@@ -6,5 +6,6 @@ export enum NotificationEnumType {
     LIKE_POST = "LIKE_POST",
     ANSWER_COMMENT = "ANSWER_COMMENT",
     LIKE_COMMENT = "LIKE_COMMENT",
+    ADD_USER_DIALOG = "ADD_USER_DIALOG",
     ADD_DIALOG = "ADD_DIALOG"
 }
