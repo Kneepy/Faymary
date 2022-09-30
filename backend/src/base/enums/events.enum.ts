@@ -12,6 +12,7 @@ export enum Events {
     ADD_MESSAGE_DIALOG = "dialog.add.message",
     ADD_USER_DIALOG = "dialog.add.user",
     TRANSMIT_MESSAGE_DIALOG = "dialog.transmit-message",
+    REMOVE_USER_DIALOG = "dialog.remove.user",
 
     // update data
     REFRESH_USER = "user.refresh",
