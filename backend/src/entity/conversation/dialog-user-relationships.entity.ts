@@ -1,11 +1,15 @@
-import { Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Lifetime } from "../common";
 import { Users } from "../users";
 import { Dialogs } from "./dialogs.entity";
 
 @Entity()
 export class DialogUserRelationships {
     @PrimaryGeneratedColumn("uuid")
-    id: string
+    id?: string
+
+    @Column({nullable: false, type: "bigint"})
+    createdAt: number
 
     @OneToOne(() => Dialogs, (dialog: Dialogs) => dialog.relationships)
     @JoinColumn()
@@ -13,9 +17,9 @@ export class DialogUserRelationships {
 
     @ManyToMany(() => Users)
     @JoinTable()
-    inviter: Users
+    emmiter: Users
 
     @ManyToMany(() => Users)
     @JoinTable()
-    invited: Users
+    subject: Users
 }

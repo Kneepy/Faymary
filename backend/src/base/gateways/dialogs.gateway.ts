@@ -83,13 +83,13 @@ export class DialogsGateway {
                 const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {users: true}})
 
                 await this.dialogsService.addUser(dialog, user, socket.user)
-
-                dialog.users.map(user => user.id).forEach(async id => {
+                
+                dialog.users.forEach(async user => {
                     // возможно нужно получать пользователя
-                    const notification = await this.baseGateway.setNotification({to: {id} as Users, from: socket.user, type: NotificationEnumType.ADD_USER_DIALOG})
+                    const notification = await this.baseGateway.setNotification({to: user, from: socket.user, type: NotificationEnumType.ADD_USER_DIALOG})
 
                     await this.usersService.addNotification(notification)
-                    await this.baseGateway.sendNotification(this.baseGateway.findUser(id), notification, {dialog, user})
+                    await this.baseGateway.sendNotification(this.baseGateway.findUser(user.id), notification, {dialog, user})
                 })
 
                 return {

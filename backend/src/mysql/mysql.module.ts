@@ -15,6 +15,7 @@ import {
     Files,
     Messages,
     Dialogs,
+    DialogUserRelationships,
 } from "src/entity";
 
 const providers = [...Object.values(allMySQLProviders)];
@@ -38,7 +39,8 @@ const providers = [...Object.values(allMySQLProviders)];
             Comments,
             Files,
             Messages,
-            Dialogs
+            Dialogs,
+            DialogUserRelationships
         ])
     ],
     providers: providers,
