@@ -19,7 +19,8 @@ export class DialogsGateway {
     @SubscribeMessage(Events.CREATE_DIALOG)
     public async createDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: CreateDialgDto): Promise<WsResponse<Dialogs>> {
         body.users.filter(user => user.id !== socket.user.id)
-        const dialog = await this.dialogsService.create({users: [...body.users, socket.user], creator: socket.user})
+        const usersDialog = [...body.users, socket.user]
+        const dialog = await this.dialogsService.create({users: [...body.users, socket.user], creator: socket.user, title: `${usersDialog.map(user => user.userName)}`})
 
         const userDialogSockets = this.baseGateway.findUsers(dialog.users.map(user => user.id))
         const notficationType = NotificationEnumType.ADD_DIALOG
@@ -108,24 +109,22 @@ export class DialogsGateway {
     @SubscribeMessage(Events.REMOVE_USER_DIALOG)
     public async removeUserFromDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: RemoveUserFromDialog) {
         try {
-            const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {relationships: {invited: true, inviter: true}, creator: true}})
+            const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {relationships: {subject: true, emmiter: true}, creator: true}})
 
             if(dialog) {
-                const userRelationsips = dialog.relationships.find(relationship => relationship.invited.id === body.userId)
+                const userRelationsips = dialog.relationships.find(relationship => relationship.subject.id === body.userId)
 
                 if(userRelationsips) {
-                    if(userRelationsips.inviter.id === socket.id) {
-                        this.dialogsService.removeUser(dialog, userRelationsips.invited)
-                        this.dialogsService.removeRelationship(userRelationsips.id)
+                    if(userRelationsips.emmiter.id === socket.id) {
+                        this.dialogsService.removeUser(dialog, userRelationsips.subject, socket.user)
                     } else {
                         if(socket.id === dialog.creator.id) {
-                            this.dialogsService.removeUser(dialog, userRelationsips.invited)
-                            this.dialogsService.removeRelationship(userRelationsips.id)
+                            this.dialogsService.removeUser(dialog, userRelationsips.subject, socket.user)
                         }
                         throw new ForbiddenException(FAILED_DELETE_USER_DIALOG)
                     }
 
-                    const usersFromDialog = dialog.relationships.map(relationship => relationship.invited)
+                    const usersFromDialog = dialog.relationships.map(relationship => relationship.emmiter)
                     
                     usersFromDialog.forEach(async user => {
                         const userSocket = this.baseGateway.findUser(user.id)

@@ -9,6 +9,7 @@ import {
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Users } from "../../entity/users";
+import { Files } from "../common";
 import { DialogUserRelationships } from "./dialog-user-relationships.entity";
 import { Messages } from "./messages.entity";
 
@@ -19,6 +20,10 @@ export class Dialogs {
 
     @Column({nullable: true})
     title?: string
+
+    @ManyToOne(() => Files)
+    @JoinColumn()
+    frontFile: Files
 
     @ManyToMany(() => Users, (users: Users) => users.dialogs)
     @JoinTable()

@@ -1,14 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Dialogs, DialogUserRelationships, Messages, Users } from "src/entity";
+import { Dialogs, Messages, Users } from "src/entity";
 import { FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { DialogsArgs, DialogsInput, ManyDialogsArgs } from "../dto";
+import { DialogUserRelationshipsService } from "./relationships.service";
 
 @Injectable()
 export class DialogsService {
     constructor(
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>,
-        @InjectRepository(DialogUserRelationships) private relationshipsRepo: Repository<DialogUserRelationships>
+        private dialogUserRelationshipsService: DialogUserRelationshipsService
     ) {}
     
     public async addMessage(message: Messages) {
@@ -17,7 +18,7 @@ export class DialogsService {
 
     public async addUser(dialog: Dialogs, invited: Users, inviter?: Users): Promise<void> {
         if(inviter) {
-            const relationship = await this.relationshipsRepo.save({dialog, subject: invited, emitter: inviter, createdAt: Date.now()})
+            const relationship = await this.dialogUserRelationshipsService.create({dialog, subject: invited, emitter: inviter})
             await this.repository.createQueryBuilder().relation(Dialogs, "relationships").of(dialog).add(relationship)
         }
         await this.repository.createQueryBuilder().relation(Dialogs, "users").of(dialog).add(invited)
@@ -25,14 +26,10 @@ export class DialogsService {
 
     public async removeUser(dialog: Dialogs, excluded: Users, emitter?: Users): Promise<void> {
         if(emitter) {
-            const relationship = await this.relationshipsRepo.save({dialog, subject: excluded, emitter: emitter, createdAt: Date.now()})
+            const relationship = await this.dialogUserRelationshipsService.create({dialog, subject: excluded, emitter: emitter})
             await this.repository.createQueryBuilder().relation(Dialogs, "relationships").of(dialog).add(relationship)
         }
         await this.repository.createQueryBuilder().relation(Dialogs, "users").of(dialog).remove(excluded)
-    }
-
-    public async removeRelationship(id: string): Promise<any> {
-        return await this.relationshipsRepo.delete(id)
     }
 
     public async findOne(args: DialogsArgs, options?: FindOneOptions<Dialogs>): Promise<Dialogs> {

@@ -8,3 +8,4 @@ export { FilesService } from "./files.service";
 export { CommentsService } from "./comments.service";
 export { DialogsService } from "./dialogs.service"
 export { MessagesService } from "./messages.service"
+export { DialogUserRelationshipsService } from "./relationships.service"

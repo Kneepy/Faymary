@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { ArrayMinSize, IsNotEmpty } from "class-validator";
+import { ArrayMinSize, IsNotEmpty, IsOptional } from "class-validator";
 import { Users } from "src/entity";
 
 export class DialogsInput {
@@ -10,4 +10,7 @@ export class DialogsInput {
     @IsNotEmpty()
     @Type(() => Users)
     creator: Users
+
+    @IsOptional()
+    title: string
 }
