@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Dialogs } from "src/entity";
+import { FindOperator } from "typeorm";
 
 export class MessagesArgs {
     @IsString()
@@ -10,6 +11,9 @@ export class MessagesArgs {
 
 export class ManyMessagesArgs {
     @Type(() => Dialogs)
-    @IsNotEmpty()
-    dialog: Dialogs | Dialogs[]
+    @IsOptional()
+    dialog?: Dialogs | Dialogs[]
+
+    @IsOptional()
+    id?: FindOperator<any> // In typeorm func
 }

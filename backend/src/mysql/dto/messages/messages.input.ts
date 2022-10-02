@@ -1,11 +1,11 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Users, Files, Dialogs } from "src/entity";
+import { Users, Files, Dialogs, Messages, Posts } from "src/entity";
 
-export class MessagesInput {
+export class MessagesInput implements Omit<Messages, "id"> {
     @IsString()
-    @IsNotEmpty()
-    message: string
+    @IsOptional()
+    message?: string
 
     @IsNotEmpty()
     @Type(() => Users)
@@ -17,5 +17,17 @@ export class MessagesInput {
 
     @Type(() => Files)
     @IsOptional()
-    files: Files[]
+    files?: Files[]
+
+    @IsOptional()
+    @Type(() => Messages)
+    forwardedMessages?: Messages[]
+
+    @IsOptional()
+    @Type(() => Messages)
+    answerTo?: Messages;
+
+    @IsOptional()
+    @Type(() => Posts)
+    forwardedPosts?: Posts[];
 }

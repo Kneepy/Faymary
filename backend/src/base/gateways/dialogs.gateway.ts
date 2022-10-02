@@ -1,8 +1,9 @@
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
-import { DIALOG_NOT_FOUND, FAILED_DELETE_USER_DIALOG, ICustomSocket, USER_NOT_FOUND_DIALOG, USER_NOT_FOUND_ID } from "src/common";
+import { DIALOG_NOT_FOUND, FAILED_DELETE_USER_DIALOG, ICustomSocket, MESSAGES_NOT_FOUND, USER_NOT_FOUND_DIALOG, USER_NOT_FOUND_ID } from "src/common";
 import { Dialogs, Messages, Users } from "src/entity";
 import { DialogsService, MessagesService, NotificationEnumType, NotificationsService, UsersService } from "src/mysql";
+import { In } from "typeorm";
 import { AddUserToDialogDto, CreateDialgDto, CreateMessageDto, RemoveUserFromDialog, TransmitMessageToDialogDto } from "../dto/conversation";
 import { Events } from "../enums";
 import { BaseGateway } from "./base.gateway";
@@ -157,5 +158,30 @@ export class DialogsGateway {
     public async transmitMessageToDialog(
         @ConnectedSocket() socket: ICustomSocket,
         @MessageBody() body: TransmitMessageToDialogDto
-    ) {return}
+    ) {
+        try {
+            const messages = await this.messagesService.find({id: In(body.messageIds)}, {relations: {user: true}})
+    
+            if(!!messages.length) {
+                const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {users: true}})
+
+                if(dialog) {
+                    const message = await this.messagesService.create({dialog, user: socket.user, forwardedMessages: messages})
+
+                    // нужно попробовать без этой конструкции т.к мы вроде оздаём это отношение при создании диалога
+                    await this.dialogsService.addMessage(message)
+
+                    
+                }   
+                else {
+                    throw new NotFoundException(DIALOG_NOT_FOUND)
+                }
+            } 
+            else {
+                throw new NotFoundException(MESSAGES_NOT_FOUND)
+            }
+        } catch (e) {
+            throw new WsException(e)
+        }
+    }
 }
