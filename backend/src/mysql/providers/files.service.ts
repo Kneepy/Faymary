@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Files } from "src/entity/common/files.entity";
-import { Repository, FindOneOptions } from "typeorm";
-import { FilesArgs, FilesInput } from "../dto";
+import { Repository, FindOneOptions, FindManyOptions } from "typeorm";
+import { FilesArgs, FilesInput, ManyFilesArgs } from "../dto";
 
 @Injectable()
 export class FilesService {
@@ -18,6 +18,10 @@ export class FilesService {
             where: args,
             ...options
         });
+    }
+
+    public async find(args: ManyFilesArgs, options?: FindManyOptions<Files>): Promise<Files[]> {
+        return await this.repository.find({where: args, ...options})
     }
 
     public async update(args: Files): Promise<Files> {

@@ -21,6 +21,7 @@ export class Messages {
     message?: string;
 
     @ManyToMany(() => Dialogs, (dialog: Dialogs) => dialog.messages)
+    @JoinTable()
     dialog: Dialogs;
 
     @ManyToOne(() => Users, (user: Users) => user.messages)
@@ -28,6 +29,7 @@ export class Messages {
     user: Users;
 
     @ManyToMany(() => Files)
+    @JoinTable()
     files?: Files[];
 
     @ManyToMany(() => Messages)

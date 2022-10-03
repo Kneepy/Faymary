@@ -27,7 +27,7 @@ export class MessagesInput implements Omit<Messages, "id"> {
     @Type(() => Messages)
     answerTo?: Messages;
 
-    @IsOptional()
     @Type(() => Posts)
-    forwardedPosts?: Posts[];
+    @IsOptional()
+    forwardedPost?: Posts;
 }

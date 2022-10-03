@@ -9,6 +9,7 @@ import {
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Files } from "../common/files.entity";
+import { Messages } from "../conversation";
 import { Users } from "../users/users.entity";
 import { Comments } from "./comments.entity";
 

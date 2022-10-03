@@ -1,4 +1,5 @@
-import { UseFilters, UseGuards } from "@nestjs/common";
+import { Inject, UseFilters, UseGuards } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 import {
     ConnectedSocket,
     MessageBody,
@@ -10,6 +11,7 @@ import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Comments, Posts } from "src/entity";
 import { CommentsService, NotificationEnumType, PostsService } from "src/mysql";
+import { Repository } from "typeorm";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
@@ -27,8 +29,11 @@ export class PostGateway {
     constructor(
         private postsService: PostsService,
         private baseGateway: BaseGateway,
-        private commentsService: CommentsService,
-    ) {}
+        private commentsService: CommentsService
+    ) {
+        // на основе этой штуки переписать систему лайков
+        //this.postsService.findOne({likes: {id: "1c02f23c-3e6e-40a5-87db-2b3c6a6becf8"}, id: "d9e06e68-6bf8-4c66-916e-798e16106167"} as any, {relations: {likes: true}}).then(e => console.log(e))
+    }
 
     @SubscribeMessage(Events.ADD_ANSWER_COMMENT)
     public async addAnswerToComment(

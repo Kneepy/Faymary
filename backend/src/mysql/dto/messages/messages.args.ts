@@ -15,5 +15,5 @@ export class ManyMessagesArgs {
     dialog?: Dialogs | Dialogs[]
 
     @IsOptional()
-    id?: FindOperator<any> // In typeorm func
+    id?: FindOperator<any> | string // In typeorm func
 }

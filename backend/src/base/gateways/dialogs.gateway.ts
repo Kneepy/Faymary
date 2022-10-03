@@ -1,10 +1,9 @@
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
-import { DIALOG_NOT_FOUND, FAILED_DELETE_USER_DIALOG, ICustomSocket, MESSAGES_NOT_FOUND, USER_NOT_FOUND_DIALOG, USER_NOT_FOUND_ID } from "src/common";
+import { DIALOG_NOT_FOUND, FAILED_DELETE_USER_DIALOG, ICustomSocket, USER_NOT_FOUND_DIALOG, USER_NOT_FOUND_ID } from "src/common";
 import { Dialogs, Messages, Users } from "src/entity";
-import { DialogsService, MessagesService, NotificationEnumType, NotificationsService, UsersService } from "src/mysql";
-import { In } from "typeorm";
-import { AddUserToDialogDto, CreateDialgDto, CreateMessageDto, RemoveUserFromDialog, TransmitMessageToDialogDto } from "../dto/conversation";
+import { DialogsService, MessagesService, NotificationEnumType, UsersService } from "src/mysql";
+import { AddUserToDialogDto, CreateDialgDto, CreateMessageDto, RemoveUserFromDialog } from "../dto/conversation";
 import { Events } from "../enums";
 import { BaseGateway } from "./base.gateway";
 
@@ -19,18 +18,17 @@ export class DialogsGateway {
 
     @SubscribeMessage(Events.CREATE_DIALOG)
     public async createDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: CreateDialgDto): Promise<WsResponse<Dialogs>> {
-        body.users.filter(user => user.id !== socket.user.id)
+        body.users = body.users.filter(user => user.id !== socket.user.id)
+
         const usersDialog = [...body.users, socket.user]
         const dialog = await this.dialogsService.create({users: [...body.users, socket.user], creator: socket.user, title: `${usersDialog.map(user => user.userName)}`})
-
-        const userDialogSockets = this.baseGateway.findUsers(dialog.users.map(user => user.id))
         const notficationType = NotificationEnumType.ADD_DIALOG
         
-        userDialogSockets.forEach(async userSocket => {
-            const notification = await this.baseGateway.setNotification({from: socket.user, to: userSocket.user, type: notficationType})
-            await this.usersService.addNotification(notification)
-            
-            this.baseGateway.sendNotification(userSocket, notification, dialog)
+        dialog.users.forEach(async user => {
+            const userSocket = this.baseGateway.findUser(user.id)
+            const notification = await this.baseGateway.setNotification({from: socket.user, to: user, type: notficationType})
+
+            userSocket && notification && this.baseGateway.sendNotification(userSocket, notification, dialog)
         })
 
         return {
@@ -46,15 +44,14 @@ export class DialogsGateway {
     ): Promise<WsResponse<Messages>> {
         try {
             const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {users: true}})
-            
+    
             if(dialog) {
-                const message = await this.messagesService.create({message: body.message, files: body.files, dialog, user: socket.user})
+                Object.keys(body).forEach(key => !body[key] && delete body[key])
 
-                await this.dialogsService.addMessage(message)
-                
+                const message = await this.messagesService.create({message: body.message, files: body.files, dialog, user: socket.user, ...body})
+
+                await this.dialogsService.addMessage(message)                
                 delete message.user.settings
-                delete message.user.activity
-
                 this.baseGateway.findUsers(dialog.users.map(user => user.id)).forEach(userSocket => userSocket.id !== socket.id && userSocket.send(JSON.stringify({
                     data: message,
                     event: Events.REFRESH_MESSAGES
@@ -148,37 +145,6 @@ export class DialogsGateway {
             } 
             else {
                 throw new NotFoundException(DIALOG_NOT_FOUND)
-            }
-        } catch (e) {
-            throw new WsException(e)
-        }
-    }
-
-    @SubscribeMessage(Events.TRANSMIT_MESSAGE_DIALOG)
-    public async transmitMessageToDialog(
-        @ConnectedSocket() socket: ICustomSocket,
-        @MessageBody() body: TransmitMessageToDialogDto
-    ) {
-        try {
-            const messages = await this.messagesService.find({id: In(body.messageIds)}, {relations: {user: true}})
-    
-            if(!!messages.length) {
-                const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {users: true}})
-
-                if(dialog) {
-                    const message = await this.messagesService.create({dialog, user: socket.user, forwardedMessages: messages})
-
-                    // нужно попробовать без этой конструкции т.к мы вроде оздаём это отношение при создании диалога
-                    await this.dialogsService.addMessage(message)
-
-                    
-                }   
-                else {
-                    throw new NotFoundException(DIALOG_NOT_FOUND)
-                }
-            } 
-            else {
-                throw new NotFoundException(MESSAGES_NOT_FOUND)
             }
         } catch (e) {
             throw new WsException(e)

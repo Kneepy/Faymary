@@ -63,7 +63,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ): Promise<Notifications | undefined> {
         if(from.id !== to.id) {
             const similarNotification = await this.notificationService.findOne({from, type}, {relations: {from: true}})
-
+            
             if(!similarNotification) {
                 const notification = await this.notificationService.create({from, to, type})
 

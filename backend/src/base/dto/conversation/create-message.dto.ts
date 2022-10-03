@@ -1,10 +1,10 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Files, Messages } from "src/entity";
+import { Files, Messages, Posts } from "src/entity";
 
-export class CreateMessageDto extends Messages {
-    @IsNotEmpty()
+export class CreateMessageDto implements Omit<Messages, "id" | "dialog" | "user"> {
     @IsString()
+    @IsOptional()
     message: string;
 
     @IsNotEmpty()
@@ -14,4 +14,16 @@ export class CreateMessageDto extends Messages {
     @Type(() => Files)
     @IsOptional()
     files: Files[]
+
+    @Type(() => Messages)
+    @IsOptional()
+    answerTo?: Messages;
+
+    @Type(() => Messages)
+    @IsOptional()
+    forwardedMessages?: Messages[];
+
+    @Type(() => Posts)
+    @IsOptional()
+    forwardedPosts?: Posts[];
 }

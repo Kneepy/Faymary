@@ -37,6 +37,5 @@ export class Dialogs {
     relationships: DialogUserRelationships[]
 
     @ManyToMany(() => Messages, (message: Messages) => message.dialog)
-    @JoinTable()
     messages: Messages[];
 }
