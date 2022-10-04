@@ -10,7 +10,7 @@ export class NotificationsService {
     constructor(
         @InjectRepository(Notifications)
         private repository: Repository<Notifications>
-    ){}
+    ) {}
 
     async create(input: NotificationInput): Promise<Notifications> {
         return await this.repository.save({
@@ -20,15 +20,18 @@ export class NotificationsService {
         });
     }
 
-    async findOne(args: Partial<NotificationArgs>, options?: FindOneOptions<Notifications>): Promise<Notifications> {
+    async findOne(
+        args: Partial<NotificationArgs>,
+        options?: FindOneOptions<Notifications>
+    ): Promise<Notifications> {
         return await this.repository.findOne({
             where: {
                 ...args,
                 expirensIn: MoreThan(Date.now())
             },
-            
+
             ...options
-        })
+        });
     }
 
     async delete(notificationId: number): Promise<any> {

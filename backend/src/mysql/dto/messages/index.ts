@@ -1,2 +1,2 @@
-export * from "./messages.args"
-export * from "./messages.input"
+export * from "./messages.args";
+export * from "./messages.input";

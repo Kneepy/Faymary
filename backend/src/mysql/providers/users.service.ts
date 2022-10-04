@@ -12,15 +12,27 @@ export class UsersService {
     ) {}
 
     public async addNotification(notification: Notifications) {
-        return await this.repository.createQueryBuilder().relation(Users, "notifications").of(notification.to).add(notification)
+        return await this.repository
+            .createQueryBuilder()
+            .relation(Users, "notifications")
+            .of(notification.to)
+            .add(notification);
     }
 
     public async setSubscriber(subscriber: Users, author: Users) {
-        await this.repository.createQueryBuilder().relation(Users, "subscribers").of(author).add(subscriber)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Users, "subscribers")
+            .of(author)
+            .add(subscriber);
     }
 
     public async unsetSubscriber(subscriber: Users, author: Users) {
-        await this.repository.createQueryBuilder().relation(Users, "subscribers").of(author).remove(subscriber)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Users, "subscribers")
+            .of(author)
+            .remove(subscriber);
     }
 
     public async findOne(

@@ -33,21 +33,20 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private notificationService: NotificationsService
     ) {}
     private users: Map<string, ICustomSocket> = new Map();
-    
 
     public findUser(socketId: string): ICustomSocket {
         return this.users.get(socketId);
     }
 
     public findUsers(socketIds: string[]): ICustomSocket[] {
-        const sockets = []
+        const sockets = [];
         socketIds.forEach(socketId => {
-            const socket = this.findUser(socketId)
-            if(socket) {
-                sockets.push(socket)
+            const socket = this.findUser(socketId);
+            if (socket) {
+                sockets.push(socket);
             }
-        })
-        return sockets
+        });
+        return sockets;
     }
 
     public setUser(socketId: string, socket: ICustomSocket) {
@@ -58,56 +57,87 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return this.users.delete(socketId);
     }
 
-    async setNotification(
-        { from, to, type }: { from: Users; to: Users, type: NotificationEnumType }
-    ): Promise<Notifications | undefined> {
-        if(from.id !== to.id) {
-            const similarNotification = await this.notificationService.findOne({from, type}, {relations: {from: true}})
-            
-            if(!similarNotification) {
-                const notification = await this.notificationService.create({from, to, type})
+    async setNotification({
+        from,
+        to,
+        type
+    }: {
+        from: Users;
+        to: Users;
+        type: NotificationEnumType;
+    }): Promise<Notifications | undefined> {
+        if (from.id !== to.id) {
+            const similarNotification = await this.notificationService.findOne(
+                { from, type },
+                { relations: { from: true } }
+            );
 
-                await this.usersService.addNotification(notification)
-                return notification
+            if (!similarNotification) {
+                const notification = await this.notificationService.create({
+                    from,
+                    to,
+                    type
+                });
+
+                await this.usersService.addNotification(notification);
+                return notification;
             }
         }
     }
 
-    public async sendNotification(socket: ICustomSocket, notification: Notifications, payload?: any) {
+    public async sendNotification(
+        socket: ICustomSocket,
+        notification: Notifications,
+        payload?: any
+    ) {
         let toSendNotification: boolean;
         // очень страшная конструкция надо что-то придумать...
         switch (notification.type) {
             case NotificationEnumType.SUB:
-                toSendNotification = socket.user.settings.subscriptionNotifications
+                toSendNotification =
+                    socket.user.settings.subscriptionNotifications;
                 break;
             case NotificationEnumType.LIKE_POST:
-                toSendNotification = socket.user.settings.likeOnPostNotifications
+                toSendNotification =
+                    socket.user.settings.likeOnPostNotifications;
                 break;
             case NotificationEnumType.LIKE_COMMENT:
-                toSendNotification = socket.user.settings.likeOnCommentNotification
+                toSendNotification =
+                    socket.user.settings.likeOnCommentNotification;
                 break;
             case NotificationEnumType.COMMENT:
-                toSendNotification = socket.user.settings.commentsOnPostNotifications
+                toSendNotification =
+                    socket.user.settings.commentsOnPostNotifications;
                 break;
             case NotificationEnumType.ANSWER_COMMENT:
-                toSendNotification = socket.user.settings.answersOnCommentNotification
+                toSendNotification =
+                    socket.user.settings.answersOnCommentNotification;
                 break;
             case NotificationEnumType.ADD_DIALOG:
-                toSendNotification = socket.user.settings.addMeToDialogNotification
+                toSendNotification =
+                    socket.user.settings.addMeToDialogNotification;
                 break;
-            case NotificationEnumType.REMOVE_USER_DIALOG || NotificationEnumType.ADD_USER_DIALOG: 
-                toSendNotification = socket.user.settings.moveOtherUsersDialogNotification
+            case NotificationEnumType.REMOVE_USER_DIALOG ||
+                NotificationEnumType.ADD_USER_DIALOG:
+                toSendNotification =
+                    socket.user.settings.moveOtherUsersDialogNotification;
                 break;
-            default: 
-                toSendNotification = true
+            default:
+                toSendNotification = true;
                 break;
         }
 
-        if(socket && notification.to.id !== notification.from.id && toSendNotification) {
-            socket.send(JSON.stringify({
-                event: Events.NEW_NOTIFICATION,
-                data: {notification, payload}
-            }))
+        if (
+            socket &&
+            notification.to.id !== notification.from.id &&
+            toSendNotification
+        ) {
+            socket.send(
+                JSON.stringify({
+                    event: Events.NEW_NOTIFICATION,
+                    data: { notification, payload }
+                })
+            );
         }
     }
 
@@ -129,7 +159,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             if (socket.user.activity) {
                 socket.user.activity = Object.assign(socket.user.activity, {
                     state: ActivityEnum.ONLINE,
-                     start: Date.now()
+                    start: Date.now()
                 });
 
                 socket.state = socket.user.activity;

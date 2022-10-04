@@ -7,5 +7,5 @@ export * from "./find.options";
 export * from "./posts";
 export * from "./files";
 export * from "./comments";
-export * from "./dialogs"
-export * from "./messages"
+export * from "./dialogs";
+export * from "./messages";

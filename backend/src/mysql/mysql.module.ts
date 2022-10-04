@@ -15,7 +15,7 @@ import {
     Files,
     Messages,
     Dialogs,
-    HistoryActions,
+    HistoryActions
 } from "src/entity";
 
 const providers = [...Object.values(allMySQLProviders)];

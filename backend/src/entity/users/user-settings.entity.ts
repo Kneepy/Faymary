@@ -31,7 +31,7 @@ export class UserSettings {
     @Column({ nullable: false, default: true })
     addMeToDialogNotification: boolean;
 
-    @Column({nullable: false, default: true})
+    @Column({ nullable: false, default: true })
     moveOtherUsersDialogNotification: boolean;
 
     @OneToOne(() => Users, (user: Users) => user.settings)

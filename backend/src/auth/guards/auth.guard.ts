@@ -29,10 +29,13 @@ export class AuthGuard implements CanActivate {
         const res: ICustomResponse = http.getResponse();
         const req: ICustomRequest = http.getRequest();
         const headers: ICustomHeaders = req.headers;
-        const fatalAuthErrors: any[] = []
+        const fatalAuthErrors: any[] = [];
 
         try {
-            if (this.reflector.get(USE_AUTH_METADATA, context.getHandler()) === false) {
+            if (
+                this.reflector.get(USE_AUTH_METADATA, context.getHandler()) ===
+                false
+            ) {
                 return true;
             }
             if (!req.cookies.refreshToken || !headers.authorization) {
@@ -42,16 +45,23 @@ export class AuthGuard implements CanActivate {
             req.user = this.authService.verifyAccessToken(
                 headers.authorization
             );
-            const currentRefreshToken = await this.authService.verifyRefreshToken(req.cookies.refreshToken);
+            const currentRefreshToken =
+                await this.authService.verifyRefreshToken(
+                    req.cookies.refreshToken
+                );
 
             if (currentRefreshToken.user.id !== req.user.userId) {
-                fatalAuthErrors.push(new UnauthorizedException())
+                fatalAuthErrors.push(new UnauthorizedException());
                 throw new UnauthorizedException();
             }
 
             return true;
         } catch (e) {
-            if (!req.cookies.refreshToken || !headers.authorization || fatalAuthErrors.length) {
+            if (
+                !req.cookies.refreshToken ||
+                !headers.authorization ||
+                fatalAuthErrors.length
+            ) {
                 throw new UnauthorizedException();
             }
 

@@ -4,10 +4,10 @@ import { Users } from "src/entity";
 
 export class DialogsArgs {
     @IsString()
-    id: string
+    id: string;
 }
 
 export class ManyDialogsArgs {
     @Type(() => Users)
-    users: Users[] | Users
+    users: Users[] | Users;
 }

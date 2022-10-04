@@ -20,8 +20,11 @@ export class FilesService {
         });
     }
 
-    public async find(args: ManyFilesArgs, options?: FindManyOptions<Files>): Promise<Files[]> {
-        return await this.repository.find({where: args, ...options})
+    public async find(
+        args: ManyFilesArgs,
+        options?: FindManyOptions<Files>
+    ): Promise<Files[]> {
+        return await this.repository.find({ where: args, ...options });
     }
 
     public async update(args: Files): Promise<Files> {

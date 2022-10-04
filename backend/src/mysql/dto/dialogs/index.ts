@@ -1,3 +1,3 @@
-export * from "./dialogs.args"
-export * from "./dialogs.input"
-export * from "./relationships"
+export * from "./dialogs.args";
+export * from "./dialogs.input";
+export * from "./relationships";

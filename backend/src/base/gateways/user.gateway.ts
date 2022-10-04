@@ -28,24 +28,39 @@ export class UserGateway {
         @MessageBody() body: SubscribeUserDto,
         @ConnectedSocket() socket: ICustomSocket
     ): Promise<WsResponse<any>> {
-        const author = await this.usersService.findOne({id: body.userId}, {relations: {subscribers: true}})
-        const subscriber = await this.usersService.findOne({id: socket.id}, {relations: {subscriptions: true}})
-        const subscriberContainsIndex = author.subscribers.findIndex(user => user.id === subscriber.id)
+        const author = await this.usersService.findOne(
+            { id: body.userId },
+            { relations: { subscribers: true } }
+        );
+        const subscriber = await this.usersService.findOne(
+            { id: socket.id },
+            { relations: { subscriptions: true } }
+        );
+        const subscriberContainsIndex = author.subscribers.findIndex(
+            user => user.id === subscriber.id
+        );
 
-        if(subscriberContainsIndex === -1) {
-            await this.usersService.unsetSubscriber(subscriber, author)
-        }
-        else {
-            await this.usersService.setSubscriber(subscriber, author)
+        if (subscriberContainsIndex === -1) {
+            await this.usersService.unsetSubscriber(subscriber, author);
+        } else {
+            await this.usersService.setSubscriber(subscriber, author);
 
-            const notification = await this.baseGateway.setNotification({to: author, from: subscriber, type: NotificationEnumType.SUB})
+            const notification = await this.baseGateway.setNotification({
+                to: author,
+                from: subscriber,
+                type: NotificationEnumType.SUB
+            });
 
-            await this.baseGateway.sendNotification(this.baseGateway.findUser(author.id), notification, {...subscriber, subscriptions: undefined})
+            await this.baseGateway.sendNotification(
+                this.baseGateway.findUser(author.id),
+                notification,
+                { ...subscriber, subscriptions: undefined }
+            );
         }
 
         return {
             event: Events.REFRESH_USER,
             data: subscriber
-        }
+        };
     }
 }

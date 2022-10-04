@@ -6,8 +6,8 @@ export class CreateDialgDto {
     @Type(() => Users)
     @ArrayMinSize(1)
     @IsNotEmpty()
-    users: Users[]
+    users: Users[];
 
     @IsOptional()
-    title: string
+    title: string;
 }

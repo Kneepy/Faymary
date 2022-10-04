@@ -5,30 +5,30 @@ import { Dialogs, Users } from "src/entity";
 export class ManyRelationshipsArgs {
     @Type(() => Dialogs)
     @IsOptional()
-    dialog?: Dialogs
+    dialog?: Dialogs;
 
     @Type(() => Users)
     @IsOptional()
-    emitter?: Users
+    emitter?: Users;
 
     @Type(() => Users)
     @IsOptional()
-    subject?: Users
+    subject?: Users;
 }
 
 export class RelationshipsArgs {
     @IsOptional()
-    id?: string
+    id?: string;
 
     @Type(() => Dialogs)
     @IsOptional()
-    dialog?: Partial<Dialogs>
+    dialog?: Partial<Dialogs>;
 
     @Type(() => Users)
     @IsOptional()
-    emitter?: Partial<Users>
+    emitter?: Partial<Users>;
 
     @Type(() => Users)
     @IsOptional()
-    subject?: Partial<Users>
+    subject?: Partial<Users>;
 }

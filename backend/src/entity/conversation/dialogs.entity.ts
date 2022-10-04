@@ -18,12 +18,12 @@ export class Dialogs {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({nullable: true})
-    title?: string
+    @Column({ nullable: true })
+    title?: string;
 
     @ManyToOne(() => Files)
     @JoinColumn()
-    frontFile: Files
+    frontFile: Files;
 
     @ManyToMany(() => Users, (users: Users) => users.dialogs)
     @JoinTable()
@@ -31,10 +31,13 @@ export class Dialogs {
 
     @ManyToOne(() => Users)
     @JoinColumn()
-    creator: Users
+    creator: Users;
 
-    @OneToOne(() => HistoryActions, (relationships: HistoryActions) => relationships.dialog)
-    relationships: HistoryActions[]
+    @OneToOne(
+        () => HistoryActions,
+        (relationships: HistoryActions) => relationships.dialog
+    )
+    relationships: HistoryActions[];
 
     @ManyToMany(() => Messages, (message: Messages) => message.dialog)
     messages: Messages[];

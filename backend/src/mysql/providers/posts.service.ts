@@ -12,15 +12,27 @@ export class PostsService {
     ) {}
 
     public async setComment(comment: Comments) {
-        await this.repository.createQueryBuilder().relation(Posts, "comments").of(comment.post).add(comment)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Posts, "comments")
+            .of(comment.post)
+            .add(comment);
     }
 
     public async setLike(user: Users, post: Posts) {
-        await this.repository.createQueryBuilder().relation(Posts, "likes").of(post).add(user)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Posts, "likes")
+            .of(post)
+            .add(user);
     }
 
     public async unsetLike(user: Users, post: Posts) {
-        await this.repository.createQueryBuilder().relation(Posts, "likes").of(post).remove(user)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Posts, "likes")
+            .of(post)
+            .remove(user);
     }
 
     public async findOne(

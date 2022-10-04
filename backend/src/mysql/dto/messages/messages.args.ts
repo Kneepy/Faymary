@@ -6,14 +6,14 @@ import { FindOperator } from "typeorm";
 export class MessagesArgs {
     @IsString()
     @IsNotEmpty()
-    id: string
+    id: string;
 }
 
 export class ManyMessagesArgs {
     @Type(() => Dialogs)
     @IsOptional()
-    dialog?: Dialogs | Dialogs[]
+    dialog?: Dialogs | Dialogs[];
 
     @IsOptional()
-    id?: FindOperator<any> | string // In typeorm func
+    id?: FindOperator<any> | string; // In typeorm func
 }

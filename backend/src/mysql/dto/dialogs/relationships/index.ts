@@ -1,2 +1,2 @@
-export * from "./relationships.args"
-export * from "./relationships.input"
+export * from "./relationships.args";
+export * from "./relationships.input";

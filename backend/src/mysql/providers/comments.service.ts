@@ -12,15 +12,27 @@ export class CommentsService {
     ) {}
 
     public async setAnswer(answer: Comments, on: Comments) {
-        await this.repository.createQueryBuilder().relation(Comments, "answers").of(on).add(answer)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Comments, "answers")
+            .of(on)
+            .add(answer);
     }
 
     public async setLike(user: Users, comment: Comments) {
-        await this.repository.createQueryBuilder().relation(Comments, "likes").of(comment).add(user)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Comments, "likes")
+            .of(comment)
+            .add(user);
     }
 
     public async unsetLike(user: Users, comment: Comments) {
-        await this.repository.createQueryBuilder().relation(Comments, "likes").of(comment).remove(user)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Comments, "likes")
+            .of(comment)
+            .remove(user);
     }
 
     public async findOne(

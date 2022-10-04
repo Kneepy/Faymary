@@ -15,8 +15,8 @@ export class ManyFilesArgs {
     @IsOptional()
     @IsUUID()
     @IsString()
-    id?: FindOperator<any> | string
+    id?: FindOperator<any> | string;
 
     @IsOptional()
-    path?: FindOperator<any> | string
+    path?: FindOperator<any> | string;
 }

@@ -34,13 +34,13 @@ export class Messages {
 
     @ManyToMany(() => Messages)
     @JoinTable()
-    answerTo?: Messages
+    answerTo?: Messages;
 
     @ManyToMany(() => Messages)
     @JoinTable()
-    forwardedMessages?: Messages[]
+    forwardedMessages?: Messages[];
 
     @ManyToMany(() => Posts)
     @JoinTable()
-    forwardedPosts?: Posts[]
+    forwardedPosts?: Posts[];
 }

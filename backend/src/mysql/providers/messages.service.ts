@@ -11,32 +11,42 @@ export class MessagesService {
     ) {}
 
     public async addAnswer(message: Messages, answer: Messages) {
-        await this.repository.createQueryBuilder().relation(Messages, "answerTo").of(message).add(answer)
+        await this.repository
+            .createQueryBuilder()
+            .relation(Messages, "answerTo")
+            .of(message)
+            .add(answer);
     }
 
-    public async findOne(args: MessagesArgs, options?: FindOneOptions<Messages>): Promise<Messages> {
+    public async findOne(
+        args: MessagesArgs,
+        options?: FindOneOptions<Messages>
+    ): Promise<Messages> {
         return await this.repository.findOne({
             where: args,
             ...options
-        })
+        });
     }
 
-    public async find(args: ManyMessagesArgs, options?: FindManyOptions<Messages>): Promise<Messages[]> {
+    public async find(
+        args: ManyMessagesArgs,
+        options?: FindManyOptions<Messages>
+    ): Promise<Messages[]> {
         return await this.repository.find({
             where: args,
             ...options
-        })
+        });
     }
 
     public async create(input: MessagesInput): Promise<Messages> {
-        return await this.repository.save(input)
+        return await this.repository.save(input);
     }
 
     async save(message: Messages) {
-        return await this.repository.save(message)
+        return await this.repository.save(message);
     }
 
     public async delete(id: string): Promise<any> {
-        return await this.repository.delete(id)
+        return await this.repository.delete(id);
     }
 }
