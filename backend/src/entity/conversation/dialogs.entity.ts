@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { Users } from "../../entity/users";
 import { Files } from "../common";
-import { DialogUserRelationships } from "./dialog-user-relationships.entity";
+import { HistoryActions } from "./history-actions-dialog.entity";
 import { Messages } from "./messages.entity";
 
 @Entity()
@@ -33,8 +33,8 @@ export class Dialogs {
     @JoinColumn()
     creator: Users
 
-    @OneToOne(() => DialogUserRelationships, (relationships: DialogUserRelationships) => relationships.dialog)
-    relationships: DialogUserRelationships[]
+    @OneToOne(() => HistoryActions, (relationships: HistoryActions) => relationships.dialog)
+    relationships: HistoryActions[]
 
     @ManyToMany(() => Messages, (message: Messages) => message.dialog)
     messages: Messages[];

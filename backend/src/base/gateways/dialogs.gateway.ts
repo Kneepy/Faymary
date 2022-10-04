@@ -2,7 +2,7 @@ import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
 import { DIALOG_NOT_FOUND, FAILED_DELETE_USER_DIALOG, ICustomSocket, USER_NOT_FOUND_DIALOG, USER_NOT_FOUND_ID } from "src/common";
 import { Dialogs, Messages, Users } from "src/entity";
-import { DialogsService, MessagesService, NotificationEnumType, UsersService } from "src/mysql";
+import { DialogsService, HistoryActionsService, MessagesService, NotificationEnumType, UsersService } from "src/mysql";
 import { AddUserToDialogDto, CreateDialgDto, CreateMessageDto, RemoveUserFromDialog } from "../dto/conversation";
 import { Events } from "../enums";
 import { BaseGateway } from "./base.gateway";
@@ -13,7 +13,8 @@ export class DialogsGateway {
         private baseGateway: BaseGateway,
         private dialogsService: DialogsService,
         private messagesService: MessagesService,
-        private usersService: UsersService
+        private usersService: UsersService,
+        private historyActionsService: HistoryActionsService
     ) {}
 
     @SubscribeMessage(Events.CREATE_DIALOG)
@@ -76,24 +77,26 @@ export class DialogsGateway {
         @MessageBody() body: AddUserToDialogDto
     ): Promise<WsResponse<{dialog: Dialogs, user: Users}>> {
         try {
-            const user = await this.usersService.findOne({id: body.userId})
+            const accedingUser = await this.usersService.findOne({id: body.userId})
         
-            if(user) {
+            if(accedingUser) {
                 const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {users: true}})
 
-                await this.dialogsService.addUser(dialog, user, socket.user)
+                await this.dialogsService.addUser(dialog, accedingUser, socket.user)
                 
                 dialog.users.forEach(async user => {
                     // возможно нужно получать пользователя
                     const notification = await this.baseGateway.setNotification({to: user, from: socket.user, type: NotificationEnumType.ADD_USER_DIALOG})
 
-                    await this.usersService.addNotification(notification)
-                    await this.baseGateway.sendNotification(this.baseGateway.findUser(user.id), notification, {dialog, user})
+                    if(notification) {
+                        const userSocket = this.baseGateway.findUser(user.id)
+                        userSocket && await this.baseGateway.sendNotification(userSocket, notification, {dialog, user: accedingUser})
+                    }
                 })
 
                 return {
                     event: Events.REFRESH_DIALOG,
-                    data: {dialog, user}
+                    data: {dialog, user: accedingUser}
                 }
             }
             else {
@@ -107,22 +110,26 @@ export class DialogsGateway {
     @SubscribeMessage(Events.REMOVE_USER_DIALOG)
     public async removeUserFromDialog(@ConnectedSocket() socket: ICustomSocket, @MessageBody() body: RemoveUserFromDialog) {
         try {
-            const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {relationships: {subject: true, emmiter: true}, creator: true}})
+            const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {creator: true, users: true}})
 
             if(dialog) {
-                const userRelationsips = dialog.relationships.find(relationship => relationship.subject.id === body.userId)
+                const userRelationsips = await this.historyActionsService.findOne({dialog: {id: dialog.id}, subject: {id: body.userId}}, {relations: {dialog: true, subject: true}})
 
                 if(userRelationsips) {
                     if(userRelationsips.emmiter.id === socket.id) {
+                        dialog.users = dialog.users.filter(user => user.id !== body.userId)
                         this.dialogsService.removeUser(dialog, userRelationsips.subject, socket.user)
                     } else {
                         if(socket.id === dialog.creator.id) {
+                            dialog.users = dialog.users.filter(user => user.id !== body.userId)
                             this.dialogsService.removeUser(dialog, userRelationsips.subject, socket.user)
                         }
-                        throw new ForbiddenException(FAILED_DELETE_USER_DIALOG)
+                        else {
+                            throw new ForbiddenException(FAILED_DELETE_USER_DIALOG)
+                        }
                     }
 
-                    const usersFromDialog = dialog.relationships.map(relationship => relationship.emmiter)
+                    const usersFromDialog = dialog.users
                     
                     usersFromDialog.forEach(async user => {
                         const userSocket = this.baseGateway.findUser(user.id)
@@ -130,13 +137,13 @@ export class DialogsGateway {
                         if(userSocket) {
                             const notification = await this.baseGateway.setNotification({from: socket.user, to: user, type: NotificationEnumType.REMOVE_USER_DIALOG})
 
-                            notification && await this.baseGateway.sendNotification(userSocket, notification, user)
+                            notification && await this.baseGateway.sendNotification(userSocket, notification, {dialog, user})
                         }
                     })
 
                     return {
                         event: Events.REFRESH_DIALOG,
-                        data: ""
+                        data: dialog
                     }
                 }
                 else {

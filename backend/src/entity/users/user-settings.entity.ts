@@ -14,7 +14,6 @@ export class UserSettings {
     id: string;
 
     @Column({ nullable: false, default: true })
-    @Reflect.metadata("notificationType", () => NotificationEnumType.SUB)
     subscriptionNotifications: boolean;
 
     @Column({ nullable: false, default: true })
@@ -31,6 +30,9 @@ export class UserSettings {
 
     @Column({ nullable: false, default: true })
     addMeToDialogNotification: boolean;
+
+    @Column({nullable: false, default: true})
+    moveOtherUsersDialogNotification: boolean;
 
     @OneToOne(() => Users, (user: Users) => user.settings)
     @JoinColumn()

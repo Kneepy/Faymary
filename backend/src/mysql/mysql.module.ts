@@ -15,7 +15,7 @@ import {
     Files,
     Messages,
     Dialogs,
-    DialogUserRelationships,
+    HistoryActions,
 } from "src/entity";
 
 const providers = [...Object.values(allMySQLProviders)];
@@ -40,7 +40,7 @@ const providers = [...Object.values(allMySQLProviders)];
             Files,
             Messages,
             Dialogs,
-            DialogUserRelationships
+            HistoryActions
         ])
     ],
     providers: providers,

@@ -3,13 +3,13 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Dialogs, Messages, Users } from "src/entity";
 import { FindManyOptions, FindOneOptions, Repository } from "typeorm";
 import { DialogsArgs, DialogsInput, ManyDialogsArgs } from "../dto";
-import { DialogUserRelationshipsService } from "./relationships.service";
+import { HistoryActionsService } from "./history-actions-dialog.service";
 
 @Injectable()
 export class DialogsService {
     constructor(
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>,
-        private dialogUserRelationshipsService: DialogUserRelationshipsService
+        private dialogUserRelationshipsService: HistoryActionsService
     ) {}
     
     public async addMessage(message: Messages) {

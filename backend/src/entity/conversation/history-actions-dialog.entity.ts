@@ -1,10 +1,9 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Lifetime } from "../common";
 import { Users } from "../users";
 import { Dialogs } from "./dialogs.entity";
 
 @Entity()
-export class DialogUserRelationships {
+export class HistoryActions {
     @PrimaryGeneratedColumn("uuid")
     id?: string
 

@@ -95,6 +95,9 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             case NotificationEnumType.ADD_DIALOG:
                 toSendNotification = socket.user.settings.addMeToDialogNotification
                 break;
+            case NotificationEnumType.REMOVE_USER_DIALOG || NotificationEnumType.ADD_USER_DIALOG: 
+                toSendNotification = socket.user.settings.moveOtherUsersDialogNotification
+                break;
             default: 
                 toSendNotification = true
                 break;
