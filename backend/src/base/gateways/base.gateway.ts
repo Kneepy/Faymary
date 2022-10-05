@@ -9,7 +9,7 @@ import {
 import { IncomingMessage } from "http";
 import { AuthService, WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
-import { Notifications, Users, UserSettings } from "src/entity";
+import { NotificationPayload, Notifications, Users, UserSettings } from "src/entity";
 import {
     ActivityEnum,
     ActivityService,
@@ -60,11 +60,13 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async setNotification({
         from,
         to,
-        type
+        type,
+        payload
     }: {
         from: Users;
         to: Users;
         type: NotificationEnumType;
+        payload?: NotificationPayload
     }): Promise<Notifications | undefined> {
         if (from.id !== to.id) {
             const similarNotification = await this.notificationService.findOne(
@@ -76,7 +78,8 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const notification = await this.notificationService.create({
                     from,
                     to,
-                    type
+                    type,
+                    ...payload 
                 });
 
                 await this.usersService.addNotification(notification);
@@ -87,8 +90,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     public async sendNotification(
         socket: ICustomSocket,
-        notification: Notifications,
-        payload?: any
+        notification: Notifications
     ) {
         let toSendNotification: boolean;
         // очень страшная конструкция надо что-то придумать...
@@ -135,7 +137,7 @@ export class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
             socket.send(
                 JSON.stringify({
                     event: Events.NEW_NOTIFICATION,
-                    data: { notification, payload }
+                    data: { notification }
                 })
             );
         }

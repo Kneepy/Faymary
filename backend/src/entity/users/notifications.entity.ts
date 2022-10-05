@@ -6,11 +6,11 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
-import { Lifetime } from "../common";
+import { NotificationPayload } from "../common";
 import { Users } from "./users.entity";
 
 @Entity()
-export class Notifications extends Lifetime {
+export class Notifications extends NotificationPayload {
     @PrimaryGeneratedColumn("uuid")
     id?: string;
 

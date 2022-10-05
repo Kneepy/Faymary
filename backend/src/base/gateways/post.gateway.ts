@@ -52,14 +52,14 @@ export class PostGateway {
         const notification = await this.baseGateway.setNotification({
             from: body.answer.user,
             to: comment.user,
-            type: NotificationEnumType.ANSWER_COMMENT
+            type: NotificationEnumType.ANSWER_COMMENT,
+            payload: {comment: answer}
         });
 
         if (notification) {
             this.baseGateway.sendNotification(
                 this.baseGateway.findUser(notification.to.id),
-                notification,
-                answer
+                notification
             );
         }
 
@@ -94,14 +94,14 @@ export class PostGateway {
         const notfication = await this.baseGateway.setNotification({
             from: socket.user,
             to: post.user,
-            type: NotificationEnumType.COMMENT
+            type: NotificationEnumType.COMMENT,
+            payload: {comment}
         });
 
         if (notfication) {
             this.baseGateway.sendNotification(
                 this.baseGateway.findUser(notfication.to.id),
-                notfication,
-                comment
+                notfication
             );
         }
 
@@ -132,16 +132,15 @@ export class PostGateway {
             const notfication = await this.baseGateway.setNotification({
                 from: socket.user,
                 to: post.user,
-                type: NotificationEnumType.LIKE_POST
+                type: NotificationEnumType.LIKE_POST,
+                payload: {post}
             });
 
             if (notfication) {
                 delete post.likes;
                 this.baseGateway.sendNotification(
                     this.baseGateway.findUser(post.user.id),
-                    notfication,
-                    post
-                );
+                    notfication);
             }
         }
 
@@ -171,20 +170,19 @@ export class PostGateway {
             await this.commentsService.unsetLike(socket.user, comment);
         } else {
             await this.commentsService.setLike(socket.user, comment);
-
+            delete comment.likes;
+            
             const notfication = await this.baseGateway.setNotification({
                 from: socket.user,
                 to: comment.user,
-                type: NotificationEnumType.LIKE_COMMENT
+                type: NotificationEnumType.LIKE_COMMENT,
+                payload: {comment}
             });
 
             if (notfication) {
-                delete comment.likes;
                 this.baseGateway.sendNotification(
                     this.baseGateway.findUser(comment.user.id),
-                    notfication,
-                    comment
-                );
+                    notfication);
             }
         }
 

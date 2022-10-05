@@ -53,8 +53,7 @@ export class UserGateway {
 
             await this.baseGateway.sendNotification(
                 this.baseGateway.findUser(author.id),
-                notification,
-                { ...subscriber, subscriptions: undefined }
+                notification
             );
         }
 

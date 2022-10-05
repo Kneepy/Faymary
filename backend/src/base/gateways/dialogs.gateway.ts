@@ -61,15 +61,15 @@ export class DialogsGateway {
             const notification = await this.baseGateway.setNotification({
                 from: socket.user,
                 to: user,
-                type: notficationType
+                type: notficationType,
+                payload: {dialog}
             });
 
             userSocket &&
                 notification &&
                 this.baseGateway.sendNotification(
                     userSocket,
-                    notification,
-                    dialog
+                    notification
                 );
         });
 
@@ -96,10 +96,8 @@ export class DialogsGateway {
                 );
 
                 const message = await this.messagesService.create({
-                    message: body.message,
-                    files: body.files,
-                    dialog,
                     user: socket.user,
+                    dialog,
                     ...body
                 });
 
@@ -158,7 +156,8 @@ export class DialogsGateway {
                         {
                             to: user,
                             from: socket.user,
-                            type: NotificationEnumType.ADD_USER_DIALOG
+                            type: NotificationEnumType.ADD_USER_DIALOG,
+                            payload: {user: accedingUser}
                         }
                     );
 
@@ -167,8 +166,7 @@ export class DialogsGateway {
                         userSocket &&
                             (await this.baseGateway.sendNotification(
                                 userSocket,
-                                notification,
-                                { dialog, user: accedingUser }
+                                notification
                             ));
                     }
                 });
@@ -243,14 +241,14 @@ export class DialogsGateway {
                                 await this.baseGateway.setNotification({
                                     from: socket.user,
                                     to: user,
-                                    type: NotificationEnumType.REMOVE_USER_DIALOG
+                                    type: NotificationEnumType.REMOVE_USER_DIALOG,
+                                    payload: {user: userRelationsips.subject}
                                 });
 
                             notification &&
                                 (await this.baseGateway.sendNotification(
                                     userSocket,
-                                    notification,
-                                    { dialog, user }
+                                    notification
                                 ));
                         }
                     });

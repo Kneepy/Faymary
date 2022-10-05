@@ -5,8 +5,8 @@ export class Lifetime {
         nullable: false,
         type: "bigint"
     })
-    expirensIn: number;
+    expirensIn?: number;
 
     @Column({ nullable: false, type: "bigint" })
-    createdAt: number;
+    createdAt?: number;
 }
