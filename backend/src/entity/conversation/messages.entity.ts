@@ -5,6 +5,7 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
+    OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 import { Files } from "../../entity/common";
@@ -31,6 +32,10 @@ export class Messages {
     @ManyToMany(() => Files)
     @JoinTable()
     files?: Files[];
+
+    @OneToOne(() => Files)
+    @JoinColumn()
+    voice?: Files
 
     @ManyToMany(() => Messages)
     @JoinTable()

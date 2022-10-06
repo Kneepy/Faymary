@@ -17,6 +17,10 @@ export class CreateMessageDto
     @IsOptional()
     files: Files[];
 
+    @Type(() => Files)
+    @IsOptional()
+    voice: Files
+
     @Type(() => Messages)
     @IsOptional()
     answerTo?: Messages;
