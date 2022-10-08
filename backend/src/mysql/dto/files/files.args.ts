@@ -9,6 +9,9 @@ export class FilesArgs {
 
     @IsOptional()
     path?: string;
+
+    @IsOptional()
+    filename?: string
 }
 
 export class ManyFilesArgs {

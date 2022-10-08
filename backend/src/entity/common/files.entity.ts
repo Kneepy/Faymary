@@ -20,5 +20,11 @@ export class Files {
     user: Users;
 
     @Column()
-    path: string;
+    path: string; // "https://localhost:5000/example.mp3"
+
+    @Column()
+    filename: string // "exapmle"
+
+    @Column()
+    extname: string // ".mp3"
 }

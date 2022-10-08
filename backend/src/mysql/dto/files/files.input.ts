@@ -9,4 +9,10 @@ export class FilesInput {
     @Type(() => Users)
     @IsNotEmpty()
     user: Users;
+
+    @IsNotEmpty()
+    filename: string
+
+    @IsNotEmpty()
+    extname: string
 }
