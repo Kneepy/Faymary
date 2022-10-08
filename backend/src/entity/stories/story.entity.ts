@@ -7,7 +7,7 @@ export class Story extends Lifetime {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @ManyToMany(() => File)
+    @ManyToMany(() => Files)
     file: Files
 
     @ManyToOne(() => Users)
