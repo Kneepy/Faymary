@@ -1,25 +1,27 @@
-import { Controller, Get, Param, Post, UploadedFile, UploadedFiles } from "@nestjs/common";
+import { Controller, Get, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
 import { createReadStream } from "fs";
 import * as path from "path";
 import { DisableAuth } from "src/auth";
-import { ICustomFile } from "src/common";
-import { STORE_FOLDER } from "src/config";
+import { ICustomFile, ICustomResponse } from "src/common";
+import { ConfigService } from "src/config";
 import { Files } from "src/entity";
 import { FilesService } from "src/mysql";
 import { SaveFile, SaveFiles } from "../decorators";
 
 @Controller("/file")
 export class FileController {
-    constructor(private filesService: FilesService) {}
+    constructor(
+        private filesService: FilesService,
+        private configService: ConfigService
+    ) {}
 
     @Get(":filename")
     @DisableAuth()
-    public async getFile(@Param("filename") filename: string) {
+    public async getFile(@Param("filename") filename: string, @Res({passthrough: true}) res: ICustomResponse) {
         const file = await this.filesService.findOne({filename})
-        console.log(path.join(process.cwd(), STORE_FOLDER, file.filename + file.extname))
-        const stream = createReadStream(path.join(process.cwd(), STORE_FOLDER, file.filename + file.extname))
+        const stream = createReadStream(path.join(this.configService.getStaticOptions().rootPath, file.filename + file.extname))
 
-        stream.on("data", chunk => console.log(chunk))
+        stream.pipe(res)
     }
 
     @Post("/upload")

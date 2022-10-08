@@ -15,10 +15,15 @@ export enum Events {
     REMOVE_USER_DIALOG = "dialog.remove.user",
     UPDATE_DIALOG = "dialog.update",
 
+    ADD_STORY = "story.add",
+    ADD_LIKE_STORY = "story.add.like",
+    ADD_REFERENCE_STORY = "story.add.reference",
+    REMOVE_STORY = "story.remove",
+
     // update data
     REFRESH_USER = "user.refresh",
     REFRESH_POST = "post.refresh",
     REFRESH_COMMENT = "post.comment.refresh",
     REFRESH_DIALOG = "dialog.refresh",
-    REFRESH_MESSAGES = "dialogs.messages.refresh"
+    REFRESH_MESSAGES = "dialogs.messages.refresh",
 }

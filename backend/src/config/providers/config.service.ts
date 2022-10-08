@@ -13,6 +13,7 @@ import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer
 import * as path from "path";
 import * as multer from "multer";
 import { ICustomRequest } from "src/common/types/request.type";
+import { ServeStaticModuleOptions } from "@nestjs/serve-static";
 
 @Injectable()
 export class ConfigService {
@@ -27,20 +28,18 @@ export class ConfigService {
         }
     });
 
-    getStaticOptions = () => [
-        {
-            rootPath: path.join(process.cwd(), STORE_FOLDER)
-        }
-    ];
+    getStaticOptions = (): ServeStaticModuleOptions => ({
+        rootPath: path.join(process.cwd(), STORE_FOLDER)
+    })
 
     getMulterOptions = (): MulterOptions => ({
         dest: path.join(process.cwd(), STORE_FOLDER),
         storage: multer.diskStorage({
             destination: (req: ICustomRequest, file, cb) => {
-                cb(null, this.getStaticOptions()[0].rootPath);
+                cb(null, this.getStaticOptions().rootPath);
             },
             filename: (req, file, cb) => {
-                cb(null, Date.now() + path.extname(file.originalname));
+                cb(null, Buffer.from(`${Date.now()}`).toString("base64") + path.extname(file.originalname));
             }
         })
     });

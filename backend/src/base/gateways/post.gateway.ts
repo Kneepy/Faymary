@@ -11,7 +11,6 @@ import { WsAuthGuard } from "src/auth";
 import { ICustomSocket } from "src/common";
 import { Comments, Posts } from "src/entity";
 import { CommentsService, NotificationEnumType, PostsService } from "src/mysql";
-import { Repository } from "typeorm";
 import {
     AddAnswerToComment,
     AddCommentToPostDto,
