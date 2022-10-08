@@ -16,12 +16,12 @@ import { ConfigService } from "./config";
         AuthModule,
         BaseModule,
         ConfigModule,
-        /*ServeStaticModule.forRootAsync({
+        ServeStaticModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) =>
                 [configService.getStaticOptions()],
             inject: [ConfigService]
-        })*/
+        })
     ],
     providers: [
         {

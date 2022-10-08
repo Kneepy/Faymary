@@ -17,7 +17,7 @@ export class FileController {
 
     @Get(":filename")
     @DisableAuth()
-    public async getFile(@Param("filename") filename: string, @Res({passthrough: true}) res: ICustomResponse) {
+    public async getFile(@Param("filename") filename: string, @Res() res: ICustomResponse) {
         const file = await this.filesService.findOne({filename})
         const stream = createReadStream(path.join(this.configService.getStaticOptions().rootPath, file.filename + file.extname))
 
