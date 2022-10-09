@@ -1,8 +1,8 @@
-import { Controller, Get, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
+import { Controller, Get, NotFoundException, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
 import { createReadStream } from "fs";
 import * as path from "path";
 import { DisableAuth } from "src/auth";
-import { ICustomFile, ICustomResponse } from "src/common";
+import { FILE_NOT_FOUND, ICustomFile, ICustomResponse } from "src/common";
 import { ConfigService } from "src/config";
 import { Files } from "src/entity";
 import { FilesService } from "src/mysql";
@@ -19,9 +19,15 @@ export class FileController {
     @DisableAuth()
     public async getFile(@Param("filename") filename: string, @Res() res: ICustomResponse) {
         const file = await this.filesService.findOne({filename})
-        const stream = createReadStream(path.join(this.configService.getStaticOptions().rootPath, file.filename + file.extname))
+        
+        if(file) {
+            const stream = createReadStream(path.join(this.configService.getStaticOptions().rootPath, file.filename + file.extname))
 
-        stream.pipe(res)
+            stream.pipe(res)
+        }
+        else {
+            throw new NotFoundException(FILE_NOT_FOUND)
+        }
     }
 
     @Post("/upload")

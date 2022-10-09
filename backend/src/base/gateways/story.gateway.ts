@@ -1,8 +1,13 @@
+import { UseFilters, UseGuards } from "@nestjs/common";
 import { MessageBody, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
+import { WsAuthGuard } from "src/auth";
 import { AddLikeStoryDTO, AddReferenceStoryDTO, AddStoryDTO, RemoveStoryDTO } from "../dto/stories";
 import { Events } from "../enums";
+import { WsExeptionFilter } from "../filters";
 
 @WebSocketGateway()
+@UseFilters(WsExeptionFilter)
+@UseGuards(WsAuthGuard)
 export class StoryGateway {
     constructor() {}
 
