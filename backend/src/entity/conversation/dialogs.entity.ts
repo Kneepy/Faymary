@@ -37,7 +37,7 @@ export class Dialogs {
         () => HistoryActions,
         (relationships: HistoryActions) => relationships.dialog
     )
-    relationships: HistoryActions[];
+    history: HistoryActions[];
 
     @ManyToMany(() => Messages, (message: Messages) => message.dialog)
     messages: Messages[];

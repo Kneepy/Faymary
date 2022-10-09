@@ -1,9 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { HistoryActions } from "src/entity";
-import { FindManyOptions, FindOneOptions, Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 import {
-    ManyRelationshipsArgs,
-    RelationshipsArgs,
     RelationshipsInput
 } from "../dto";
 
@@ -14,14 +12,14 @@ export class HistoryActionsService {
     ) {}
 
     public async find(
-        args: ManyRelationshipsArgs,
+        args: FindOptionsWhere<HistoryActions>,
         options?: FindManyOptions<HistoryActions>
     ): Promise<HistoryActions[]> {
         return await this.repository.find({ where: args, ...options });
     }
 
     public async findOne(
-        args: RelationshipsArgs,
+        args: FindOptionsWhere<HistoryActions>,
         options?: FindOneOptions<HistoryActions>
     ): Promise<HistoryActions> {
         return await this.repository.findOne({ where: args, ...options });

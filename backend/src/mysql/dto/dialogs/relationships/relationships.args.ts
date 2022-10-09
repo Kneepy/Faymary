@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import { IsOptional } from "class-validator";
-import { Dialogs, Users } from "src/entity";
+import { Dialogs, HistoryActions, Users } from "src/entity";
+import { FindOptionsWhere } from "typeorm";
 
 export class ManyRelationshipsArgs {
     @Type(() => Dialogs)
@@ -9,7 +10,7 @@ export class ManyRelationshipsArgs {
 
     @Type(() => Users)
     @IsOptional()
-    emitter?: Users;
+    emiter?: Users;
 
     @Type(() => Users)
     @IsOptional()
@@ -26,7 +27,7 @@ export class RelationshipsArgs {
 
     @Type(() => Users)
     @IsOptional()
-    emitter?: Partial<Users>;
+    emiter?: Partial<Users>;
 
     @Type(() => Users)
     @IsOptional()

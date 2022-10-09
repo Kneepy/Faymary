@@ -1,0 +1,3 @@
+export enum HistoryActionsDialogType {
+    ADD_USER, REMOVE_USER, CHANGE_FRONT_FILE, CHANGE_TITLE, CHANGE_CREATOR 
+}
