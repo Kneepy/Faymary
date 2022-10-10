@@ -5,6 +5,7 @@ import {
     JoinTable,
     ManyToMany,
     ManyToOne,
+    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
@@ -33,7 +34,7 @@ export class Dialogs {
     @JoinColumn()
     creator: Users;
 
-    @OneToOne(
+    @OneToMany(
         () => HistoryActions,
         (relationships: HistoryActions) => relationships.dialog
     )

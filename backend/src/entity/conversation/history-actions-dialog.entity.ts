@@ -5,6 +5,7 @@ import {
     JoinColumn,
     JoinTable,
     ManyToMany,
+    ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
@@ -23,7 +24,7 @@ export class HistoryActions {
     @Column({nullable: false})
     type: HistoryActionsDialogType
 
-    @OneToOne(() => Dialogs, (dialog: Dialogs) => dialog.history)
+    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.history)
     @JoinColumn()
     dialog: Dialogs;
 
