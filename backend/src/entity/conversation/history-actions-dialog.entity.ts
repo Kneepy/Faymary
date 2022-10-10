@@ -1,12 +1,15 @@
+import { HistoryActionsDialogType } from "src/mysql";
 import {
     Column,
     Entity,
     JoinColumn,
     JoinTable,
     ManyToMany,
+    ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
+import { Files } from "../common";
 import { Users } from "../users";
 import { Dialogs } from "./dialogs.entity";
 
@@ -18,15 +21,24 @@ export class HistoryActions {
     @Column({ nullable: false, type: "bigint" })
     createdAt: number;
 
-    @OneToOne(() => Dialogs, (dialog: Dialogs) => dialog.relationships)
+    @Column({nullable: false})
+    type: HistoryActionsDialogType
+
+    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.history)
     @JoinColumn()
     dialog: Dialogs;
 
     @ManyToMany(() => Users)
     @JoinTable()
-    emmiter: Users;
+    emiter: Users;
 
     @ManyToMany(() => Users)
     @JoinTable()
     subject: Users;
+
+    @ManyToMany(() => Files)
+    file: Files
+
+    @Column({nullable: true})
+    payload: string
 }

@@ -17,10 +17,11 @@ import {
     USER_NOT_FOUND_DIALOG,
     USER_NOT_FOUND_ID
 } from "src/common";
-import { Dialogs, Messages, Users } from "src/entity";
+import { Dialogs, HistoryActions, Messages, Users } from "src/entity";
 import {
     DialogsService,
     FilesService,
+    HistoryActionsDialogType,
     HistoryActionsService,
     MessagesService,
     NotificationEnumType,
@@ -147,12 +148,14 @@ export class DialogsGateway {
                 { id: body.dialogId },
                 { relations: { users: true } }
             );
+            const historyAction = await this.historyActionsService.create({
+                type: HistoryActionsDialogType.ADD_USER,
+                subject: accedingUser,
+                emiter: socket.user,
+                dialog
+            })
 
-            await this.dialogsService.addUser(
-                dialog,
-                accedingUser,
-                socket.user
-            );
+            await this.dialogsService.addUser(dialog, accedingUser);
 
             dialog.users.forEach(async user => {
                 // возможно нужно получать пользователя
@@ -195,8 +198,10 @@ export class DialogsGateway {
         );
 
         if (dialog) {
-            const userRelationsips =
-                await this.historyActionsService.findOne(
+            const deletingUser = dialog.users.find(user => user.id === body.userId)
+
+            if (deletingUser) {
+                const userRelationsips = await this.historyActionsService.findOne(
                     {
                         dialog: { id: dialog.id },
                         subject: { id: body.userId }
@@ -204,31 +209,24 @@ export class DialogsGateway {
                     { relations: { dialog: true, subject: true } }
                 );
 
-            if (userRelationsips) {
-                if (userRelationsips.emmiter.id === socket.id) {
+                if (userRelationsips.emiter.id === socket.id || dialog.creator.id === socket.user.id) {
                     dialog.users = dialog.users.filter(
                         user => user.id !== body.userId
                     );
+                    const historyAction = await this.historyActionsService.create({
+                        type: HistoryActionsDialogType.REMOVE_USER,
+                        emiter: socket.user,
+                        subject: deletingUser,
+                        dialog
+                    })
                     this.dialogsService.removeUser(
                         dialog,
-                        userRelationsips.subject,
-                        socket.user
+                        deletingUser,
                     );
                 } else {
-                    if (socket.id === dialog.creator.id) {
-                        dialog.users = dialog.users.filter(
-                            user => user.id !== body.userId
-                        );
-                        this.dialogsService.removeUser(
-                            dialog,
-                            userRelationsips.subject,
-                            socket.user
-                        );
-                    } else {
-                        throw new ForbiddenException(
-                            FAILED_DELETE_USER_DIALOG
-                        );
-                    }
+                    throw new ForbiddenException(
+                        FAILED_DELETE_USER_DIALOG
+                    );
                 }
 
                 const usersFromDialog = dialog.users;
@@ -270,9 +268,19 @@ export class DialogsGateway {
         const dialog = await this.dialogsService.findOne({id: body.dialogId}, {relations: {creator: true, users: true}})
         
         if(dialog) {
+            let historyActions: HistoryActions[] = []
+
             if(body.creator) {
                 if(socket.id === dialog.creator.id) {
+                    
                     dialog.creator = body.creator
+
+                    historyActions.push(await this.historyActionsService.create({
+                        type: HistoryActionsDialogType.CHANGE_CREATOR, 
+                        subject: body.creator,
+                        emiter: socket.user,
+                        dialog
+                    }))
                 } else {
                     throw new ForbiddenException(FAILED_UPDATE_DILAOG)
                 }
@@ -281,12 +289,22 @@ export class DialogsGateway {
                 const file = await this.filesService.findOne({id: body.frontFile.id})
 
                 if(file) {
+
                     dialog.frontFile = file 
+
+                    historyActions.push(await this.historyActionsService.create({
+                        type: HistoryActionsDialogType.CHANGE_FRONT_FILE,
+                        file: file,
+                        emiter: socket.user,
+                        dialog
+                    }))
                 } else {
                     throw new NotFoundException(FILE_NOT_FOUND)
                 }
             }
             const updatedDialog = await this.dialogsService.update(dialog)
+
+            updatedDialog.history = historyActions
 
             dialog.users.forEach(user => {
                 const userSocket = this.baseGateway.findUser(user.id)

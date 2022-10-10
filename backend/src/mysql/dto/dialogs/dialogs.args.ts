@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import { IsString } from "class-validator";
 import { Users } from "src/entity";
+import { FindOperator } from "typeorm";
 
 export class DialogsArgs {
     @IsString()
@@ -9,5 +10,5 @@ export class DialogsArgs {
 
 export class ManyDialogsArgs {
     @Type(() => Users)
-    users: Users[] | Users;
+    users: Users | FindOperator<Users>;
 }

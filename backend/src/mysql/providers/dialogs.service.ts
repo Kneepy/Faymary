@@ -23,21 +23,7 @@ export class DialogsService {
     public async addUser(
         dialog: Dialogs,
         invited: Users,
-        inviter?: Users
     ): Promise<void> {
-        if (inviter) {
-            const relationship =
-                await this.dialogUserRelationshipsService.create({
-                    dialog,
-                    subject: invited,
-                    emitter: inviter
-                });
-            await this.repository
-                .createQueryBuilder()
-                .relation(Dialogs, "relationships")
-                .of(dialog)
-                .add(relationship);
-        }
         await this.repository
             .createQueryBuilder()
             .relation(Dialogs, "users")
@@ -48,21 +34,7 @@ export class DialogsService {
     public async removeUser(
         dialog: Dialogs,
         excluded: Users,
-        emitter?: Users
     ): Promise<void> {
-        if (emitter) {
-            const relationship =
-                await this.dialogUserRelationshipsService.create({
-                    dialog,
-                    subject: excluded,
-                    emitter: emitter
-                });
-            await this.repository
-                .createQueryBuilder()
-                .relation(Dialogs, "relationships")
-                .of(dialog)
-                .add(relationship);
-        }
         await this.repository
             .createQueryBuilder()
             .relation(Dialogs, "users")
