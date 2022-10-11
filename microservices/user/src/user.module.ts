@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { Users } from "./entities";
 
 @Module({
     imports: [
@@ -9,8 +10,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
             port: 3306,
             username: "root",
             password: "root",
-            database: "test",
-            entities: [],
+            database: "user",
+            entities: [Users],
             synchronize: true
         })
     ],
