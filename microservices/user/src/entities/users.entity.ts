@@ -1,6 +1,7 @@
 import {
     Column,
     Entity,
+    ManyToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
 
@@ -20,4 +21,10 @@ export class Users {
 
     @Column({ nullable: false })
     password: string;
+
+    @ManyToMany(() => Users, (users: Users) => users.subscriptions)
+    followers: Users[]
+
+    @ManyToMany(() => Users, (users: Users) => users.followers) 
+    subscriptions: Users[]
 }

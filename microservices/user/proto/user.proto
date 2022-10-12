@@ -3,10 +3,16 @@ syntax = "proto3";
 package user;
 
 service UserService {
-    rpc FindOne (UserBy) returns (User);
+    rpc FindOne (FindUserDTO) returns (User);
+    rpc FollowUser (FollowUserDTO) returns (User);
 }
 
-message UserBy {
+message FollowUserDTO {
+    string user_id = 1;
+    string follower_id = 2;
+}
+
+message FindUserDTO {
     string email = 1;
     string id = 2;
     string lastName = 3;
@@ -18,4 +24,6 @@ message User {
     string username = 3;
     string lastName = 4;
     string password = 5;
+    User followers = 6;
+    User subscriptions = 7;
 }
