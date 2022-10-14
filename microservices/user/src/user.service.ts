@@ -10,6 +10,14 @@ export class UserService {
         @InjectRepository(Users) private repository: Repository<Users> 
     ) {}
 
+    async addSubscription(user: Partial<Users> | any, subscriber: Partial<Users> | any) {
+        await this.repository.createQueryBuilder().relation(Users, "followers").of(user).add(subscriber)
+    }
+
+    async removeSubscription(user: Partial<Users> | any, subscriber: Partial<Users> | any) {
+        await this.repository.createQueryBuilder().relation(Users, "followers").of(user).remove(subscriber)
+    }
+
     async findOne(where: FindOptionsWhere<FindUser>, otherOptions?: Omit<FindOneOptions<Users>, "where">): Promise<Users> {
         return await this.repository.findOne({where, ...otherOptions})
     }

@@ -1,6 +1,7 @@
 import {
     Column,
     Entity,
+    JoinTable,
     ManyToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
@@ -23,6 +24,7 @@ export class Users {
     password: string;
 
     @ManyToMany(() => Users, (users: Users) => users.subscriptions)
+    @JoinTable()
     followers: Users[]
 
     @ManyToMany(() => Users, (users: Users) => users.followers) 

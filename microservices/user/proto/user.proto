@@ -4,7 +4,13 @@ package user;
 
 service UserService {
     rpc FindOne (FindUserDTO) returns (User);
-    rpc FollowUser (FollowUserDTO) returns (User);
+    rpc FollowUser (FollowUserDTO) returns ();
+    rpc GetFollowers (GetSubscribeDTO) returns (User);
+    rpc GetSubscriptions (GetSubscribeDTO) returns (User);
+}
+
+message GetSubscribeDTO {
+    string user_id = 1;
 }
 
 message FollowUserDTO {
