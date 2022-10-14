@@ -14,7 +14,7 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
     async findOne(data: FindUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Users> {
-        const user = await this.userService.findOne(data)
+        const user = await this.userService.findOne(data.criteria, {relations: data.fields})
 
         return user
     }
@@ -29,10 +29,4 @@ export class UserController {
             await this.userService.addSubscription(data.user_id, data.follower_id)
         }
     }
-
-    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.GET_FOLLOWERS)
-    async getFollowers() {}
-
-    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.GET_SUBSCRIPTIONS)
-    async getSubscriptions() {}
 }

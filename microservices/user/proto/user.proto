@@ -5,8 +5,6 @@ package user;
 service UserService {
     rpc FindOne (FindUserDTO) returns (User);
     rpc FollowUser (FollowUserDTO) returns ();
-    rpc GetFollowers (GetSubscribeDTO) returns (User);
-    rpc GetSubscriptions (GetSubscribeDTO) returns (User);
 }
 
 message GetSubscribeDTO {
@@ -19,6 +17,16 @@ message FollowUserDTO {
 }
 
 message FindUserDTO {
+    FindUserBy criteria = 1;
+    UserFields fields = 2;
+}
+
+enum UserFields {
+    FIELD_FOLLOWERS = 0;
+    FIELD_SUBSCRIPTIONS = 1;
+}
+
+message FindUserBy {
     string email = 1;
     string id = 2;
     string lastName = 3;
