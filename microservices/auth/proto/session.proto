@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package session;
+
+service SessionService {
+    rpc FindOne (FindUserDTO) returns (User);
+}
+
+message FindSessionDTO {
+    
+}
