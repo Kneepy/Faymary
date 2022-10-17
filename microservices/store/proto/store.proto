@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package store;
+
+service StoreSession {
+    rpc addFile (AddFileDTO) returns (AddFilePayload);
+}
+
+message AddFileDTO {}
+
+message AddFilePayload {}
