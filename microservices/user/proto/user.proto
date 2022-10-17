@@ -4,7 +4,7 @@ package user;
 
 service UserService {
     rpc FindOne (FindUserDTO) returns (User);
-    rpc FollowUser (FollowUserDTO) returns ();
+    rpc FollowUser (FollowUserDTO) returns (Empty);
 }
 
 message GetSubscribeDTO {
@@ -41,3 +41,5 @@ message User {
     User followers = 6;
     User subscriptions = 7;
 }
+
+message Empty {}

@@ -11,6 +11,5 @@ import { AppModule } from "./user.module";
             protoPath: USER_PROTO_PATH  
         }
     })
-
     await app.listen();
 })()

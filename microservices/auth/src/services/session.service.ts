@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
-import { Sessions } from "../entities";
+import { Sessions } from "../entities/session.entity";
 import { CreateSession } from "../interfaces";
 
 @Injectable()

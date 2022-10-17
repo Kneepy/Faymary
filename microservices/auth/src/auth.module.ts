@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Sessions } from "./entities";
 import { AuthController } from "./auth.controller";
-import { SessionService } from "./services/session.service";
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_EXPIRES_IN_ACCESS, JWT_SECRET } from "./constants/session.constants";
+import { AuthService, SessionService } from "./services";
 
 @Module({
     imports: [
@@ -14,16 +14,17 @@ import { JWT_EXPIRES_IN_ACCESS, JWT_SECRET } from "./constants/session.constants
             port: 3306,
             username: "root",
             password: "root",
-            database: "user",
+            database: "auth",
             entities: [Sessions],
             synchronize: true
         }),
+        TypeOrmModule.forFeature([Sessions]),
         JwtModule.register({
             secret: JWT_SECRET,
             signOptions: {expiresIn: JWT_EXPIRES_IN_ACCESS}
         })
     ],
     controllers: [AuthController],
-    providers: [SessionService]
+    providers: [SessionService, AuthService]
 })
 export class AuthModule {}

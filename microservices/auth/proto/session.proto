@@ -3,9 +3,23 @@ syntax = "proto3";
 package session;
 
 service SessionService {
-    rpc FindOne (FindUserDTO) returns (User);
+    rpc VerifyTokens (VerifyTokensDTO) returns (AccessToken);
+    rpc GenerateTokens (GenerateTokensDTO) returns (VerifyTokensDTO);
 }
 
-message FindSessionDTO {
-    
+message AccessToken {
+    string user_id = 1;
+}
+
+message VerifyTokensDTO {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message GenerateTokensDTO {
+    string fingerprint = 1;
+    string ua = 2;
+    string ip = 3;
+    string user_id = 4;
+    string old_refresh_token = 5;
 }
