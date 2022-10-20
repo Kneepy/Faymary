@@ -1,5 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { File } from "./entities";
+import { StoreController } from "./store.controller";
+import { StoreService } from "./store.service";
 
 @Module({
     imports: [
@@ -10,12 +13,12 @@ import { TypeOrmModule } from "@nestjs/typeorm";
             username: "root",
             password: "root",
             database: "store",
-            entities: [],
+            entities: [File],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([])
+        TypeOrmModule.forFeature([File])
     ],
-    controllers: [],
-    providers: []
+    controllers: [StoreController],
+    providers: [StoreService]
 })
 export class StoreModule {}

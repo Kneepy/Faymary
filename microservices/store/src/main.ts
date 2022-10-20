@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { StoreModule } from "./store.module";
 import { STORE_PACKAGE_NAME, STORE_PROTO_PATH } from "./store.constants";
+import { Logger } from "@nestjs/common";
 
 (async () => {
     const app = await NestFactory.create(StoreModule)
@@ -14,6 +15,5 @@ import { STORE_PACKAGE_NAME, STORE_PROTO_PATH } from "./store.constants";
         }
     })
     await app.startAllMicroservices();
-    await app.listen(3000, async () => console.log(`Serve start on: ${await app.getUrl()}`))
-
+    await app.listen(3000, async () => Logger.log(`Serve start on: ${await app.getUrl()}`))
 })()
