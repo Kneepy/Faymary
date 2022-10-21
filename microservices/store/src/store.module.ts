@@ -2,7 +2,9 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { File } from "./entities";
 import { StoreController } from "./store.controller";
-import { StoreService } from "./store.service";
+import { StoreResource } from "./providers";
+import { MulterModule } from "@nestjs/platform-express";
+import { GetMulterConfig } from "./multer.config";
 
 @Module({
     imports: [
@@ -16,9 +18,12 @@ import { StoreService } from "./store.service";
             entities: [File],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([File])
+        TypeOrmModule.forFeature([File]),
+        MulterModule.registerAsync({
+            useFactory: () => GetMulterConfig()
+        })
     ],
     controllers: [StoreController],
-    providers: [StoreService]
+    providers: [StoreResource]
 })
 export class StoreModule {}

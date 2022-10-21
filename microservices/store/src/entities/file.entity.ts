@@ -12,9 +12,6 @@ export class File {
     user_id: string;
 
     @Column()
-    path: string; // "https://localhost:5000/example.mp3"
-
-    @Column()
     filename: string // "exapmle"
 
     @Column()
