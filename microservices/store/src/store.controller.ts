@@ -1,12 +1,15 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import { createReadStream } from "fs";
 import * as path from "path";
 import { SaveFile, SaveFiles } from "./decorators/save-file.decorator";
 import { StoreResource } from "./providers";
-import { STORE_FOLDER_PATH } from "./constants/store.constants";
+import { STORE_FOLDER_PATH, STORE_SERVICE, STORE_SERVICE_METHODS } from "./constants/store.constants";
 import { ICustomFile, ICustomResponse } from "./types";
 import { FILE_NOT_FOUND } from "./constants";
+import { File } from "./entities";
+import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
+import { RemoveFileDTO } from "./dtos";
 
 @Controller()
 export class StoreController {
@@ -16,13 +19,16 @@ export class StoreController {
 
     @Post()
     @SaveFile()
-    async createFile(@UploadedFile() file: ICustomFile) {}
+    async createFile(@UploadedFile() file: ICustomFile): Promise<File> {
+        return file.savedAs
+    }
 
     @Post()
     @SaveFiles()
-    async createFiles(@UploadedFiles() files: ICustomFile[]) {}
+    async createFiles(@UploadedFiles() files: ICustomFile[]): Promise<File[]> {
+        return files.map(file => file.savedAs)
+    }
 
-    @GrpcMethod()
     @Get(":filename")
     async getFiles(@Param("filename") filename: string, @Res() res: ICustomResponse) {
         const file = await this.storeResource.findOne({filename})
@@ -37,6 +43,17 @@ export class StoreController {
         }
     }
 
-    @GrpcMethod() 
-    async deleteFiles() {}
+    @GrpcMethod(STORE_SERVICE, STORE_SERVICE_METHODS.REMOVE_FILE) 
+    async deleteFileGrpc(data: RemoveFileDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<any> {
+        return await this.deleteFile(data.id)
+    }
+
+    @Delete() 
+    async deleteFileHttp(@Body() body: RemoveFileDTO): Promise<any> {
+        return await this.deleteFile(body.id)
+    }
+
+    async deleteFile(id: string): Promise<any> {
+        return await this.storeResource.delete(id)
+    }
 }

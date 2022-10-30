@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor, UnauthorizedException } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { CreateFileDAO, ICustomFile, ICustomRequest } from "src/types";
 import * as path from "path"
@@ -18,6 +18,10 @@ export class WriteFileInterceptor implements NestInterceptor {
             user_id: user, filename: file.filename.split(".")[0],
             extname: path.extname(file.filename)
         })
+
+        if(!user) {
+            throw new UnauthorizedException()
+        }
 
         if(req.file) {
             req.file.savedAs = await this.storeResourse.create(getFileObject(req.file))

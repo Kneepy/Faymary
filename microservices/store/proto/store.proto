@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package store;
 
-service StoreSession {
-    rpc addFile (AddFileDTO) returns (AddFilePayload);
+service StoreService {
+    rpc RemoveFile (RemoveFileDTO) returns (RemoveFileRes);
 }
 
-message AddFileDTO {}
+message RemoveFileDTO {
+    string id = 1;
+}
 
-message AddFilePayload {}
+message RemoveFileRes {}
