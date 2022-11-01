@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+    rpc FindOne (FindUserDTO) returns (User);
+    rpc FollowUser (FollowUserDTO) returns (Empty);
+}
+
+message GetSubscribeDTO {
+    string user_id = 1;
+}
+
+message FollowUserDTO {
+    string user_id = 1;
+    string follower_id = 2;
+}
+
+message FindUserDTO {
+    FindUserBy criteria = 1;
+    UserFields fields = 2;
+}
+
+enum UserFields {
+    FIELD_FOLLOWERS = 0;
+    FIELD_SUBSCRIPTIONS = 1;
+}
+
+message FindUserBy {
+    string email = 1;
+    string id = 2;
+    string lastName = 3;
+}
+
+message User {
+    string id = 1;
+    string email = 2;
+    string username = 3;
+    string lastName = 4;
+    string password = 5;
+    User followers = 6;
+    User subscriptions = 7;
+}
+
+message Empty {}
