@@ -31,7 +31,7 @@ export class PostsController {
 
             const post = await this.postService.findOne({id: data.id})
 
-            if(post) {
+            if(post || post.user_id !== data.user_id) {
                 
                 return await this.postService.update(Object.assign(post, data))
 

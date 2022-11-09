@@ -47,12 +47,7 @@ export class StoreController {
     async deleteFileGrpc(data: RemoveFileDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<any> {
         return await this.deleteFile(data.id)
     }
-
-    @Delete() 
-    async deleteFileHttp(@Body() body: RemoveFileDTO): Promise<any> {
-        return await this.deleteFile(body.id)
-    }
-
+    
     async deleteFile(id: string): Promise<any> {
         return await this.storeResource.delete(id)
     }
