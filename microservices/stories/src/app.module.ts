@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { MODULE_PACKAGE_NAME, MYSQL_HOST, MYSQL_PASS, MYSQL_PORT, MYSQL_USER } from "./constants";
 import { Mark, Story } from "./entities";
+import { StoriesService } from "./providers";
 
 @Module({
     imports: [
@@ -16,7 +17,7 @@ import { Mark, Story } from "./entities";
             synchronize: true
         })
     ],
-    providers: [],
+    providers: [StoriesService],
     controllers: []
 })
 export class AppModule {}
