@@ -21,7 +21,7 @@ export class StoriesService {
         return await this.repository.findOne({where: args})
     }
 
-    async find(args: FindOptionsWhere<FindManyStoryInterface>, otherOpt: Omit<FindManyOptions<Story>, "where">): Promise<Story[]> {
+    async find(args: FindOptionsWhere<FindManyStoryInterface>, otherOpt?: Omit<FindManyOptions<Story>, "where">): Promise<Story[]> {
         return await this.repository.find({where: args, ...otherOpt})
     }
 
