@@ -23,10 +23,7 @@ export class StoriesController {
         if(!data.file_id) {
             throw FileNotFound
         }
-        if(data.marks) {
-
-        }
         
-        return
+        return await this.storiesService.create(data as Story)
     }
 }

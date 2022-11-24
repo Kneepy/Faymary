@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Mark } from "./mark.entity";
+import { Mark } from "./mark.entity"
 
 @Entity()
 export class Story {
@@ -15,6 +15,6 @@ export class Story {
     @Column()
     file_id: string
 
-    @OneToMany(() => Mark, (marks: Mark) => marks.story)
+    @OneToMany(() => Mark, (marks: Mark) => marks.story, {cascade: true})
     marks: Mark[]
 }

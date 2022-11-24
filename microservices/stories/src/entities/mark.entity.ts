@@ -1,5 +1,5 @@
 import { MarkEnumType } from "src/mark.enum";
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import { Story } from "./story.enitity";
 
 @Entity()
@@ -13,6 +13,6 @@ export class Mark {
     @Column()
     item_id: string
 
-    @ManyToMany(() => Story, (story: Story) => story.marks)
+    @ManyToOne(() => Story, (story: Story) => story.marks)
     story: Story
 }
