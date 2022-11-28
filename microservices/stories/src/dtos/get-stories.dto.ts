@@ -1,3 +1,3 @@
 export class GetStoriesDTO {
-    user_id: string
+    user_id: string;
 }

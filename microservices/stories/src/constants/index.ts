@@ -1,2 +1,2 @@
-export * from "./app.constants"
-export * from "./errors.constants"
+export * from "./app.constants";
+export * from "./errors.constants";

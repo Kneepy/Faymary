@@ -1,2 +1,2 @@
-export * from "./mark.entity"
-export * from "./story.enitity"
+export * from "./mark.entity";
+export * from "./story.enitity";

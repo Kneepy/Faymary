@@ -1,2 +1,2 @@
-export * from "./story-create.interface"
-export * from "./story-find.interface"
+export * from "./story-create.interface";
+export * from "./story-find.interface";

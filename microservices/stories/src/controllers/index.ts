@@ -1,1 +1,1 @@
-export * from "./stories.controller"
+export * from "./stories.controller";
