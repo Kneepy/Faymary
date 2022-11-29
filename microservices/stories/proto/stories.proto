@@ -3,25 +3,49 @@ syntax = "proto3";
 package stories;
 
 service StoriesService {
-    rpc GetStories (VerifyTokensDTO) returns (AccessToken);
-    rpc CreateStory (GenerateTokensDTO) returns (VerifyTokensDTO);
-    rpc DeleteStory (GenerateTokensDTO) returns (VerifyTokensDTO);
-    rpc UpdateStory (GenerateTokensDTO) returns (VerifyTokensDTO);
+    rpc GetStories (GetStories) returns (Story);
+    rpc CreateStory (CreateStoryDTO) returns (Story);
+    rpc DeleteStory (DeleteStoryDTO) returns (Empty);
+    rpc UpdateStory (UpdateStoryDTO) returns (Story);
 }
 
-message AccessToken {
+message GetStoriesDTO {
     string user_id = 1;
 }
 
-message VerifyTokensDTO {
-    string access_token = 1;
-    string refresh_token = 2;
+message CreateStoryDTO {
+    strign user_id = 1;
+    string file_id = 2;
+    Mark marks = 3;
 }
 
-message GenerateTokensDTO {
-    string fingerprint = 1;
-    string ua = 2;
-    string ip = 3;
-    string user_id = 4;
-    string old_refresh_token = 5;
+message DeleteStoryDTO {
+    string id = 1;
 }
+
+message UpdateStoryDTO {
+    string file_id = 1;
+    Mark marks = 2;
+}
+
+message Story {
+    string id = 1;
+    string user_id = 2;
+    int ctratedAt = 3;
+    string file_id = 4;
+    Mark marks = 5;
+}
+
+message Mark {
+    string id = 1;
+    string item_id = 2;
+    MarkType type = 3;
+}
+
+enum MarkType {
+    user = 0;
+    story = 1;
+    post = 2;
+}
+
+message Empty {}

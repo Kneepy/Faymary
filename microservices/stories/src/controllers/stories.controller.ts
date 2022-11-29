@@ -20,9 +20,12 @@ export class StoriesController {
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.GET_STORIES)
     async getStories(data: GetStoriesDTO): Promise<Story[]> {
-        const stories = await this.storiesService.find({
-            user_id: data.user_id
-        });
+        const stories = await this.storiesService.find(
+            {
+                user_id: data.user_id
+            },
+            { relations: { marks: true } }
+        );
 
         return stories;
     }

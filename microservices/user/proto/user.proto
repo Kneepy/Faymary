@@ -22,8 +22,8 @@ message FindUserDTO {
 }
 
 enum UserFields {
-    FIELD_FOLLOWERS = 0;
-    FIELD_SUBSCRIPTIONS = 1;
+    followers = 0;
+    subscriptions = 1;
 }
 
 message FindUserBy {
