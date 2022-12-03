@@ -1,9 +1,9 @@
 import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
 import { Controller } from "@nestjs/common";
-import { GrpcMethod } from "@nestjs/microservices";
-import { FindUserDTO, FollowUserDTO } from "./dtos";
+import {GrpcMethod, RpcException} from "@nestjs/microservices";
+import {FindUserDTO, FollowUserDTO, UserIsFollowDTO} from "./dtos";
 import { Users } from "./entities";
-import { USER_SERVICE, USER_SERVICE_METHODS } from "./user.constants";
+import {USER_ID_NOT_FOUND, USER_SERVICE, USER_SERVICE_METHODS} from "./user.constants";
 import { UserService } from "./user.service";
 
 @Controller()
@@ -17,6 +17,24 @@ export class UserController {
         const user = await this.userService.findOne(data.criteria, {relations: data.fields})
 
         return user
+    }
+
+    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USER_IS_FOLLOW)
+    async userIsFollow(data: UserIsFollowDTO): Promise<boolean | Map<string, boolean>> {
+        if(data.owner_id) {
+            const user = await this.userService.findOne({id: data.owner_id}, {relations: {subscriptions: true}})
+
+            if(data.users_ids.length) {
+                const respond = new Map<string, boolean>()
+                user.subscriptions.forEach(subsc => respond.set(subsc.id, data.users_ids.indexOf(subsc.id) !== -1))
+
+                return respond
+            }
+            if(data.user_id) {
+                return !!user.subscriptions.find(subs => subs.id === data.user_id)
+            }
+
+        } else throw USER_ID_NOT_FOUND
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
