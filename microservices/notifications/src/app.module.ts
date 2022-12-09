@@ -1,13 +1,15 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Notificaiton } from "./notification.entity";
 import {
     MODULE_PACKAGE_NAME,
     MYSQL_HOST,
     MYSQL_PASS,
     MYSQL_PORT,
-    MYSQL_USER
-} from "./notifications.constants";
+    MYSQL_USER,
+    Notifications
+} from "./common";
+import { NotificationService } from "./providers";
+import { NotificationController } from "./controllers";
 
 @Module({
     imports: [
@@ -18,12 +20,12 @@ import {
             username: MYSQL_USER,
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
-            entities: [Notificaiton],
+            entities: [Notifications],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([Notificaiton])
+        TypeOrmModule.forFeature([Notifications])
     ],
-    controllers: [],
-    providers: []
+    controllers: [NotificationController],
+    providers: [NotificationService]
 })
 export class AppModule {}
