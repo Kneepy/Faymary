@@ -31,16 +31,11 @@ export class NotificationService {
 
     async find(
         args: FindOptionsWhere<NotificationFindManyInterface>,
-        otherOpt?: Omit<FindManyOptions<Notifications>, "where">
+        otherOpt: Omit<FindManyOptions<Notifications>, "where"> = {take: DEFAULT_TAKE_NOTIFICATIONS, skip: DEFAULT_ORDER_NOTIFICATIONS}
     ): Promise<Notifications[]> {
         return await this.repository.find({
             where: args,
-            ...(otherOpt.skip || otherOpt.take
-                ? otherOpt
-                : {
-                      take: DEFAULT_TAKE_NOTIFICATIONS,
-                      skip: DEFAULT_ORDER_NOTIFICATIONS
-                  })
+            ...otherOpt
         });
     }
 

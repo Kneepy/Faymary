@@ -3,5 +3,34 @@ syntax = "proto3";
 package notifications;
 
 service NotificationsService {
+    rpc GetAllUserNotifications (NotificationGetDTO) returns (Notification);
+    rpc CreateNotification (NotificationCreate) returns (Notification);
+}
 
+message Notification {
+    string id = 0;
+    NotificationEnumType type = 1;
+    string item_id = 2;
+    string to_id = 3;
+    string from_id = 4;
+    int createdAt = 5;
+}
+
+message NotificationGetDTO {
+    string user_id = 0;
+    optional int skip = 1;
+    optional int take = 2;
+}
+
+message NotificationCreate {
+    string from_id = 0;
+    string to_id = 1;
+    string item_id = 2;
+    NotificationEnumType type = 3;
+}
+
+enum NotificationEnumType {
+    user = 0;
+    story = 1;
+    post = 2;
 }

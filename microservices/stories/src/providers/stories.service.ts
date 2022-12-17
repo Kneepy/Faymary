@@ -25,7 +25,7 @@ export class StoriesService {
             where: {
                 ...args,
                 createdAt: Raw(
-                    alias => `${alias} <= ${alias} + ${STORY_EXPIRES_AFTER}`
+                    alias => `${Date.now()} >= ${alias} + ${STORY_EXPIRES_AFTER}`
                 )
             }
         });

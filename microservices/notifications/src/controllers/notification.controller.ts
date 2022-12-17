@@ -41,11 +41,21 @@ export class NotificationController {
                 from_id: data.from_id,
                 type: data.type,
                 createdAt: Raw(
-                    alias => `${alias} <= ${alias} + ${NOTIFICATION_LIFETIME}`
+                    alias => `${Date.now()} >= ${alias} + ${NOTIFICATION_LIFETIME}`
                 ) as FindOperator<any>
             });
-        }
 
-        return;
+            if(existNotification){
+                const updatedNotification = await this.notificationService.update({...existNotification, createdAt: Date.now()})
+
+                return updatedNotification
+            }
+            else {
+                const {from_id, type, to_id, item_id} = data
+                const newNotification = await this.notificationService.create({from_id, type, to_id, item_id})
+
+                return newNotification
+            }
+        }
     }
 }
