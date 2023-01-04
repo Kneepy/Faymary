@@ -1,22 +1,25 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { NotificationEnumType } from "../enums";
+import { MessagesEnumType } from "../enums";
 
 @Entity()
-export class Notifications {
+export class Messages {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @Column()
-    type: NotificationEnumType;
+    attachment: MessagesEnumType;
 
     @Column()
     item_id: string;
 
     @Column()
-    to_id: string;
+    dialog_id: string;
 
     @Column()
-    from_id: string;
+    user_id: string;
+
+    @Column()
+    message: string;
 
     @Column({ type: "bigint" })
     createdAt: number;

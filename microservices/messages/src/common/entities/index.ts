@@ -1,1 +1,1 @@
-export * from "./notifications.entity";
+export * from "./messages.entity";

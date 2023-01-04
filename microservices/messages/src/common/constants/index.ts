@@ -1,2 +1,2 @@
-export * from "./notifications.constants";
+export * from "./messages.constants";
 export * from "./errors.constants";

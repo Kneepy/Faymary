@@ -1,1 +1,1 @@
-export * from "./notification.controller";
+export * from "./messages.controller";
