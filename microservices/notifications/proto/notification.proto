@@ -13,13 +13,13 @@ message Notification {
     string item_id = 2;
     string to_id = 3;
     string from_id = 4;
-    int createdAt = 5;
+    int64 createdAt = 5;
 }
 
 message NotificationGetDTO {
     string user_id = 0;
-    optional int skip = 1;
-    optional int take = 2;
+    optional int64 skip = 1;
+    optional int64 take = 2;
 }
 
 message NotificationCreate {
