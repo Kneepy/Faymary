@@ -1,8 +1,16 @@
 import { RpcException } from "@nestjs/microservices";
 
-export const NotFoundNotification = new RpcException(
-    "Не удалось найти уведомления для этого пользователя!"
+export const NotFoundUserDialogs = new RpcException(
+    "Не удалось найти диалоги для этого пользователя!"
 );
-export const ImpossibleCreateNotification = new RpcException(
-    "Не удалось создать уведомление!"
+
+export const InsufficientRightToMoveDialog = new RpcException(
+    "Не достаточно прав для внесения изменений в диалог диалога!"
+)
+
+export const NotFoundDialog = new RpcException(
+    "Не удалось найти диалог с таким id!"
+);
+export const ImpossibleAddUserDialog = new RpcException(
+    "Не удалось добавить пользователя в диалог!"
 );

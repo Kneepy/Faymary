@@ -14,7 +14,10 @@ export class DialogHistory {
     action: DialogActionEnum
 
     @Column({nullable: true})
-    item_id: string
+    item_id?: string
+
+    @Column({nullable: true})
+    desc?: string
 
     @Column({type: "bigint"})
     createdAt: number

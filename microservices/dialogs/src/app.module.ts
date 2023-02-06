@@ -9,6 +9,8 @@ import {
     MYSQL_PORT,
     MYSQL_USER,
 } from "./common";
+import {DialogsController} from "./controllers";
+import {DialogsService} from "./providers";
 
 @Module({
     imports: [
@@ -24,7 +26,7 @@ import {
         }),
         TypeOrmModule.forFeature([DialogHistory, Dialogs])
     ],
-    controllers: [],
-    providers: []
+    controllers: [DialogsController],
+    providers: [DialogsService]
 })
 export class AppModule {}
