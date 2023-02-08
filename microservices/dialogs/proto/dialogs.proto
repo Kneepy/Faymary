@@ -1,36 +1,98 @@
 syntax = "proto3";
 
-package notifications;
+package dialogs;
 
-service NotificationsService {
-    rpc GetAllUserNotifications (NotificationGetDTO) returns (Notification);
-    rpc CreateNotification (NotificationCreate) returns (Notification);
+service DialogsService {
+    rpc AddUserToDialog (AddUserDialogDTO) returns (DialogHistory);
+    rpc CreateDialog (CreateDialogDTO) returns (Dialog);
+    rpc GetDialog (GetDialogDTO) returns (Dialog);
+    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (Dialog);
+    rpc DeleteDialog (DeleteDialogDTO) returns (Empty);
+    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (Dialog);
+    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (Dialog);
+    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (HistoryDialog);
+    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (Dialog);
 }
 
-message Notification {
-    string id = 0;
-    NotificationEnumType type = 1;
-    string item_id = 2;
-    string to_id = 3;
-    string from_id = 4;
+message Dialog {
+    int id = 0;
+    string user_ids = 1;
+    string creator_id = 2;
+    StateDialogEnum state = 3;
+    string name = 4;
+    string file_id = 5;
+}
+
+message DialogHistory {
+    int id = 0;
+    string user_id = 1;
+    DialogActionEnum action = 2;
+    optional string item_id = 3;
+    optional string desc = 4;
     int createdAt = 5;
+    Dialog dialog = 6;
 }
 
-message NotificationGetDTO {
+message AddUserDialogDTO {
     string user_id = 0;
-    optional int skip = 1;
-    optional int take = 2;
+    string dialog_id = 1;
+    string who_adds_id = 2;
 }
 
-message NotificationCreate {
-    string from_id = 0;
-    string to_id = 1;
-    string item_id = 2;
-    NotificationEnumType type = 3;
+message CreateDialogDTO {
+    string creator_id = 0;
+    string user_ids = 1;
 }
 
-enum NotificationEnumType {
-    user = 0;
-    story = 1;
-    post = 2;
+message GetDialogDTO {
+    string dialog_id = 0;
 }
+
+message GetUserDialogsDTO {
+    string user_id = 0;
+    int skip = 1;
+    int take = 2;
+}
+
+message DeleteDialogDTO {
+    string user_id = 0;
+    string dialog_id = 1;
+}
+
+message DeleteUserDialogDTO {
+    string delete_id = 0;
+    string user_id = 1;
+    string dialog_id = 2;
+}
+
+message ChangeNameDialogDTO {
+    string name = 0;
+    string user_id = 1;
+    string dialog_id = 2;
+}
+
+message GetHistoryDialogDTO {
+    string dialog_id = 0;
+    int take = 1;
+    int skip = 2;
+}
+
+message ChangeFileDialogDTO {
+    string dialog_id = 0;
+    string file_id = 1;
+    string user_id = 2;
+}
+
+enum DialogActionEnum {
+    CREATE_DIALOG = 0;
+    ADD_USER = 1;
+    REMOVE_USER = 2;
+    CHANGE_NAME_DIALOG = 3;
+}
+
+enum StateDialogEnum {
+    DELETED = 0;
+    ACTIVE = 1;
+}
+
+message Empty {}

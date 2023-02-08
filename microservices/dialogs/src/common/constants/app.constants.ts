@@ -12,6 +12,7 @@ export const MYSQL_PORT = 3306;
 export const MYSQL_HOST = "localhost";
 
 export const DEFAULT_TAKE_DIALOGS = 12;
+
 export const DEFAULT_SKIP_DIALOGS = 0;
 
 export const DEFAULT_TAKE_HISTORY_DIALOG = 20;
@@ -26,5 +27,6 @@ export enum DIALOGS_SERVICE_METHODS {
     CREATE_DIALOG = "CreateDialog",
     REMOVE_USER_DIALOG = "RemoveUserDialog",
     CHANGE_NAME_DIALOG = "ChangeNameDialog",
-    GET_HISTORY_DIALOG = "GetHistoryDialog"
+    GET_HISTORY_DIALOG = "GetHistoryDialog",
+    CHANGE_FILE_DIALOG = "ChangeFileDialog"
 }

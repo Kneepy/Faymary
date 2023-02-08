@@ -1,7 +1,8 @@
 import {Controller} from "@nestjs/common";
 import {GrpcMethod} from "@nestjs/microservices";
 import {
-    DialogActionEnum, DialogHistory,
+    DialogActionEnum,
+    DialogHistory,
     Dialogs,
     DIALOGS_SERVICE_METHODS,
     DIALOGS_SERVICE_NAME,
@@ -13,11 +14,13 @@ import {
 import {DialogsService} from "src/providers";
 import {
     AddUserDialogDTO,
+    ChangeFileDialogDTO,
     ChangeNameDialogDTO,
     CreateDialogDTO,
     DeleteDialogDTO,
     DeleteUserDialogDTO,
-    GetDialogDTO, GetHistoryDialogDTO,
+    GetDialogDTO,
+    GetHistoryDialogDTO,
     GetUserDialogsDTO
 } from "../dtos";
 
@@ -26,7 +29,7 @@ export class DialogsController {
     constructor(private dialogsService: DialogsService) {}
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.ADD_USER_TO_DIALOG)
-    async addUserToDialog(data: AddUserDialogDTO) {
+    async addUserToDialog(data: AddUserDialogDTO): Promise<DialogHistory> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
         if(dialog) {
@@ -101,6 +104,19 @@ export class DialogsController {
             dialog.name = data.name
 
             const historyNote = await this.dialogsService.createHistoryNote({dialog, action: DialogActionEnum.CHANGE_NAME_DIALOG, user_id: data.user_id, desc: data.name})
+
+            return await this.dialogsService.update(dialog)
+        } else throw NotFoundDialog
+    }
+
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CHANGE_FILE_DIALOG)
+    async changeFileDialog(data: ChangeFileDialogDTO): Promise<Dialogs> {
+        const dialog = await this.dialogsService.findOne({id: data.dialog_id})
+
+        if(dialog) {
+            dialog.file_id = data.file_id
+
+            const historyNote = await this.dialogsService.createHistoryNote({dialog, action: DialogActionEnum.CHANGE_FILE_DIALOG, user_id: data.user_id, item_id: data.file_id})
 
             return await this.dialogsService.update(dialog)
         } else throw NotFoundDialog

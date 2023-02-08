@@ -3,4 +3,5 @@ export enum DialogActionEnum {
     ADD_USER,
     REMOVE_USER,
     CHANGE_NAME_DIALOG,
+    CHANGE_FILE_DIALOG
 }
