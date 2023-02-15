@@ -3,7 +3,7 @@ import {LikesService} from "../providers";
 import {Likes} from "../common";
 import {LikesDTO} from "../dtos";
 import {LikeStateEnum} from "../common/enums/like-state.enum";
-import { LIKES_SERVICE_NAME, SERVICE_METHODS } from "../common/constants/app.constants";
+import { LIKES_SERVICE_NAME, SERVICE_METHODS } from "../common";
 import {GrpcMethod} from "@nestjs/microservices";
 
 @Controller()
