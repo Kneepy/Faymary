@@ -1,33 +1,62 @@
 syntax = "proto3";
 
-package likes;
+package comments;
 
-service LikesService {
-    rpc AddLike (AddLikeDTO) returns (Like);
+service CommentsService {
+    rpc CreateComment (CreateCommentDTO) returns (Comment);
+    rpc UpdateComment (UpdateCommentDTO) returns (Comment);
+    rpc DeleteComment (DeleteCommentDTO) returns (bool)
+    rpc GetComments (GetCommentsDTO) returns (Comment);
 }
 
-message Like {
-    int id = 0;
-    LikeType type = 1;
-    LikeState state = 2;
+message Comment {
+    string id = 0;
+    string msg = 1;
+    string file_ids = 2;
+    string user_id = 3;
+    string item_id = 4;
+    CommentType type = 5;
+    int createdAt = 6;
+    CommentState state = 7;
+}
+
+message CreateCommentDTO {
+    string msg = 0;
+    string file_ids = 1;
+    string user_id = 2;
     string item_id = 3;
-    string user_id = 4;
-    int createdAr = 5;
+    CommentType type = 4;
 }
 
-message AddLikeDTO {
-    string user_id = 0;
-    string item_id = 1;
-    LikeType type = 2;
+message UpdateCommentDTO {
+    string id = 0;
+    string msg = 1;
+    string file_ids = 2;
+    string user_id = 3;
+    string item_id = 4;
+    CommentType type = 5;
+    CommentState state = 6;
 }
 
-enum LikeType {
-    POST = 0;
-    COMMENT = 1;
-    STORY = 2;
-    MESSAGE = 3;
+message DeleteCommentDTO {
+    string id = 0;
 }
-enum LikeState {
-    NOT_ACTIVE = 0;
+
+message GetCommentsDTO {
+    string item_id = 0;
+    CommentType type = 1;
+    int take = 3;
+    int skip = 4;
+}
+
+enum CommentState {
     ACTIVE = 1;
+    UNACTIVE = 0;
 }
+
+enum CommentType {
+    POST = 0;
+    STORY = 1;
+    COMMENT = 2;
+}
+

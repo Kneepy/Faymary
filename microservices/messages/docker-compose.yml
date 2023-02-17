@@ -1,0 +1,15 @@
+version: '0.0'
+services:
+  main: 
+    container_name: user
+    build: .
+    ports:
+      - "8080:5555"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run start:dev
+    restart: always
+  mysql: 
+    container_name: mysql
+    image: mysql

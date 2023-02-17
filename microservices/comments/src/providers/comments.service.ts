@@ -1,5 +1,11 @@
 import {FindManyOptions, Repository} from "typeorm";
-import {Comments, CommentStateEnum, DEFAULT_SKIP_COMMENTS, DEFAULT_TAKE_COMMENTS} from "../common";
+import {
+    Comments,
+    CommentStateEnum,
+    DEFAULT_COMMENT_STATE,
+    DEFAULT_SKIP_COMMENTS,
+    DEFAULT_TAKE_COMMENTS
+} from "../common";
 import {InjectRepository} from "@nestjs/typeorm";
 import {CommentType} from "../interfaces";
 
@@ -7,7 +13,7 @@ export class CommentsService {
     constructor(@InjectRepository(Comments) private repository: Repository<Comments>) {}
 
     async create(comment: CommentType.CreateCommentInterface): Promise<Comments> {
-        return await this.repository.save({...comment, createdAt: Date.now()})
+        return await this.repository.save({...comment, createdAt: Date.now(), state: DEFAULT_COMMENT_STATE})
     }
 
     async update(comment: CommentType.UpdateCommentInterface): Promise<Comments> {
