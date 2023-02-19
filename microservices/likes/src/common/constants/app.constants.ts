@@ -1,4 +1,5 @@
 import * as path from "path";
+import { LikeStateEnum } from "../enums/like-state.enum";
 
 export const MODULE_PACKAGE_NAME = "likes";
 export const DIALOG_PROTO_PATH = path.join(

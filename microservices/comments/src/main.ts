@@ -14,5 +14,6 @@ import { MODULE_PACKAGE_NAME, COMMENTS_PROTO_PATH } from "./common";
             }
         }
     );
+
     await app.listen();
 })();
