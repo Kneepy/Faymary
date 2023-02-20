@@ -1,7 +1,9 @@
 import * as path from "path";
 import { LikeStateEnum } from "../enums/like-state.enum";
 
+export const MODULE_PORT = 5001;
 export const MODULE_PACKAGE_NAME = "likes";
+export const MODULE_HOST = `localhost:${MODULE_PORT}`;
 export const DIALOG_PROTO_PATH = path.join(
     process.cwd(),
     "proto/likes.proto"
