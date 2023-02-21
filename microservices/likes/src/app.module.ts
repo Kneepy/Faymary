@@ -1,15 +1,16 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
+    Likes,
     MODULE_PACKAGE_NAME,
     MYSQL_HOST,
     MYSQL_PASS,
     MYSQL_PORT,
     MYSQL_USER,
 } from "./common";
-import {Likes} from "./common/entities";
 import {LikesService} from "./providers";
 import {LikesController} from "./controllers";
+import { Broker } from "./borker.interceptor";
 
 @Module({
     imports: [
@@ -26,6 +27,6 @@ import {LikesController} from "./controllers";
         TypeOrmModule.forFeature([Likes])
     ],
     controllers: [LikesController],
-    providers: [LikesService]
+    providers: [LikesService, Broker]
 })
 export class AppModule {}

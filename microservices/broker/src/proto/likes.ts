@@ -19,12 +19,12 @@ export enum LikeState {
 }
 
 export interface Like {
-  id: number;
+  id: string;
   type: LikeType;
   state: LikeState;
   item_id: string;
   user_id: string;
-  createdAr: number;
+  createdAt: string;
 }
 
 export interface AddLikeDTO {

@@ -8,6 +8,6 @@ export class LikesController {
 
     @Get("/")
     async addLike(): Promise<Like> {
-        return await this.likesClient.addLike({type: LikeType.COMMENT, item_id: "ewfwef", user_id: "fwfe"}).toPromise()
+        return await (this.likesClient.addLike({type: LikeType.COMMENT, item_id: "ewfwef", user_id: "fwfe"}).toPromise())
     }
 }

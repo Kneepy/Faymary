@@ -7,12 +7,12 @@ service LikesService {
 }
 
 message Like {
-    int64 id = 1;
+    string id = 1;
     LikeType type = 2;
     LikeState state = 3;
     string item_id = 4;
     string user_id = 5;
-    int64 createdAr = 6;
+    string createdAt = 6;
 }
 
 message AddLikeDTO {

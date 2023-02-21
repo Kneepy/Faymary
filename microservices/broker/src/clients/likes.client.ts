@@ -15,8 +15,6 @@ export class LikesClient implements OnModuleInit {
     }
 
     addLike(data: AddLikeDTO): Observable<Like> {
-        const a = this.likesService.addLike(data)
-        a.toPromise().then(el => console.log(el))
-        return a
+        return this.likesService.addLike(data)
     }
 }

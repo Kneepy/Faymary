@@ -1,6 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
+import { Broker } from "./borker.interceptor";
 import {MODULE_PACKAGE_NAME, DIALOG_PROTO_PATH, MODULE_HOST} from "./common";
 
 (async () => {
@@ -18,6 +19,8 @@ import {MODULE_PACKAGE_NAME, DIALOG_PROTO_PATH, MODULE_HOST} from "./common";
             }
         }
     );
+
+    app.useGlobalInterceptors(new Broker())
 
     await app.listen();
 })();
