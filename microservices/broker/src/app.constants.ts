@@ -1,9 +1,11 @@
+import { ClientOptions, Transport } from "@nestjs/microservices";
 import * as path from "path"
 import * as process from "process";
 
 export const APP_PORT = 5000;
 
 export const DEFAULT_HOST = 'localhost'
+
 interface ConfingModuleArgs {
     port: number,
     pkgName: string,
@@ -27,6 +29,17 @@ export const getModuleConfig = (data: ConfingModuleArgs): ConfigModule => ({
     SERVICE: data.serviceName
 })
 const getProtoPath = (protoFileName: string) => path.join(process.cwd(), `src/proto/${protoFileName}.proto`)
+export const getClientOptionsByConfig = (config: ConfigModule): ClientOptions => ({
+    transport: Transport.GRPC,
+    options: {
+        url: config.HOST,
+        package: config.PACKAGE,
+        protoPath: config.PROTO,
+        loader: {
+            keepCase: true
+        }
+    }
+})
 
 export const USER_MODULE_CONFIG = getModuleConfig({port: 5002, pkgName: "user", host: DEFAULT_HOST, protoPath: getProtoPath("user"), serviceName: "UserService"})
 export const STORIES_MODULE_CONFIG = getModuleConfig({port: 5009, pkgName: "stories", host: DEFAULT_HOST, protoPath: getProtoPath("stories"), serviceName: "StoriesService"})

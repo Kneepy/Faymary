@@ -1,22 +1,12 @@
 import {Injectable, OnModuleInit} from "@nestjs/common";
-import {Client, ClientGrpc, Transport} from "@nestjs/microservices";
+import {Client, ClientGrpc} from "@nestjs/microservices";
 import {AddLikeDTO, Like, LikesServiceClient} from "src/proto/likes";
-import {LIKES_MODULE_CONFIG} from "../app.constants";
+import {getClientOptionsByConfig, LIKES_MODULE_CONFIG} from "../app.constants";
 
 @Injectable()
 export class LikesClient implements OnModuleInit {
 
-    @Client({
-        transport: Transport.GRPC,
-        options: {
-            url: LIKES_MODULE_CONFIG.HOST,
-            package: LIKES_MODULE_CONFIG.PACKAGE,
-            protoPath: LIKES_MODULE_CONFIG.PROTO,
-            loader: {
-                keepCase: true
-            }
-        }
-    })
+    @Client(getClientOptionsByConfig(LIKES_MODULE_CONFIG))
     client: ClientGrpc
 
     private likesService: LikesServiceClient;
