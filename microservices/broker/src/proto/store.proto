@@ -3,7 +3,7 @@ syntax = "proto3";
 package store;
 
 service StoreService {
-    rpc RemoveFile (RemoveFileDTO) returns (RemoveFileRes);
+    rpc RemoveFile (RemoveFileDTO) returns (stream RemoveFileRes);
 }
 
 message RemoveFileDTO {

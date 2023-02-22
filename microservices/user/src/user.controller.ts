@@ -38,7 +38,7 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
-    async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<void>  {
+    async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<{isFollow: boolean}>  {
         const isFollow = await this.userService.findOne({id: data.follower_id, subscriptions: {id: data.user_id}}, {relations: {subscriptions: true}})
 
         if(isFollow) {
@@ -46,5 +46,6 @@ export class UserController {
         } else {
             await this.userService.addSubscription(data.user_id, data.follower_id)
         }
+        return {isFollow: !isFollow}
     }
 }

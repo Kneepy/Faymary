@@ -23,14 +23,14 @@ export class CommentsController {
     }
 
     @GrpcMethod(COMMENTS_SERVICE_NAME, COMMENTS_SERVICE_METHODS.DELETE_COMMENT)
-    async deleteComment(data: CommentDTOs.DeleteCommentDTO): Promise<boolean> {
+    async deleteComment(data: CommentDTOs.DeleteCommentDTO): Promise<{isDeleted: boolean}> {
         const comment = await this.commentsService.findOne({id: data.id})
 
         if(comment) {
             comment.state = CommentStateEnum.UNACTIVE
             await this.commentsService.update(comment)
 
-            return true
+            return {isDeleted: true}
         } else throw NotFoundComment
     }
 

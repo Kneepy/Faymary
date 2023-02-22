@@ -3,11 +3,11 @@ syntax = "proto3";
 package posts;
 
 service PostService {
-    rpc CreatePost(PostCreateDTO) returns (Post);
-    rpc UpdatePost(PostUpdateDTO) returns (Post);
-    rpc DeletePost(PostDeleteDTO) returns (Empty);
-    rpc GetPost(GetOnePostDTO) returns (Post);
-    rpc GetPosts(GetManyPostsDTO) returns (Post);
+    rpc CreatePost(PostCreateDTO) returns (stream Post);
+    rpc UpdatePost(PostUpdateDTO) returns (stream Post);
+    rpc DeletePost(PostDeleteDTO) returns (stream Empty);
+    rpc GetPost(GetOnePostDTO) returns (stream Post);
+    rpc GetPosts(GetManyPostsDTO) returns (stream Post);
 }
 
 message PostCreateDTO {

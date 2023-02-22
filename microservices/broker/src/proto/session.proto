@@ -3,8 +3,8 @@ syntax = "proto3";
 package session;
 
 service SessionService {
-    rpc VerifyTokens (VerifyTokensDTO) returns (AccessToken);
-    rpc GenerateTokens (GenerateTokensDTO) returns (VerifyTokensDTO);
+    rpc VerifyTokens (VerifyTokensDTO) returns (stream AccessToken);
+    rpc GenerateTokens (GenerateTokensDTO) returns (stream VerifyTokensDTO);
 }
 
 message AccessToken {

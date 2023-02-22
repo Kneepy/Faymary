@@ -3,16 +3,16 @@ syntax = "proto3";
 package likes;
 
 service LikesService {
-    rpc AddLike (AddLikeDTO) returns (Like);
+    rpc AddLike (AddLikeDTO) returns (stream Like);
 }
 
 message Like {
     string id = 1;
     LikeType type = 2;
-    LikeState state = 3;
-    string item_id = 4;
-    string user_id = 5;
-    string createdAt = 6;
+    string item_id = 3;
+    string user_id = 4;
+    string createdAt = 5;
+    LikeState state = 6;
 }
 
 message AddLikeDTO {

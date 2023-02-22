@@ -21,10 +21,10 @@ export enum LikeState {
 export interface Like {
   id: string;
   type: LikeType;
-  state: LikeState;
   item_id: string;
   user_id: string;
   createdAt: string;
+  state: LikeState;
 }
 
 export interface AddLikeDTO {
@@ -40,7 +40,7 @@ export interface LikesServiceClient {
 }
 
 export interface LikesServiceController {
-  addLike(request: AddLikeDTO): Promise<Like> | Observable<Like> | Like;
+  addLike(request: AddLikeDTO): Observable<Like>;
 }
 
 export function LikesServiceControllerMethods() {

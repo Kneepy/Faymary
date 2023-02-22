@@ -3,15 +3,15 @@ syntax = "proto3";
 package dialogs;
 
 service DialogsService {
-    rpc AddUserToDialog (AddUserDialogDTO) returns (DialogHistory);
-    rpc CreateDialog (CreateDialogDTO) returns (Dialog);
-    rpc GetDialog (GetDialogDTO) returns (Dialog);
-    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (Dialog);
-    rpc DeleteDialog (DeleteDialogDTO) returns (Empty);
-    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (Dialog);
-    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (Dialog);
-    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (HistoryDialog);
-    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (Dialog);
+    rpc AddUserToDialog (AddUserDialogDTO) returns (stream DialogHistory);
+    rpc CreateDialog (CreateDialogDTO) returns (stream Dialog);
+    rpc GetDialog (GetDialogDTO) returns (stream Dialog);
+    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialog);
+    rpc DeleteDialog (DeleteDialogDTO) returns (stream Empty);
+    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream Dialog);
+    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream Dialog);
+    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistory);
+    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream Dialog);
 }
 
 message Dialog {
@@ -84,10 +84,10 @@ message ChangeFileDialogDTO {
 }
 
 enum DialogActionEnum {
-    CREATE_DIALOG = 1;
-    ADD_USER = 2;
-    REMOVE_USER = 3;
-    CHANGE_NAME_DIALOG = 4;
+    CREATE_DIALOG = 0;
+    ADD_USER = 1;
+    REMOVE_USER = 2;
+    CHANGE_NAME_DIALOG = 3;
 }
 
 enum StateDialogEnum {

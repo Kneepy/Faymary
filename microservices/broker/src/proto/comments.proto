@@ -3,10 +3,10 @@ syntax = "proto3";
 package comments;
 
 service CommentsService {
-    rpc CreateComment (CreateCommentDTO) returns (Comment);
-    rpc UpdateComment (UpdateCommentDTO) returns (Comment);
-    rpc DeleteComment (DeleteCommentDTO) returns (bool);
-    rpc GetComments (GetCommentsDTO) returns (Comment);
+    rpc CreateComment (CreateCommentDTO) returns (stream Comment);
+    rpc UpdateComment (UpdateCommentDTO) returns (stream Comment);
+    rpc DeleteComment (DeleteCommentDTO) returns (stream IsDeleted);
+    rpc GetComments (GetCommentsDTO) returns (stream Comment);
 }
 
 message Comment {
@@ -49,9 +49,13 @@ message GetCommentsDTO {
     int64 skip = 4;
 }
 
+message IsDeleted {
+    bool isDeleted = 1;
+}
+
 enum CommentState {
-    ACTIVE = 1;
     UNACTIVE = 0;
+    ACTIVE = 1;
 }
 
 enum CommentType {

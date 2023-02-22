@@ -3,10 +3,10 @@ syntax = "proto3";
 package stories;
 
 service StoriesService {
-    rpc GetStories (GetStories) returns (Story);
-    rpc CreateStory (CreateStoryDTO) returns (Story);
-    rpc DeleteStory (DeleteStoryDTO) returns (Empty);
-    rpc UpdateStory (UpdateStoryDTO) returns (Story);
+    rpc GetStories (GetStoriesDTO) returns (stream Story);
+    rpc CreateStory (CreateStoryDTO) returns (stream Story);
+    rpc DeleteStory (DeleteStoryDTO) returns (stream Empty);
+    rpc UpdateStory (UpdateStoryDTO) returns (stream Story);
 }
 
 message GetStoriesDTO {
@@ -14,7 +14,7 @@ message GetStoriesDTO {
 }
 
 message CreateStoryDTO {
-    strign user_id = 1;
+    string user_id = 1;
     string file_id = 2;
     Mark marks = 3;
 }

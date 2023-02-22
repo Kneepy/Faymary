@@ -10,7 +10,6 @@ import {
 } from "./common";
 import {LikesService} from "./providers";
 import {LikesController} from "./controllers";
-import { Broker } from "./borker.interceptor";
 
 @Module({
     imports: [
@@ -27,6 +26,6 @@ import { Broker } from "./borker.interceptor";
         TypeOrmModule.forFeature([Likes])
     ],
     controllers: [LikesController],
-    providers: [LikesService, Broker]
+    providers: [LikesService]
 })
 export class AppModule {}

@@ -3,10 +3,10 @@ syntax = "proto3";
 package messages;
 
 service MessagesSerivce {
-    rpc CreateMessage (Create) returns (Messages);
-    rpc GetDialogMessages (Get) returns (Messages);
-    rpc UpdateMessage (Update) returns (Messages);
-    rpc DeleteMessage (Delete) returns (Messages);
+    rpc CreateMessage (Create) returns (stream Messages);
+    rpc GetDialogMessages (Get) returns (stream Messages);
+    rpc UpdateMessage (Update) returns (stream Messages);
+    rpc DeleteMessage (Delete) returns (stream Messages);
 }
 
 message Get {

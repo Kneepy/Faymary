@@ -3,8 +3,8 @@ syntax = "proto3";
 package notifications;
 
 service NotificationsService {
-    rpc GetAllUserNotifications (NotificationGetDTO) returns (Notification);
-    rpc CreateNotification (NotificationCreate) returns (Notification);
+    rpc GetAllUserNotifications (NotificationGetDTO) returns (stream Notification);
+    rpc CreateNotification (NotificationCreate) returns (stream Notification);
 }
 
 message Notification {
