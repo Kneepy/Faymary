@@ -1,12 +1,11 @@
 import { Controller, Get, Inject } from "@nestjs/common";
-import { LikesClient } from "src/clients/likes.client";
 import {Like, LikesServiceClient, LikeType} from "src/proto/likes";
+import {LIKES_MODULE_CONFIG} from "../app.constants";
 
 @Controller()
 export class LikesController {
     constructor(
-        private likesClient: LikesClient,
-        @Inject("LIKES_SERVICE") private likesService: LikesServiceClient
+        @Inject(LIKES_MODULE_CONFIG.PROVIDER) private likesService: LikesServiceClient
     ) {}
 
     @Get("/")

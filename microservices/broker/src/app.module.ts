@@ -1,21 +1,25 @@
 import { Module } from '@nestjs/common';
 import {LikesController} from "./controllers/likes.controller";
-import {LikesClient} from "./clients/likes.client";
-import {ClientGrpc, ClientsModule} from "@nestjs/microservices";
-import {getClientOptionsByConfig, LIKES_MODULE_CONFIG} from "./app.constants";
-import {LikesServiceClient} from "./proto/likes";
+import {ClientsModule} from "@nestjs/microservices";
+import {
+    CommentsClient,
+    CommentsClientDependency, DialogsClient,
+    DialogsClientDependency,
+    LikesClient,
+    LikesClientDependency, MessagesClient,
+    MessagesClientDependency, NotificationsClient,
+    NotificationsClientDependency, PostClient,
+    PostClientDependency, SessionClient,
+    SessionClientDependency, StoreClient,
+    StoreClientDependency, StoriesClient, StoriesClientDependency, UsersClient,
+    UsersClientDependency
+} from './app-clients.providers';
 
 @Module({
     imports: [
-        ClientsModule.register([{name: "LIKES_PACKAGE", ...getClientOptionsByConfig(LIKES_MODULE_CONFIG)}])
+        ClientsModule.register([LikesClientDependency, UsersClientDependency, StoreClientDependency, SessionClientDependency, PostClientDependency, NotificationsClientDependency, MessagesClientDependency, DialogsClientDependency, StoriesClientDependency, CommentsClientDependency])
     ],
     controllers: [LikesController],
-    providers: [LikesClient, {
-        inject: [{token: "LIKES_PACKAGE", optional: false}],
-        useFactory: (likesPackage: ClientGrpc) => {
-            return likesPackage.getService<LikesServiceClient>(LIKES_MODULE_CONFIG.SERVICE)
-        },
-        provide: "LIKES_SERVICE"
-    }],
+    providers: [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient],
 })
 export class AppModule {}
