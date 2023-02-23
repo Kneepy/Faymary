@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
-import { USER_PACKAGE_NAME, USER_PROTO_PATH } from "./user.constants";
+import { USER_PACKAGE_NAME, USER_PROTO_PATH } from "./constants/user.constants";
 import { AppModule } from "./user.module";
 
 (async () => {

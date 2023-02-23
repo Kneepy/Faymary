@@ -44,6 +44,12 @@ message User {
     string password = 5;
     User followers = 6;
     User subscriptions = 7;
+    UserState state = 8;
+}
+
+enum UserState {
+    UNACTIVE = 0;
+    ACTIVE = 1;
 }
 
 message Empty {}

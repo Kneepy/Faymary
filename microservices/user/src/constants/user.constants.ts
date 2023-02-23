@@ -8,7 +8,8 @@ export const USER_SERVICE = "UserService"
 export enum USER_SERVICE_METHODS {
     FIND_USER = "FindUser",
     FOLLOW_USER = "FollowUser",
-    USER_IS_FOLLOW = "UserIsFollow"
+    USER_IS_FOLLOW = "UserIsFollow",
+    CREATE_USER = "CreateUser"
 }
 
 export const USER_ID_NOT_FOUND = new RpcException("Идентификатор пользователя не найден")

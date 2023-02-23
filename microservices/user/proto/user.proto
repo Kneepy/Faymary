@@ -5,10 +5,19 @@ package user;
 service UserService {
     rpc FindOne (FindUserDTO) returns (stream User);
     rpc FollowUser (FollowUserDTO) returns (stream IsFollow);
+    rpc CreateUser ()
 }
 
 message GetSubscribeDTO {
     string user_id = 1;
+}
+
+message CreateUserDTO {
+    string email = 1;
+    string lastName = 2;
+    string userName = 3;
+    string password = 4;
+    UserState state = 5;
 }
 
 message FollowUserDTO {
@@ -44,6 +53,12 @@ message User {
     string password = 5;
     User followers = 6;
     User subscriptions = 7;
+    UserState state = 8;
+}
+
+enum UserState {
+    UNACTIVE = 0;
+    ACTIVE = 1;
 }
 
 message Empty {}

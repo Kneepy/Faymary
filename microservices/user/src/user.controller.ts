@@ -1,10 +1,11 @@
 import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
 import { Controller } from "@nestjs/common";
 import {GrpcMethod, RpcException} from "@nestjs/microservices";
-import {FindUserDTO, FollowUserDTO, UserIsFollowDTO} from "./dtos";
+import {CreateUserDTO, FindUserDTO, FollowUserDTO, UserIsFollowDTO} from "./dtos";
 import { Users } from "./entities";
-import {USER_ID_NOT_FOUND, USER_SERVICE, USER_SERVICE_METHODS} from "./user.constants";
+import {USER_ID_NOT_FOUND, USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
+import { IncorrectEmailError, ShortPasswordError, UserAlredyExist } from "./constants";
 
 @Controller()
 export class UserController {
@@ -12,6 +13,19 @@ export class UserController {
         private userService: UserService
     ) {}
 
+    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.CREATE_USER) 
+    async createUser(data: CreateUserDTO): Promise<Users> {
+        if(data.password.length < 6) throw ShortPasswordError
+        if(!data.email.split("@")[1] || !data.email.split(".")[1]) throw IncorrectEmailError
+
+        const existUser = await this.userService.findOne({email: data.email})
+
+        if(!!existUser.email) throw UserAlredyExist
+        else {
+            return 
+        }
+    }
+    
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
     async findOne(data: FindUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Users> {
         const user = await this.userService.findOne(data.criteria, {relations: data.fields})

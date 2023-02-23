@@ -1,3 +1,4 @@
+import { UserState } from "src/user-state.enum";
 import {
     Column,
     Entity,
@@ -29,4 +30,7 @@ export class Users {
 
     @ManyToMany(() => Users, (users: Users) => users.followers) 
     subscriptions: Users[]
+
+    @Column({ nullable: false })
+    state: UserState
 }
