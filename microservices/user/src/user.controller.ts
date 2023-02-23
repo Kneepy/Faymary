@@ -34,7 +34,7 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USER_IS_FOLLOW)
-    async userIsFollow(data: UserIsFollowDTO): Promise<boolean | Map<string, boolean>> {
+    async userIsFollow(data: UserIsFollowDTO): Promise<boolean> {
         if(data.owner_id) {
             const user = await this.userService.findOne({id: data.owner_id}, {relations: {subscriptions: true}})
 

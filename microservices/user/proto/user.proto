@@ -5,6 +5,7 @@ package user;
 service UserService {
     rpc FindOne (FindUserDTO) returns (stream User);
     rpc FollowUser (FollowUserDTO) returns (stream IsFollow);
+
     rpc CreateUser ()
 }
 
