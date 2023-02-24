@@ -1,6 +1,6 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { AccessCodes } from "src/access-codes.entity";
-import { LIFE_TIME_ACCESS_CODE } from "src/app.constants";
+import { LIFE_TIME_ACCESS_CODE } from "src/constants";
 import { CreateAccessCodeInterface, FindOneAccessCodeInterface } from "src/interfaces";
 import { Raw, Repository } from "typeorm";
 

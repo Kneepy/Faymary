@@ -5,7 +5,7 @@ export class AccessCodes {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @Column()
+    @Column({type: "bigint"})
     createdAt: number
 
     @Column()

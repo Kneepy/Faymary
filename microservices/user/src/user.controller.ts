@@ -1,13 +1,5 @@
 import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
 import { Controller } from "@nestjs/common";
-<<<<<<< HEAD
-import {GrpcMethod, RpcException} from "@nestjs/microservices";
-import {CreateUserDTO, FindUserDTO, FollowUserDTO, UserIsFollowDTO} from "./dtos";
-import { Users } from "./entities";
-import {USER_ID_NOT_FOUND, USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
-import { UserService } from "./user.service";
-import { IncorrectEmailError, ShortPasswordError, UserAlredyExist } from "./constants";
-=======
 import {GrpcMethod} from "@nestjs/microservices";
 import * as bcrypt from "bcryptjs"
 import {CreateUserDTO, FindUserDTO, FindUsersDTO, FollowUserDTO, UpdateUserDTO, UserIsFollowDTO, UsersIsFollowDTO} from "./dtos";
@@ -16,7 +8,6 @@ import { USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
 import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound } from "./constants";
 import { UserIsFollowInterface, UsersIsFollowsInterface } from "./interfaces";
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 
 @Controller()
 export class UserController {
@@ -33,28 +24,13 @@ export class UserController {
 
         if(!!existUser.email) throw UserAlredyExist
         else {
-<<<<<<< HEAD
-            return 
-        }
-    }
-    
-    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
-    async findOne(data: FindUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Users> {
-        const user = await this.userService.findOne(data.criteria, {relations: data.fields})
-
-        return user
-    }
-
-    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USER_IS_FOLLOW)
-    async userIsFollow(data: UserIsFollowDTO): Promise<boolean> {
-=======
             const passSalt = await bcrypt.genSalt(10);
             data.password = await bcrypt.hashSync(data.password, passSalt)
-        
+
             return await this.userService.create(data)
         }
     }
-    
+
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.UPDATE_USER)
     async updateUser(data: UpdateUserDTO): Promise<Users> {
         const user = await this.userService.findOne({id: data.id})
@@ -98,7 +74,6 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USERS_IS_FOLLOW)
     async usersIsFollow(data: UsersIsFollowDTO): Promise<UsersIsFollowsInterface> {
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
         if(data.owner_id) {
             const user = await this.userService.findOne({id: data.owner_id}, {relations: {subscriptions: true}})
 
@@ -106,19 +81,6 @@ export class UserController {
                 const respond = new Map<string, boolean>()
                 user.subscriptions.forEach(subsc => respond.set(subsc.id, data.users_ids.indexOf(subsc.id) !== -1))
 
-<<<<<<< HEAD
-                return respond
-            }
-            if(data.user_id) {
-                return !!user.subscriptions.find(subs => subs.id === data.user_id)
-            }
-
-        } else throw USER_ID_NOT_FOUND
-    }
-
-    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
-    async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<{isFollow: boolean}>  {
-=======
                 return {follows: respond}
             }
         } else throw UserIdNotFound
@@ -126,7 +88,6 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
     async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<UserIsFollowInterface>  {
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
         const isFollow = await this.userService.findOne({id: data.follower_id, subscriptions: {id: data.user_id}}, {relations: {subscriptions: true}})
 
         if(isFollow) {

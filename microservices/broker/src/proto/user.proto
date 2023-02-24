@@ -3,14 +3,6 @@ syntax = "proto3";
 package user;
 
 service UserService {
-<<<<<<< HEAD
-    rpc FindOne (FindUserDTO) returns (stream User);
-    rpc FollowUser (FollowUserDTO) returns (stream IsFollow);
-}
-
-message GetSubscribeDTO {
-    string user_id = 1;
-=======
     rpc FindUser (FindUserDTO) returns (stream User);
     rpc FollowUser (FollowUserDTO) returns (stream UserIsFollowResult);
     rpc UserIsFollow (UserIsFollowDTO) returns (stream UserIsFollowResult);
@@ -26,7 +18,6 @@ message CreateUserDTO {
     string userName = 3;
     string password = 4;
     UserState state = 5;
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 }
 
 message FollowUserDTO {
@@ -34,26 +25,6 @@ message FollowUserDTO {
     string follower_id = 2;
 }
 
-<<<<<<< HEAD
-message FindUserDTO {
-    FindUserBy criteria = 1;
-    UserFields fields = 2;
-}
-
-enum UserFields {
-    followers = 0;
-    subscriptions = 1;
-}
-
-message IsFollow {
-    bool isFollow = 1;
-}
-
-message FindUserBy {
-    string email = 1;
-    string id = 2;
-    string lastName = 3;
-=======
 message FindUsersDTO {
     optional int32 take = 1;
     optional string email = 2;
@@ -80,7 +51,6 @@ message FindUserDTO {
     optional string id = 2;
     optional string lastName = 3;
     optional bool addSubs = 4;
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 }
 
 message User {
@@ -92,8 +62,6 @@ message User {
     User followers = 6;
     User subscriptions = 7;
     UserState state = 8;
-<<<<<<< HEAD
-=======
     string file_id = 9;
 }
 
@@ -121,7 +89,6 @@ message UserIsFollowDTO {
 message UsersIsFollowDTO {
     string owner_id = 1;
     repeated string users_ids = 2;
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 }
 
 enum UserState {

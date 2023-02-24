@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccessCodes } from './access-codes.entity';
-import { MODULE_PACKAGE_NAME, MYSQL_HOST, MYSQL_PASS, MYSQL_PORT, MYSQL_USER } from './app.constants';
-import { AppController } from './app.controller';
+import { MODULE_PACKAGE_NAME, MYSQL_HOST, MYSQL_PASS, MYSQL_PORT, MYSQL_USER, MYSQL_DB } from './constants';
+import { MailController } from './mail.controller';
 import { AccessCodesService } from './providers';
 import { MailerService } from './providers/mailer.service';
 
@@ -14,13 +14,13 @@ import { MailerService } from './providers/mailer.service';
         port: MYSQL_PORT,
         username: MYSQL_USER,
         password: MYSQL_PASS,
-        database: MODULE_PACKAGE_NAME,
+        database: MYSQL_DB,
         entities: [AccessCodes],
         synchronize: true
       }),
       TypeOrmModule.forFeature([AccessCodes])
     ],
-    controllers: [AppController],
+    controllers: [MailController],
     providers: [AccessCodesService, MailerService],
 })
 export class AppModule {}
