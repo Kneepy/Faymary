@@ -3,6 +3,7 @@ syntax = "proto3";
 package user;
 
 service UserService {
+<<<<<<< HEAD
     rpc FindOne (FindUserDTO) returns (stream User);
     rpc FollowUser (FollowUserDTO) returns (stream IsFollow);
 
@@ -11,6 +12,15 @@ service UserService {
 
 message GetSubscribeDTO {
     string user_id = 1;
+=======
+    rpc FindUser (FindUserDTO) returns (stream User);
+    rpc FollowUser (FollowUserDTO) returns (stream UserIsFollowResult);
+    rpc UserIsFollow (UserIsFollowDTO) returns (stream UserIsFollowResult);
+    rpc UsersIsFollow (UsersIsFollowDTO) returns (stream UsersIsFollowResult);
+    rpc CreateUser (CreateUserDTO) returns (stream User);
+    rpc UpdateUser (UpdateUserDTO) returns (stream User);
+    rpc FindUsers (FindUsersDTO) returns (stream Users);
+>>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 }
 
 message CreateUserDTO {
@@ -26,6 +36,7 @@ message FollowUserDTO {
     string follower_id = 2;
 }
 
+<<<<<<< HEAD
 message FindUserDTO {
     FindUserBy criteria = 1;
     UserFields fields = 2;
@@ -44,6 +55,34 @@ message FindUserBy {
     string email = 1;
     string id = 2;
     string lastName = 3;
+=======
+message FindUsersDTO {
+    optional int32 take = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string lastName = 4;
+    optional string password = 5;
+    optional User followers = 6;
+    optional User subscriptions = 7;
+    optional UserState state = 8;
+    optional int32 skip = 9;
+    optional bool addSubs = 10;
+}
+
+message UserIsFollowResult {
+    bool isFollow = 1;
+}
+
+message UsersIsFollowResult {
+    map<string, bool> follows = 1;
+}
+
+message FindUserDTO {
+    optional string email = 1;
+    optional string id = 2;
+    optional string lastName = 3;
+    optional bool addSubs = 4;
+>>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 }
 
 message User {
@@ -55,6 +94,36 @@ message User {
     User followers = 6;
     User subscriptions = 7;
     UserState state = 8;
+<<<<<<< HEAD
+=======
+    string file_id = 9;
+}
+
+message UpdateUserDTO {
+    string id = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string lastName = 4;
+    optional string password = 5;
+    optional User followers = 6;
+    optional User subscriptions = 7;
+    optional UserState state = 8;
+    optional string file_id = 9;
+}
+
+message Users {
+    repeated User users = 1;
+}
+
+message UserIsFollowDTO {
+    string user_id = 1;
+    string owner_id = 2;
+}
+
+message UsersIsFollowDTO {
+    string owner_id = 1;
+    repeated string users_ids = 2;
+>>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 }
 
 enum UserState {

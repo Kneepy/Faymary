@@ -1,8 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+<<<<<<< HEAD
 import { FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 import { Users } from "./entities";
 import { CreateUser, FindUser, UpdateUser } from "./interfaces";
+=======
+import { DEFAULT_ENCODING } from "crypto";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { DEFAULT_SKIP_USERS, DEFAULT_TAKE_USERS } from "./constants";
+import { Users } from "./entities";
+import { CreateUser, FindUser, FindUsers, UpdateUser } from "./interfaces";
+>>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
 
 @Injectable()
 export class UserService {
@@ -22,6 +30,19 @@ export class UserService {
         return await this.repository.findOne({where, ...otherOptions})
     }
 
+<<<<<<< HEAD
+=======
+    async find(where: FindOptionsWhere<FindUsers>, otherOption?: Omit<FindManyOptions<Users>, "where">): Promise<Users[]> {
+        otherOption.take = otherOption.take ?? DEFAULT_TAKE_USERS
+        otherOption.skip = otherOption.take ?? DEFAULT_SKIP_USERS
+
+        if(where.followers) otherOption.relations = Object.assign(otherOption.relations, {followers: true})
+        if(where.subscriptions) otherOption.relations = Object.assign(otherOption.relations, {subscriptions: true})
+
+        return await this.repository.find({where, ...otherOption})
+    }
+
+>>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
     async create(user: CreateUser): Promise<Users> {
         return await this.repository.save(user)
     }

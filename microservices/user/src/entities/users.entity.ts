@@ -24,6 +24,12 @@ export class Users {
     @Column({ nullable: false })
     password: string;
 
+<<<<<<< HEAD
+=======
+    @Column()
+    file_id: string
+
+>>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
     @ManyToMany(() => Users, (users: Users) => users.subscriptions)
     @JoinTable()
     followers: Users[]
