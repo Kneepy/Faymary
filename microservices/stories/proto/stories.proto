@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package stories;
+
+service StoriesService {
+    rpc GetStories (GetStoriesDTO) returns (stream Story);
+    rpc CreateStory (CreateStoryDTO) returns (stream Story);
+    rpc DeleteStory (DeleteStoryDTO) returns (stream Empty);
+    rpc UpdateStory (UpdateStoryDTO) returns (stream Story);
+}
+
+message GetStoriesDTO {
+    string user_id = 1;
+}
+
+message CreateStoryDTO {
+    string user_id = 1;
+    string file_id = 2;
+    Mark marks = 3;
+}
+
+message DeleteStoryDTO {
+    string id = 1;
+}
+
+message UpdateStoryDTO {
+    string file_id = 1;
+    Mark marks = 2;
+}
+
+message Story {
+    string id = 1;
+    string user_id = 2;
+    int64 ctratedAt = 3;
+    string file_id = 4;
+    Mark marks = 5;
+}
+
+message Mark {
+    string id = 1;
+    string item_id = 2;
+    MarkType type = 3;
+}
+
+enum MarkType {
+    user = 0;
+    story = 1;
+    post = 2;
+}
+
+message Empty {}

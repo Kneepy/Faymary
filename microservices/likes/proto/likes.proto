@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package likes;
+
+service LikesService {
+    rpc AddLike (AddLikeDTO) returns (stream Like);
+}
+
+message Like {
+    string id = 1;
+    LikeType type = 2;
+    string item_id = 3;
+    string user_id = 4;
+    string createdAt = 5;
+    LikeState state = 6;
+}
+
+message AddLikeDTO {
+    string user_id = 1;
+    string item_id = 2;
+    LikeType type = 3;
+}
+
+enum LikeType {
+    POST = 0;
+    COMMENT = 1;
+    STORY = 2;
+    MESSAGE = 3;
+}
+enum LikeState {
+    NOT_ACTIVE = 0;
+    ACTIVE = 1;
+}

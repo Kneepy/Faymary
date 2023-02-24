@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package comments;
+
+service CommentsService {
+    rpc CreateComment (CreateCommentDTO) returns (stream Comment);
+    rpc UpdateComment (UpdateCommentDTO) returns (stream Comment);
+    rpc DeleteComment (DeleteCommentDTO) returns (stream IsDeleted);
+    rpc GetComments (GetCommentsDTO) returns (stream Comment);
+}
+
+message Comment {
+    string id = 1;
+    string msg = 2;
+    string file_ids = 3;
+    string user_id = 4;
+    string item_id = 5;
+    CommentType type = 6;
+    int64 createdAt = 7;
+    CommentState state = 8;
+}
+
+message CreateCommentDTO {
+    string msg = 1;
+    string file_ids = 2;
+    string user_id = 3;
+    string item_id = 4;
+    CommentType type = 5;
+}
+
+message UpdateCommentDTO {
+    string id = 1;
+    string msg = 2;
+    string file_ids = 3;
+    string user_id = 4;
+    string item_id = 5;
+    CommentType type = 6;
+    CommentState state = 7;
+}
+
+message DeleteCommentDTO {
+    string id = 1;
+}
+
+message GetCommentsDTO {
+    string item_id = 1;
+    CommentType type = 2;
+    int64 take = 3;
+    int64 skip = 4;
+}
+
+message IsDeleted {
+    bool isDeleted = 1;
+}
+
+enum CommentState {
+    UNACTIVE = 0;
+    ACTIVE = 1;
+}
+
+enum CommentType {
+    POST = 0;
+    STORY = 1;
+    COMMENT = 2;
+}
+

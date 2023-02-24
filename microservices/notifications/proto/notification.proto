@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package notifications;
+
+service NotificationsService {
+    rpc GetAllUserNotifications (NotificationGetDTO) returns (stream Notification);
+    rpc CreateNotification (NotificationCreate) returns (stream Notification);
+}
+
+message Notification {
+    string id = 1;
+    NotificationEnumType type = 2;
+    string item_id = 3;
+    string to_id = 4;
+    string from_id = 5;
+    int64 createdAt = 6;
+}
+
+message NotificationGetDTO {
+    string user_id = 1;
+    optional int64 skip = 2;
+    optional int64 take = 3;
+}
+
+message NotificationCreate {
+    string from_id = 1;
+    string to_id = 2;
+    string item_id = 3;
+    NotificationEnumType type = 4;
+}
+
+enum NotificationEnumType {
+    user = 0;
+    story = 1;
+    post = 2;
+}

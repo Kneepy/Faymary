@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package messages;
+
+service MessagesSerivce {
+    rpc CreateMessage (Create) returns (stream Messages);
+    rpc GetDialogMessages (Get) returns (stream Messages);
+    rpc UpdateMessage (Update) returns (stream Messages);
+    rpc DeleteMessage (Delete) returns (stream Messages);
+}
+
+message Get {
+    string dialog_id = 1;
+    optional int64 take = 2;
+    optional int64 skip = 3;
+}
+
+message Create {
+    optional MessagesEnumType attachment = 1;
+    string dialog_id = 2;
+    optional string item_id = 3;
+    string message = 4;
+    string user_id = 5;
+}
+
+message Update {
+    optional MessagesEnumType attachment = 1;
+    string dialog_id = 2;
+    string id = 3;
+    string message = 4;
+    optional string item_id = 5;
+    string user_id = 6;
+}
+
+message Delete {
+    string id = 1;
+}
+
+message Messages {
+    string id = 1;
+    optional MessagesEnumType attachment = 2;
+    optional string item_id = 3;
+    string dialog_id = 4;
+    string user_id = 5;
+    string message = 6;
+    int64 createdAt = 7;
+}
+
+enum MessagesEnumType {
+    user = 0;
+    post = 1;
+    story = 2;
+    messages = 3;
+}

@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+    rpc FindUser (FindUserDTO) returns (stream User);
+    rpc FollowUser (FollowUserDTO) returns (stream UserIsFollowResult);
+    rpc UserIsFollow (UserIsFollowDTO) returns (stream UserIsFollowResult);
+    rpc UsersIsFollow (UsersIsFollowDTO) returns (stream UsersIsFollowResult);
+    rpc CreateUser (CreateUserDTO) returns (stream User);
+    rpc UpdateUser (UpdateUserDTO) returns (stream User);
+    rpc FindUsers (FindUsersDTO) returns (stream Users);
+}
+
+message CreateUserDTO {
+    string email = 1;
+    string lastName = 2;
+    string userName = 3;
+    string password = 4;
+    UserState state = 5;
+}
+
+message FollowUserDTO {
+    string user_id = 1;
+    string follower_id = 2;
+}
+
+message FindUsersDTO {
+    optional int32 take = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string lastName = 4;
+    optional string password = 5;
+    optional User followers = 6;
+    optional User subscriptions = 7;
+    optional UserState state = 8;
+    optional int32 skip = 9;
+    optional bool addSubs = 10;
+}
+
+message UserIsFollowResult {
+    bool isFollow = 1;
+}
+
+message UsersIsFollowResult {
+    map<string, bool> follows = 1;
+}
+
+message FindUserDTO {
+    optional string email = 1;
+    optional string id = 2;
+    optional string lastName = 3;
+    optional bool addSubs = 4;
+}
+
+message User {
+    string id = 1;
+    string email = 2;
+    string username = 3;
+    string lastName = 4;
+    string password = 5;
+    User followers = 6;
+    User subscriptions = 7;
+    UserState state = 8;
+    string file_id = 9;
+}
+
+message UpdateUserDTO {
+    string id = 1;
+    optional string email = 2;
+    optional string username = 3;
+    optional string lastName = 4;
+    optional string password = 5;
+    optional User followers = 6;
+    optional User subscriptions = 7;
+    optional UserState state = 8;
+    optional string file_id = 9;
+}
+
+message Users {
+    repeated User users = 1;
+}
+
+message UserIsFollowDTO {
+    string user_id = 1;
+    string owner_id = 2;
+}
+
+message UsersIsFollowDTO {
+    string owner_id = 1;
+    repeated string users_ids = 2;
+}
+
+enum UserState {
+    UNACTIVE = 0;
+    ACTIVE = 1;
+}
+
+message Empty {}

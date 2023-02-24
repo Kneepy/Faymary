@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package dialogs;
+
+service DialogsService {
+    rpc AddUserToDialog (AddUserDialogDTO) returns (stream DialogHistory);
+    rpc CreateDialog (CreateDialogDTO) returns (stream Dialog);
+    rpc GetDialog (GetDialogDTO) returns (stream Dialog);
+    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialog);
+    rpc DeleteDialog (DeleteDialogDTO) returns (stream Empty);
+    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream Dialog);
+    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream Dialog);
+    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistory);
+    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream Dialog);
+}
+
+message Dialog {
+    string id = 1;
+    string user_ids = 2;
+    string creator_id = 3;
+    StateDialogEnum state = 4;
+    string name = 5;
+    string file_id = 6;
+}
+
+message DialogHistory {
+    string id = 1;
+    string user_id = 2;
+    DialogActionEnum action = 3;
+    optional string item_id = 4;
+    optional string desc = 5;
+    int64 createdAt = 6;
+    Dialog dialog = 7;
+}
+
+message AddUserDialogDTO {
+    string user_id = 1;
+    string dialog_id = 2;
+    string who_adds_id = 3;
+}
+
+message CreateDialogDTO {
+    string creator_id = 1;
+    string user_ids = 2;
+}
+
+message GetDialogDTO {
+    string dialog_id = 1;
+}
+
+message GetUserDialogsDTO {
+    string user_id = 1;
+    int64 skip = 2;
+    int64 take = 3;
+}
+
+message DeleteDialogDTO {
+    string user_id = 1;
+    string dialog_id = 2;
+}
+
+message DeleteUserDialogDTO {
+    string delete_id = 1;
+    string user_id = 2;
+    string dialog_id = 3;
+}
+
+message ChangeNameDialogDTO {
+    string name = 1;
+    string user_id = 2;
+    string dialog_id = 3;
+}
+
+message GetHistoryDialogDTO {
+    string dialog_id = 1;
+    int64 take = 2;
+    int64 skip = 3;
+}
+
+message ChangeFileDialogDTO {
+    string dialog_id = 1;
+    string file_id = 2;
+    string user_id = 3;
+}
+
+enum DialogActionEnum {
+    CREATE_DIALOG = 0;
+    ADD_USER = 1;
+    REMOVE_USER = 2;
+    CHANGE_NAME_DIALOG = 3;
+}
+
+enum StateDialogEnum {
+    DELETED = 0;
+    ACTIVE = 1;
+}
+
+message Empty {}
