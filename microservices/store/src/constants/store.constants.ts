@@ -1,6 +1,8 @@
 import { join } from "path"
 
 export const STORE_PACKAGE_NAME = "store"
+export const MODULE_PORT = 5008
+export const MODULE_HOST = `localhost:${MODULE_PORT}`
 export const STORE_PROTO_PATH = join(process.cwd(), "proto/store.proto")
 
 export const STORE_FOLDER = "store"

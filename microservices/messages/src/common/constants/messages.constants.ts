@@ -1,6 +1,8 @@
 import * as path from "path";
 
 export const MODULE_PACKAGE_NAME = "messages";
+export const MODULE_PORT = 5004
+export const MODULE_HOST = `localhost:${MODULE_PORT}`
 export const MESSAGES_PROTO_PATH = path.join(
     process.cwd(),
     "proto/messages.proto"

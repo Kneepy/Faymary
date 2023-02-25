@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { StoreModule } from "./store.module";
-import { STORE_PACKAGE_NAME, STORE_PROTO_PATH } from "./constants/store.constants";
+import { MODULE_HOST, STORE_PACKAGE_NAME, STORE_PROTO_PATH } from "./constants/store.constants";
 import { Logger } from "@nestjs/common";
 import { middlware } from "./app.middleware";
 
@@ -14,7 +14,8 @@ import { middlware } from "./app.middleware";
         transport: Transport.GRPC,
         options: {
             package: STORE_PACKAGE_NAME,
-            protoPath: STORE_PROTO_PATH  
+            protoPath: STORE_PROTO_PATH,
+            url: MODULE_HOST
         }
     })
     await app.startAllMicroservices();

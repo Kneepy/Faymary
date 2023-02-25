@@ -1,6 +1,8 @@
 import * as path from "path";
 
 export const MODULE_PACKAGE_NAME = "dialogs";
+export const MODULE_PORT = 5003
+export const MODULE_HOST = `localhost:${MODULE_PORT}`
 export const DIALOG_PROTO_PATH = path.join(
     process.cwd(),
     "proto/dialogs.proto"

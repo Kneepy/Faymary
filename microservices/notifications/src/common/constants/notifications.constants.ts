@@ -1,6 +1,8 @@
 import * as path from "path";
 
 export const MODULE_PACKAGE_NAME = "notifications";
+export const MODULE_PORT = 5005
+export const MODULE_HOST = `localhost:${MODULE_PORT}`
 export const NOTIFICATION_PROTO_PATH = path.join(
     process.cwd(),
     "proto/notification.proto"
