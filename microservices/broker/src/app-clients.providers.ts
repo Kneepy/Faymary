@@ -2,7 +2,7 @@ import {GetClientOptionsByConfig, GetClientProvider } from "./app-clients.utils"
 import {
     COMMENTS_MODULE_CONFIG,
     DIALOGS_MODULE_CONFIG,
-    LIKES_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG,
+    LIKES_MODULE_CONFIG, MAIL_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG,
     POST_MODULE_CONFIG,
     SESSION_MODULE_CONFIG,
     STORE_MODULE_CONFIG, STORIES_MODULE_CONFIG,
@@ -11,6 +11,7 @@ import {
 import { CommentsServiceClient } from "./proto/comments";
 import { DialogsServiceClient } from "./proto/dialogs";
 import {LikesServiceClient} from "./proto/likes";
+import { MailServiceClient } from "./proto/mail";
 import { MessagesSerivceClient } from "./proto/messages";
 import { NotificationsServiceClient } from "./proto/notification";
 import { PostServiceClient } from "./proto/post";
@@ -51,3 +52,6 @@ export const StoriesClientDependency = GetClientOptionsByConfig(STORIES_MODULE_C
 
 export const CommentsClient = GetClientProvider<CommentsServiceClient>(COMMENTS_MODULE_CONFIG)
 export const CommentsClientDependency = GetClientOptionsByConfig(COMMENTS_MODULE_CONFIG)
+
+export const MailClient = GetClientProvider<MailServiceClient>(MAIL_MODULE_CONFIG)
+export const MailClientDependency = GetClientOptionsByConfig(MAIL_MODULE_CONFIG)

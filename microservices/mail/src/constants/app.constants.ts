@@ -14,7 +14,8 @@ export const MODULE_HOST = `localhost:${MODULE_PORT}`
 export const MAIL_PROTO_PATH = path.join(process.cwd(), "proto/mail.proto")
 export const MAIL_SERVICE_NAME = "MailService"
 export enum MAIL_SERVICE_METHODS {
-    SEND_ACCESS_CODE = "SendAccessCode"
+    SEND_ACCESS_CODE = "SendAccessCode",
+    CONFIRM_ACCESS_CODE = "ConfirmAccessCode"
 }
 
 export const MAILER_SERVICE = "MAILER_SERVICE"

@@ -22,10 +22,10 @@ export class UserController {
 
         const existUser = await this.userService.findOne({email: data.email})
 
-        if(!!existUser.email) throw UserAlredyExist
+        if(!!existUser) throw UserAlredyExist
         else {
             const passSalt = await bcrypt.genSalt(10);
-            data.password = await bcrypt.hashSync(data.password, passSalt)
+            data.password = bcrypt.hashSync(data.password, passSalt)
 
             return await this.userService.create(data)
         }

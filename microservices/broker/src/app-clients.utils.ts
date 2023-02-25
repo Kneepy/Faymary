@@ -49,7 +49,7 @@ export const GetClientOptionsByConfig = (config: ConfigModule): ClientProviderOp
 })
 
 /*
-    @returns сервис который можно использовать через @Inject(Service Name). Имя сервиса можно узнать из GetClientProvider(args).provide или соответсвующего модуля конфига из GetModuleConfig(Module Name)
+    @returns сервис который можно использовать через @Inject(Service Name). Имя сервиса можно узнать из GetClientProvider(args).provide или соответсвующего модуля конфига из GetModuleConfig(Module Name).PROVIDER
 */
 export const GetClientProvider = <T>(moduleConfig: ConfigModule): FactoryProvider => ({
     provide: moduleConfig.PROVIDER,

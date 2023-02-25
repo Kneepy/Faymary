@@ -4,5 +4,5 @@ import {APP_PORT} from "./app.constants";
 
 (async () => {
     const app = await NestFactory.create(AppModule);
-    await app.listen(APP_PORT, async () => console.log(await app.getUrl()));
+    await app.listen(APP_PORT);
 })()

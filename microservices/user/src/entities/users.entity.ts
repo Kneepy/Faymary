@@ -24,7 +24,7 @@ export class Users {
     @Column({ nullable: false })
     password: string;
 
-    @Column()
+    @Column({ nullable: true })
     file_id: string
 
     @ManyToMany(() => Users, (users: Users) => users.subscriptions)

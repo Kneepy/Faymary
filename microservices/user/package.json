@@ -28,11 +28,8 @@
     "@nestjs/microservices": "^9.1.4",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/typeorm": "^9.0.1",
-<<<<<<< HEAD
-=======
     "@types/bcryptjs": "^2.4.2",
     "bcryptjs": "^2.4.3",
->>>>>>> c64b367a04156823befc2705327eb7aeb553abd3
     "mysql2": "^2.3.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
