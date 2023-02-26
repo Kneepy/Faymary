@@ -28,7 +28,7 @@ export const GetModuleConfig = (data: ConfingModuleArgs): ConfigModule => ({
     HOST: `${data.host}:${data.port}`,
     PROTO: data.protoPath,
     SERVICE: data.serviceName,
-    PROVIDER: `${data.serviceName.toUpperCase()}_SERVICE`,
+    PROVIDER: `${data.pkgName.toUpperCase()}_SERVICE`,
     DEPENDENCY: `${data.pkgName.toUpperCase()}_PACKAGE`
 })
 
