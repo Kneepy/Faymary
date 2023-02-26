@@ -21,5 +21,4 @@ message GenerateTokensDTO {
     string ua = 2;
     string ip = 3;
     string user_id = 4;
-    string old_refresh_token = 5;
 }

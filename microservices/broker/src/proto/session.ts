@@ -18,7 +18,6 @@ export interface GenerateTokensDTO {
   ua: string;
   ip: string;
   user_id: string;
-  old_refresh_token: string;
 }
 
 export const SESSION_PACKAGE_NAME = "session";
