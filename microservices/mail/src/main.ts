@@ -7,9 +7,9 @@ import { AppModule } from './app.module';
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
         transport: Transport.GRPC,
         options: {
-        package: MODULE_PACKAGE_NAME,
-        protoPath: MAIL_PROTO_PATH,
-        url: MODULE_HOST,
+            package: MODULE_PACKAGE_NAME,
+            protoPath: MAIL_PROTO_PATH,
+            url: MODULE_HOST,
             loader: {
               keepCase: true
             }

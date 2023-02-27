@@ -9,7 +9,10 @@ import { AppModule } from "./user.module";
         options: {
             package: USER_PACKAGE_NAME,
             protoPath: USER_PROTO_PATH,
-            url: MODULE_HOST
+            url: MODULE_HOST,
+            loader: {
+                keepCase: true
+            }
         }
     })
     await app.listen();

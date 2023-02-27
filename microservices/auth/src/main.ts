@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
-import { SESSION_PACKAGE_NAME, SESSION_PROTO_PATH } from "./constants/session.constants";
+import {MODULE_HOST, SESSION_PACKAGE_NAME, SESSION_PROTO_PATH } from "./constants";
 import { AuthModule } from "./auth.module";
 
 (async () => {
@@ -8,7 +8,11 @@ import { AuthModule } from "./auth.module";
         transport: Transport.GRPC,
         options: {
             package: SESSION_PACKAGE_NAME,
-            protoPath: SESSION_PROTO_PATH  
+            protoPath: SESSION_PROTO_PATH,
+            url: MODULE_HOST,
+            loader: {
+                keepCase: true
+            }
         }
     })
 

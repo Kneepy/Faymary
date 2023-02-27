@@ -11,7 +11,10 @@ import { MODULE_PACKAGE_NAME, DIALOG_PROTO_PATH, MODULE_HOST } from "./common";
             options: {
                 package: MODULE_PACKAGE_NAME,
                 protoPath: DIALOG_PROTO_PATH,
-                url: MODULE_HOST
+                url: MODULE_HOST,
+                loader: {
+                    keepCase: true
+                }
             }
         }
     );

@@ -54,9 +54,7 @@ export const GetClientOptionsByConfig = (config: ConfigModule): ClientProviderOp
 export const GetClientProvider = <T>(moduleConfig: ConfigModule): FactoryProvider => ({
     provide: moduleConfig.PROVIDER,
     inject: [{token: moduleConfig.DEPENDENCY, optional: false}],
-    useFactory: (modulePackage: ClientGrpc): T => {
-        return modulePackage.getService<T>(moduleConfig.SERVICE)
-    }
+    useFactory: (modulePackage: ClientGrpc): T => modulePackage.getService<T>(moduleConfig.SERVICE)
 })
 
 /*

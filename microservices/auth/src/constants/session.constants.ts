@@ -1,6 +1,8 @@
 import * as path from "path";
 
 export const SESSION_PACKAGE_NAME = "session"
+export const MODULE_PORT = 5007;
+export const MODULE_HOST = `localhost:${MODULE_PORT}`;
 export const SESSION_PROTO_PATH = path.join(process.cwd(), "proto/session.proto")
 
 export const SESSION_SERVICE = "SessionService"

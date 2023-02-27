@@ -15,7 +15,10 @@ import { middlware } from "./app.middleware";
         options: {
             package: STORE_PACKAGE_NAME,
             protoPath: STORE_PROTO_PATH,
-            url: MODULE_HOST
+            url: MODULE_HOST,
+            loader: {
+                keepCase: true
+            }
         }
     })
     await app.startAllMicroservices();

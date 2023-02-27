@@ -16,7 +16,7 @@ import { AuthService, SessionService } from "./services";
             password: "root",
             database: "auth",
             entities: [Sessions],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Sessions]),
         JwtModule.register({

@@ -10,10 +10,14 @@ export class AccessCodesService {
     ) {}
 
     async findOne(args: FindOneAccessCodeInterface): Promise<AccessCodes> {
-        return await this.repository.findOne({where: {...args, createdAt: Raw(alias => `(${alias} + ${LIFE_TIME_ACCESS_CODE}) < ${Date.now()}`)}})
+        return await this.repository.findOne({where: {...args, createdAt: Raw(alias => `(${alias} + ${LIFE_TIME_ACCESS_CODE}) > ${Date.now()}`)}})
     }
 
     async create(input: CreateAccessCodeInterface): Promise<AccessCodes> {
         return await this.repository.save({...input, createdAt: Date.now()})
+    }
+
+    async delete(id: string): Promise<any> {
+        return await this.repository.delete(id)
     }
 }

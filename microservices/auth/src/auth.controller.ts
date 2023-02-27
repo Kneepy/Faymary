@@ -26,11 +26,11 @@ export class AuthController {
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS)
     async generateTokens(data: GenerateTokensDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<TokensPayload> {
         const oldRefreshToken = await this.sessionService.findOne([{ua: data.ua, user_id: data.user_id}, {ip: data.ip, user_id: data.user_id}])
-            
-        if(oldRefreshToken) {
+
+        if(!!oldRefreshToken) {
             await this.sessionService.delete(oldRefreshToken.id)
         }
-
+        
         return {
             access_token: this.authService.getAccessToken(data.user_id),
             refresh_token: (await this.authService.getRefreshToken(data)).id

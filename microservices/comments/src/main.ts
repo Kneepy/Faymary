@@ -11,7 +11,10 @@ import { MODULE_PACKAGE_NAME, COMMENTS_PROTO_PATH, MODULE_HOST } from "./common"
             options: {
                 package: MODULE_PACKAGE_NAME,
                 protoPath: COMMENTS_PROTO_PATH,
-                url: MODULE_HOST
+                url: MODULE_HOST,
+                loader: {
+                    keepCase: true
+                }
             }
         }
     );

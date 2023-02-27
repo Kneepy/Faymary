@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from '@nestjs/jwt';
 import { CreateSession, UserAccessTokenPayload } from "src/interfaces";
-import { EXPIRES_IN_REFRESH_TOKEN } from "src/constants/session.constants";
+import {EXPIRES_IN_REFRESH_TOKEN, JWT_EXPIRES_IN_ACCESS} from "src/constants/session.constants";
 import { SessionService } from "./session.service";
 import { Sessions } from "src/entities";
 
@@ -27,7 +27,7 @@ export class AuthService {
     }
 
     getAccessToken(user_id: string): string {
-        return this.jwtService.sign(user_id)
+        return this.jwtService.sign({user_id}, {expiresIn: JWT_EXPIRES_IN_ACCESS})
     }
 
     async getRefreshToken(token: CreateSession) {

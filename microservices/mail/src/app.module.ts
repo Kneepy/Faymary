@@ -16,7 +16,7 @@ import { MailerService } from './providers/mailer.service';
         password: MYSQL_PASS,
         database: MYSQL_DB,
         entities: [AccessCodes],
-        synchronize: true
+        synchronize: false
       }),
       TypeOrmModule.forFeature([AccessCodes])
     ],

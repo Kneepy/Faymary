@@ -11,7 +11,10 @@ import { STORIES_PROTO_PATH, MODULE_PACKAGE_NAME, MODULE_HOST } from "./constant
             options: {
                 package: MODULE_PACKAGE_NAME,
                 protoPath: STORIES_PROTO_PATH,
-                url: MODULE_HOST
+                url: MODULE_HOST,
+                loader: {
+                    keepCase: true
+                }
             }
         }
     );

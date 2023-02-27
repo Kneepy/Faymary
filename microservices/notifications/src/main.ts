@@ -11,7 +11,10 @@ import { MODULE_HOST, MODULE_PACKAGE_NAME, NOTIFICATION_PROTO_PATH } from "./com
             options: {
                 package: MODULE_PACKAGE_NAME,
                 protoPath: NOTIFICATION_PROTO_PATH,
-                url: MODULE_HOST
+                url: MODULE_HOST,
+                loader: {
+                    keepCase: true
+                }
             }
         }
     );

@@ -14,7 +14,7 @@ import { UserService } from "./user.service";
             password: "root",
             database: "user",
             entities: [Users],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Users])
     ],

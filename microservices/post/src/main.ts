@@ -9,7 +9,10 @@ import { MODULE_HOST, MODULE_PACKAGE_NAME, POST_PROTO_PATH } from "./constants";
         options: {
             package: MODULE_PACKAGE_NAME,
             protoPath: POST_PROTO_PATH,
-            url: MODULE_HOST
+            url: MODULE_HOST,
+            loader: {
+                keepCase: true
+            }
         }
     })
     await app.listen();
