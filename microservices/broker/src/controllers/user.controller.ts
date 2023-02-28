@@ -21,6 +21,11 @@ export class UserController {
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient
     ) {}
 
+    @Put("/login")
+    async loginUser(@Body() data: Omit<CreateUserDTO, "state">) {
+
+    }
+
     @Put()
     async confirmUser(@Req() req, @Query() data): Promise<VerifyTokensDTO> {
         const { isConfirmed } = await this.mailService.confirmAccessCode({user_id: data.user_id, code: data.code}).toPromise()

@@ -6,8 +6,8 @@ import {CreateUserDTO, FindUserDTO, FindUsersDTO, FollowUserDTO, UpdateUserDTO, 
 import { Users } from "./entities";
 import { USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
-import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound } from "./constants";
-import { UserIsFollowInterface, UsersIsFollowsInterface } from "./interfaces";
+import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound, UserEmailNotFound } from "./constants";
+import { UserIsFollowInterface, UsersIsFollowsInterface, UserIsLoginedInterface } from "./interfaces";
 
 @Controller()
 export class UserController {
@@ -29,6 +29,15 @@ export class UserController {
 
             return await this.userService.create(data)
         }
+    }
+
+    @GrpcMethond(USER_SERVICE, USER_SERVICE_METHODS.LOGIN_USER)
+    async checkUser(data: LoginUserDTO): Promise<UserIsLoginedInterface> {
+        const user = await this.userService.findOne({email: data.email})
+
+        if(user) {
+            return {isLogined: bcrypt.compareSync(data.password, user.password)}
+        } else throw UserEmailNotFound
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.UPDATE_USER)
