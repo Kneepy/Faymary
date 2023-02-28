@@ -8,6 +8,7 @@ service UserService {
     rpc UserIsFollow (UserIsFollowDTO) returns (stream UserIsFollowResult);
     rpc UsersIsFollow (UsersIsFollowDTO) returns (stream UsersIsFollowResult);
     rpc CreateUser (CreateUserDTO) returns (stream User);
+    rpc LoginUser (LoginUserDTO) returns (stream UserIsLogined);
     rpc UpdateUser (UpdateUserDTO) returns (stream User);
     rpc FindUsers (FindUsersDTO) returns (stream Users);
 }
@@ -18,6 +19,15 @@ message CreateUserDTO {
     string userName = 3;
     string password = 4;
     UserState state = 5;
+}
+
+message LoginUserDTO {
+    string email = 1;
+    string password = 2;
+}
+
+message UserIsLogined {
+    bool isLogined = 1;
 }
 
 message FollowUserDTO {

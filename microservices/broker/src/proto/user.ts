@@ -18,6 +18,15 @@ export interface CreateUserDTO {
   state: UserState;
 }
 
+export interface LoginUserDTO {
+  email: string;
+  password: string;
+}
+
+export interface UserIsLogined {
+  isLogined: boolean;
+}
+
 export interface FollowUserDTO {
   user_id: string;
   follower_id: string;
@@ -110,6 +119,8 @@ export interface UserServiceClient {
 
   createUser(request: CreateUserDTO): Observable<User>;
 
+  loginUser(request: LoginUserDTO): Observable<UserIsLogined>;
+
   updateUser(request: UpdateUserDTO): Observable<User>;
 
   findUsers(request: FindUsersDTO): Observable<Users>;
@@ -126,6 +137,8 @@ export interface UserServiceController {
 
   createUser(request: CreateUserDTO): Observable<User>;
 
+  loginUser(request: LoginUserDTO): Observable<UserIsLogined>;
+
   updateUser(request: UpdateUserDTO): Observable<User>;
 
   findUsers(request: FindUsersDTO): Observable<Users>;
@@ -139,6 +152,7 @@ export function UserServiceControllerMethods() {
       "userIsFollow",
       "usersIsFollow",
       "createUser",
+      "loginUser",
       "updateUser",
       "findUsers",
     ];
