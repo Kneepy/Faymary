@@ -25,6 +25,7 @@ export interface LoginUserDTO {
 
 export interface UserIsLogined {
   isLogined: boolean;
+  user: User | undefined;
 }
 
 export interface FollowUserDTO {

@@ -37,7 +37,7 @@ export class UserController {
         const user = await this.userService.findOne({email: data.email})
 
         if(user) {
-            return {isLogined: bcrypt.compareSync(data.password, user.password)}
+            return {isLogined: bcrypt.compareSync(data.password, user.password), user}
         } else throw UserEmailNotFound
     }
 

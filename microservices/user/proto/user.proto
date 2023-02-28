@@ -28,6 +28,7 @@ message LoginUserDTO {
 
 message UserIsLogined {
     bool isLogined = 1;
+    User user = 2;
 }
 
 message FollowUserDTO {
