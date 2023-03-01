@@ -28,9 +28,8 @@ export class UserController {
 
     @Put("/login")
     @DisableAuth()
-    async loginUser(@Req() req: ICustomRequest, @Res({ passthrough: true }) res: Response, @Body() data: LoginUserDTO) {
+    async loginUser(@Body() data: LoginUserDTO, @Req() req: ICustomRequest, @Res({ passthrough: true }) res: Response) {
         const isLogined = await this.userService.loginUser({email: data.email, password: data.password}).toPromise()
-
         if(isLogined.isLogined) {
             const ip = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for']
             const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: isLogined.user.id, ip}).toPromise()

@@ -42,18 +42,18 @@ export class AuthController {
         const session = await this.sessionService.findOne({id: data.refresh_token})
         const accessCodeIsVerify = this.authService.verifyAccessToken(data.access_token)
 
-        if(accessCodeIsVerify) {
-            if((accessCodeIsVerify as UserAccessTokenPayload).user_id === session.user_id) {
-                return {
-                    access_token: data.access_token,
-                    refresh_token: data.refresh_token
+        if(session) {
+            if(accessCodeIsVerify) {
+                if((accessCodeIsVerify as UserAccessTokenPayload).user_id === session.user_id && data.session.fingerprint === session.fingerprint) {
+                    return {
+                        access_token: data.access_token,
+                        refresh_token: data.refresh_token
+                    }
+                } else {
+                    throw Unauthorized
                 }
-            } else {
-                throw Unauthorized
             }
-        }
-        else {
-            if(session) {
+            else {
                 if(session.fingerprint !== data.session.fingerprint || session.createdAt + EXPIRES_IN_REFRESH_TOKEN > Date.now()) {
                     throw Unauthorized
                 } else {
@@ -67,7 +67,7 @@ export class AuthController {
                         })).id
                     }
                 }
-            } else throw Unauthorized
-        }
+            }
+        } else throw Unauthorized
     }
 }

@@ -33,7 +33,7 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.LOGIN_USER)
-    async checkUser(data: LoginUserDTO): Promise<UserIsLoginedInterface> {
+    async loginUser(data: LoginUserDTO): Promise<UserIsLoginedInterface> {
         const user = await this.userService.findOne({email: data.email})
 
         if(user) {
