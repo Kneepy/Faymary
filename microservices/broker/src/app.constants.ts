@@ -4,6 +4,10 @@ export const APP_PORT = 5000;
 
 export const DEFAULT_HOST = 'localhost'
 
+export const COOKIE_REFRESH_TOKEN_NAME = "refresh_token"
+
+export const USE_AUTH_METADATA = "UseAuthMetadata"
+
 export const LIKES_MODULE_CONFIG = GetModuleConfig({port: 5001, pkgName: "likes", host: DEFAULT_HOST, protoPath: GetProtoPath("likes"), serviceName: "LikesService"})
 export const USER_MODULE_CONFIG = GetModuleConfig({port: 5002, pkgName: "user", host: DEFAULT_HOST, protoPath: GetProtoPath("user"), serviceName: "UserService"})
 export const STORE_MODULE_CONFIG = GetModuleConfig({port: 5008, pkgName: "store", host: DEFAULT_HOST, protoPath: GetProtoPath("store"), serviceName: "StoreService"})

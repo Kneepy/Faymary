@@ -14,8 +14,9 @@ import {
     UsersClientDependency
 } from './app-clients.providers';
 import {UserController} from "./controllers";
-import {APP_FILTER} from "@nestjs/core";
+import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {RpcExceptionFilter} from "./rpc-exception.filter";
+import { AuthGuard } from './auth.guard';
 
 @Module({
     imports: [
@@ -26,6 +27,10 @@ import {RpcExceptionFilter} from "./rpc-exception.filter";
         {
             provide: APP_FILTER,
             useClass: RpcExceptionFilter
+        },
+        {
+            provide: APP_GUARD,
+            useClass: AuthGuard
         },
         LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient
     ]

@@ -8,7 +8,8 @@ export const SESSION_PROTO_PATH = path.join(process.cwd(), "proto/session.proto"
 export const SESSION_SERVICE = "SessionService"
 export enum SESSION_SERVICE_METHODS {
     VERIFY_TOKENS = "VerifyTokens",
-    GENERATE_TOKENS = "GenerateTokens"
+    GENERATE_TOKENS = "GenerateTokens",
+    GENERATE_TOKENS_BY_SESSION = "GenerateTokensBySession"
 }
 
 export const JWT_SECRET = "FAYMARY_JWT_SECRET"

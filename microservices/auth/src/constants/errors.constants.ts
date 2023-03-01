@@ -3,7 +3,7 @@ import { RpcException } from "@nestjs/microservices";
 
 export const TokenNotFound = new RpcException({
     status: Status.NOT_FOUND,
-    message: "Tocken not found!"
+    message: "Token not found!"
 })
 
 export const Unauthorized = new RpcException({
