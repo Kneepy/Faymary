@@ -19,4 +19,5 @@ import { MODULE_PACKAGE_NAME, MESSAGES_PROTO_PATH, MODULE_HOST } from "./common"
         }
     );
     await app.listen();
+    Logger.log("Messages service successfully started")
 })();

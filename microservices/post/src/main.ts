@@ -1,3 +1,4 @@
+import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
@@ -16,4 +17,5 @@ import { MODULE_HOST, MODULE_PACKAGE_NAME, POST_PROTO_PATH } from "./constants";
         }
     })
     await app.listen();
+    Logger.log("Stories service successfully started")
 })()

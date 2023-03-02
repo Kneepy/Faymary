@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { MAIL_PROTO_PATH, MODULE_HOST, MODULE_PACKAGE_NAME } from './constants';
 import { AppModule } from './app.module';
+import { Logger } from '@nestjs/common';
 
 (async () => {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
@@ -16,4 +17,5 @@ import { AppModule } from './app.module';
         }
     })
     await app.listen()
+    Logger.log("Mail service successfully started")
 })()

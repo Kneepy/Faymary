@@ -1,7 +1,7 @@
 import * as path from "path";
 
 export const USER_PACKAGE_NAME = "user"
-export const MODULE_PORT = 5002
+export const MODULE_PORT = 5003
 export const MODULE_HOST = `localhost:${MODULE_PORT}`
 export const USER_PROTO_PATH = path.join(process.cwd(), "proto/user.proto")
 

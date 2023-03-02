@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {APP_PORT} from "./app.constants";
@@ -26,4 +27,5 @@ import { ICustomRequest } from './types/request.type';
     });
 
     await app.listen(APP_PORT);
+    Logger.log("Broker service successfully started")
 })()

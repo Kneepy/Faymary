@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
@@ -20,4 +21,5 @@ import { MODULE_PACKAGE_NAME, COMMENTS_PROTO_PATH, MODULE_HOST } from "./common"
     );
 
     await app.listen();
+    Logger.log("Comments service successfully started")
 })();

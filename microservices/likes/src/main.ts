@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
 import {MODULE_PACKAGE_NAME, DIALOG_PROTO_PATH, MODULE_HOST} from "./common";
+import {Logger} from "@nestjs/common"
 
 (async () => {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -20,4 +21,5 @@ import {MODULE_PACKAGE_NAME, DIALOG_PROTO_PATH, MODULE_HOST} from "./common";
     );
 
     await app.listen();
+    Logger.log("Likes service successfully started")
 })();
