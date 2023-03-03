@@ -19,5 +19,4 @@ export class FindUsersDTO implements Partial<Omit<Users, "email" | "id">>, Pick<
     state?: UserState
     take?: number
     skip?: number
-    addSubs: boolean
 }

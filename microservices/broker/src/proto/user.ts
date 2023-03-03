@@ -10,6 +10,12 @@ export enum UserState {
   UNRECOGNIZED = -1,
 }
 
+export interface FindFollowersDTO {
+  take: number;
+  skip: number;
+  user_id: string;
+}
+
 export interface CreateUserDTO {
   email: string;
   lastName: string;
@@ -125,6 +131,10 @@ export interface UserServiceClient {
   updateUser(request: UpdateUserDTO): Observable<User>;
 
   findUsers(request: FindUsersDTO): Observable<Users>;
+
+  findSubscriptions(request: FindFollowersDTO): Observable<Users>;
+
+  findFollowers(request: FindFollowersDTO): Observable<Users>;
 }
 
 export interface UserServiceController {
@@ -143,6 +153,10 @@ export interface UserServiceController {
   updateUser(request: UpdateUserDTO): Observable<User>;
 
   findUsers(request: FindUsersDTO): Observable<Users>;
+
+  findSubscriptions(request: FindFollowersDTO): Observable<Users>;
+
+  findFollowers(request: FindFollowersDTO): Observable<Users>;
 }
 
 export function UserServiceControllerMethods() {
@@ -156,6 +170,8 @@ export function UserServiceControllerMethods() {
       "loginUser",
       "updateUser",
       "findUsers",
+      "findSubscriptions",
+      "findFollowers",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

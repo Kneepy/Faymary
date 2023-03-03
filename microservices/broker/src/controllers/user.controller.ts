@@ -3,6 +3,7 @@ import {
     Controller, ForbiddenException,
     Get,
     Inject,
+    Patch,
     Post,
     Put,
     Query,
@@ -13,7 +14,7 @@ import {
 import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
 import {Response} from "express"
-import {CreateUserDTO, LoginUserDTO, UserServiceClient, UserState} from "src/proto/user";
+import {CreateUserDTO, FindFollowersDTO, FollowUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowResult, Users, UserServiceClient, UserState} from "src/proto/user";
 import { ICustomRequest } from "src/types/request.type";
 import {MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
@@ -70,5 +71,27 @@ export class UserController {
     @Get("/me")
     async getUserBySessionTokens(@Req() req: ICustomRequest) {
         return await this.userService.findUser({id: req.user_id}).toPromise()
+    }
+
+    @Patch()
+    async updateUser(@Req() req: ICustomRequest, @Body() data: Omit<UpdateUserDTO, "id">): Promise<User> {
+        return await this.userService.updateUser({...data, id: req.user_id}).toPromise()
+    }
+
+    @Patch("follow")
+    async followUser(@Req() req: ICustomRequest, @Body() data: Omit<FollowUserDTO, "follower_id">): Promise<UserIsFollowResult> {
+        return await this.userService.followUser({follower_id: req.user_id, user_id: data.user_id}).toPromise()
+    }
+
+    @Get("/followers")
+    @DisableAuth()
+    async getFollowers(@Query() query: FindFollowersDTO): Promise<Users> {
+        return await this.userService.findFollowers(query).toPromise()
+    }
+
+    @Get("/subscriptions")
+    @DisableAuth()
+    async getSubscriptions(@Query() query: FindFollowersDTO): Promise<Users> {
+        return await this.userService.findSubscriptions(query).toPromise()
     }
 }

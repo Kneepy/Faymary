@@ -16,5 +16,7 @@ export enum USER_SERVICE_METHODS {
     USERS_IS_FOLLOW = "UsersIsFollow",
     CREATE_USER = "CreateUser",
     LOGIN_USER = "LoginUser",
-    UPDATE_USER = "UpdateUser"
+    UPDATE_USER = "UpdateUser",
+    FIND_SUBSCRIPTIONS = "FindSubscriptions",
+    FIND_FOLLOWERS = "FindFollowers"
 }

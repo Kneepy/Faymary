@@ -11,6 +11,14 @@ service UserService {
     rpc LoginUser (LoginUserDTO) returns (stream UserIsLogined);
     rpc UpdateUser (UpdateUserDTO) returns (stream User);
     rpc FindUsers (FindUsersDTO) returns (stream Users);
+    rpc FindSubscriptions (FindFollowersDTO) returns (stream Users);
+    rpc FindFollowers (FindFollowersDTO) returns (stream Users);    
+}
+
+message FindFollowersDTO {
+    int64 take = 1;
+    int64 skip = 2;
+    string user_id = 3;
 }
 
 message CreateUserDTO {

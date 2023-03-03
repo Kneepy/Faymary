@@ -2,7 +2,7 @@ import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
 import { Controller } from "@nestjs/common";
 import {GrpcMethod} from "@nestjs/microservices";
 import * as bcrypt from "bcryptjs"
-import {CreateUserDTO, FindUserDTO, FindUsersDTO, FollowUserDTO, UpdateUserDTO, UserIsFollowDTO, UsersIsFollowDTO} from "./dtos";
+import {CreateUserDTO, FindFollowersDTO, FindUserDTO, FindUsersDTO, FollowUserDTO, UpdateUserDTO, UserIsFollowDTO, UsersIsFollowDTO} from "./dtos";
 import { Users } from "./entities";
 import { USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
@@ -52,13 +52,19 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USERS)
     async find(data: FindUsersDTO): Promise<{users: Users[]}> {
-        const relations = data.addSubs ? {subscriptions: true, followers: true} : [];
-
-        delete data.addSubs
-
         Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
 
-        return {users: await this.userService.find(data, {relations})}
+        return {users: await this.userService.find(data)}
+    }
+    
+    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_FOLLOWERS)
+    async findFollowers(data: FindFollowersDTO): Promise<Users[]> {
+        return await this.userService.find({subscriptions: {id: data.user_id}}, {relations: {subscriptions: true}, take: data.take, skip: data.skip})
+    }
+
+    @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_SUBSCRIPTIONS)
+    async findSubscriptions(data: FindFollowersDTO): Promise<Users[]> {
+        return await this.userService.find({followers: {id: data.user_id}}, {relations: {followers: true}, take: data.take, skip: data.skip})
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
@@ -85,11 +91,11 @@ export class UserController {
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USERS_IS_FOLLOW)
     async usersIsFollow(data: UsersIsFollowDTO): Promise<UsersIsFollowsInterface> {
         if(data.owner_id) {
-            const user = await this.userService.findOne({id: data.owner_id}, {relations: {subscriptions: true}})
+            const user = await this.userService.findOne({id: data.owner_id}, {relations: {followers: true}})
 
             if(data.users_ids.length) {
                 const respond = new Map<string, boolean>()
-                user.subscriptions.forEach(subsc => respond.set(subsc.id, data.users_ids.indexOf(subsc.id) !== -1))
+                user.followers.forEach(subsc => respond.set(subsc.id, data.users_ids.indexOf(subsc.id) !== -1))
 
                 return {follows: respond}
             }
