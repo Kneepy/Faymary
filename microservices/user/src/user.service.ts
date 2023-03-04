@@ -24,13 +24,7 @@ export class UserService {
         return await this.repository.findOne({where, ...otherOptions})
     }
 
-    async find(where: FindOptionsWhere<FindUsers>, otherOption?: Omit<FindManyOptions<Users>, "where">): Promise<Users[]> {
-        otherOption.take = otherOption.take ?? DEFAULT_TAKE_USERS
-        otherOption.skip = otherOption.take ?? DEFAULT_SKIP_USERS
-
-        if(where.followers) otherOption.relations = Object.assign(otherOption.relations, {followers: true})
-        if(where.subscriptions) otherOption.relations = Object.assign(otherOption.relations, {subscriptions: true})
-
+    async find(where: FindOptionsWhere<FindUsers>, otherOption: Omit<FindManyOptions<Users>, "where"> = {take: DEFAULT_TAKE_USERS, skip: DEFAULT_SKIP_USERS}): Promise<Users[]> {
         return await this.repository.find({where, ...otherOption})
     }
 

@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate {
             const accessToken = request.headers.authorization
             const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
-            if(!accessToken || !refreshToken) throw UnauthorizedException
+            if(!refreshToken) throw UnauthorizedException
             else {
                 const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
                 const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}

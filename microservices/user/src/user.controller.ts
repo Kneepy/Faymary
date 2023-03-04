@@ -10,6 +10,8 @@ import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFoun
 import { UserIsFollowInterface, UsersIsFollowsInterface, UserIsLoginedInterface } from "./interfaces";
 import { LoginUserDTO } from "./dtos/login-user.dto";
 
+type RepeatedUsers = {users: Users[]}
+
 @Controller()
 export class UserController {
     constructor(
@@ -51,20 +53,20 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USERS)
-    async find(data: FindUsersDTO): Promise<{users: Users[]}> {
+    async find(data: FindUsersDTO): Promise<RepeatedUsers> {
         Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
 
         return {users: await this.userService.find(data)}
     }
     
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_FOLLOWERS)
-    async findFollowers(data: FindFollowersDTO): Promise<Users[]> {
-        return await this.userService.find({subscriptions: {id: data.user_id}}, {relations: {subscriptions: true}, take: data.take, skip: data.skip})
+    async findFollowers(data: FindFollowersDTO): Promise<RepeatedUsers> {
+        return {users: await this.userService.find({subscriptions: {id: data.user_id}}, {take: data.take, skip: data.skip})}
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_SUBSCRIPTIONS)
-    async findSubscriptions(data: FindFollowersDTO): Promise<Users[]> {
-        return await this.userService.find({followers: {id: data.user_id}}, {relations: {followers: true}, take: data.take, skip: data.skip})
+    async findSubscriptions(data: FindFollowersDTO): Promise<RepeatedUsers> {
+        return {users: await this.userService.find({followers: {id: data.user_id}}, {take: data.take, skip: data.skip})}
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
