@@ -1,5 +1,4 @@
 import { FindOptionsWhere, FindManyOptions, Repository, Raw } from "typeorm";
-
 import {
     FindManyStoryInterface,
     FindStoryInterface
@@ -25,7 +24,7 @@ export class StoriesService {
             where: {
                 ...args,
                 createdAt: Raw(
-                    alias => `${Date.now()} >= ${alias} + ${STORY_EXPIRES_AFTER}`
+                    alias => `${Date.now()} < ${alias} + ${STORY_EXPIRES_AFTER}`
                 )
             }
         });
@@ -38,7 +37,7 @@ export class StoriesService {
         return await this.repository.find({
             where: {
                 ...args,
-                createdAt: Raw(
+                createdAt: args.createdAt ?? Raw(
                     alias => `${alias} <= ${alias} + ${STORY_EXPIRES_AFTER}`
                 )
             },

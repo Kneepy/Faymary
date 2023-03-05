@@ -13,7 +13,7 @@ import {
     StoreClientDependency, StoriesClient, StoriesClientDependency, UsersClient,
     UsersClientDependency
 } from './app-clients.providers';
-import {UserController} from "./controllers";
+import {PostController, UserController} from "./controllers";
 import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
@@ -22,7 +22,7 @@ import { AuthGuard } from './auth.guard';
     imports: [
         ClientsModule.register([LikesClientDependency, UsersClientDependency, StoreClientDependency, SessionClientDependency, PostClientDependency, NotificationsClientDependency, MessagesClientDependency, DialogsClientDependency, StoriesClientDependency, CommentsClientDependency, MailClientDependency])
     ],
-    controllers: [UserController],
+    controllers: [UserController, PostController],
     providers: [
         {
             provide: APP_FILTER,

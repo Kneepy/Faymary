@@ -18,7 +18,7 @@ export interface GetStoriesDTO {
 export interface CreateStoryDTO {
   user_id: string;
   file_id: string;
-  marks: Mark | undefined;
+  marks: Mark[];
 }
 
 export interface DeleteStoryDTO {
@@ -27,7 +27,7 @@ export interface DeleteStoryDTO {
 
 export interface UpdateStoryDTO {
   file_id: string;
-  marks: Mark | undefined;
+  marks: Mark[];
 }
 
 export interface Story {
@@ -35,7 +35,7 @@ export interface Story {
   user_id: string;
   ctratedAt: number;
   file_id: string;
-  marks: Mark | undefined;
+  marks: Mark[];
 }
 
 export interface Mark {

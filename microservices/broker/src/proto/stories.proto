@@ -16,7 +16,7 @@ message GetStoriesDTO {
 message CreateStoryDTO {
     string user_id = 1;
     string file_id = 2;
-    Mark marks = 3;
+    repeated Mark marks = 3;
 }
 
 message DeleteStoryDTO {
@@ -25,15 +25,15 @@ message DeleteStoryDTO {
 
 message UpdateStoryDTO {
     string file_id = 1;
-    Mark marks = 2;
+    repeated Mark marks = 2;
 }
 
 message Story {
     string id = 1;
     string user_id = 2;
-    int64 ctratedAt = 3;
+    int32 ctratedAt = 3;
     string file_id = 4;
-    Mark marks = 5;
+    repeated Mark marks = 5;
 }
 
 message Mark {
