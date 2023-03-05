@@ -17,9 +17,11 @@ export const MYSQL_HOST = "localhost";
 
 export const STORIES_SERVICE = "StoriesService";
 
+
 export enum STORIES_SERVICE_METHODS {
     GET_STORIES = "GetStories",
     CREATE_STORY = "CreateStory",
     DELETE_STORY = "DeleteStory",
-    UPDATE_STORY = "UpdateStory"
+    UPDATE_STORY = "UpdateStory",
+    GET_STORY = "GetStory"
 }

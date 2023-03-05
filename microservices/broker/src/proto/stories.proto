@@ -3,7 +3,8 @@ syntax = "proto3";
 package stories;
 
 service StoriesService {
-    rpc GetStories (GetStoriesDTO) returns (stream Story);
+    rpc GetStories (GetStoriesDTO) returns (stream Stories);
+    rpc GetStory (GetStoryDTO) returns (stream Story);
     rpc CreateStory (CreateStoryDTO) returns (stream Story);
     rpc DeleteStory (DeleteStoryDTO) returns (stream Empty);
     rpc UpdateStory (UpdateStoryDTO) returns (stream Story);
@@ -11,6 +12,10 @@ service StoriesService {
 
 message GetStoriesDTO {
     string user_id = 1;
+}
+
+message GetStoryDTO {
+    string id = 1;
 }
 
 message CreateStoryDTO {
@@ -21,11 +26,14 @@ message CreateStoryDTO {
 
 message DeleteStoryDTO {
     string id = 1;
+    string user_id = 2;
 }
 
 message UpdateStoryDTO {
     string file_id = 1;
     repeated Mark marks = 2;
+    string id = 3;
+    string user_id = 4;
 }
 
 message Story {
@@ -34,6 +42,10 @@ message Story {
     int32 ctratedAt = 3;
     string file_id = 4;
     repeated Mark marks = 5;
+}
+
+message Stories {
+    repeated Story stories = 1;
 }
 
 message Mark {

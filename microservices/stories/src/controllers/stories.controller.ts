@@ -1,14 +1,17 @@
+import { StoryNotFound } from './../constants/errors.constants';
 import { Controller } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import {
     FileNotFound,
     STORIES_SERVICE,
-    STORIES_SERVICE_METHODS
+    STORIES_SERVICE_METHODS,
+    UserDoesNotMatch
 } from "src/constants";
 import {
     CreateStoryDTO,
     DeleteStoryDTO,
     GetStoriesDTO,
+    GetStoryDTO,
     UpdateStoryDTO
 } from "src/dtos";
 import { Story } from "src/entities";
@@ -30,6 +33,11 @@ export class StoriesController {
         return stories;
     }
 
+    @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.GET_STORY)
+    async getStory(data: GetStoryDTO): Promise<Story> {
+        return await this.storiesService.findOne({id: data.id})
+    }
+
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.CREATE_STORY)
     async createStory(data: CreateStoryDTO): Promise<Story> {
         if (!data.file_id) {
@@ -41,11 +49,21 @@ export class StoriesController {
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.DELETE_STORY)
     async deleteStory(data: DeleteStoryDTO): Promise<any> {
-        return await this.storiesService.delete(data.id);
+        const story = await this.storiesService.findOne({id: data.id})
+
+        if(story) {
+            if(story.user_id === data.user_id) return await this.storiesService.delete(data.id);
+            else throw UserDoesNotMatch
+        } else throw StoryNotFound
     }
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.UPDATE_STORY)
     async updateStory(data: UpdateStoryDTO): Promise<Story> {
-        return await this.storiesService.update(data);
+        const story = await this.storiesService.findOne({id: data.id})
+
+        if(story.user_id === data.user_id) 
+            return await this.storiesService.update(data);
+        else throw UserDoesNotMatch
+        
     }
 }

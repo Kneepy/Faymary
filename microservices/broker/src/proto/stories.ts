@@ -15,6 +15,10 @@ export interface GetStoriesDTO {
   user_id: string;
 }
 
+export interface GetStoryDTO {
+  id: string;
+}
+
 export interface CreateStoryDTO {
   user_id: string;
   file_id: string;
@@ -23,11 +27,14 @@ export interface CreateStoryDTO {
 
 export interface DeleteStoryDTO {
   id: string;
+  user_id: string;
 }
 
 export interface UpdateStoryDTO {
   file_id: string;
   marks: Mark[];
+  id: string;
+  user_id: string;
 }
 
 export interface Story {
@@ -36,6 +43,10 @@ export interface Story {
   ctratedAt: number;
   file_id: string;
   marks: Mark[];
+}
+
+export interface Stories {
+  stories: Story[];
 }
 
 export interface Mark {
@@ -50,7 +61,9 @@ export interface Empty {
 export const STORIES_PACKAGE_NAME = "stories";
 
 export interface StoriesServiceClient {
-  getStories(request: GetStoriesDTO): Observable<Story>;
+  getStories(request: GetStoriesDTO): Observable<Stories>;
+
+  getStory(request: GetStoryDTO): Observable<Story>;
 
   createStory(request: CreateStoryDTO): Observable<Story>;
 
@@ -60,7 +73,9 @@ export interface StoriesServiceClient {
 }
 
 export interface StoriesServiceController {
-  getStories(request: GetStoriesDTO): Observable<Story>;
+  getStories(request: GetStoriesDTO): Observable<Stories>;
+
+  getStory(request: GetStoryDTO): Observable<Story>;
 
   createStory(request: CreateStoryDTO): Observable<Story>;
 
@@ -71,7 +86,7 @@ export interface StoriesServiceController {
 
 export function StoriesServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getStories", "createStory", "deleteStory", "updateStory"];
+    const grpcMethods: string[] = ["getStories", "getStory", "createStory", "deleteStory", "updateStory"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("StoriesService", method)(constructor.prototype[method], method, descriptor);
