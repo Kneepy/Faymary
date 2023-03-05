@@ -19,6 +19,7 @@ export class PostsController {
         if(!data.user_id) {
             throw USER_ID_UNDEFINED
         }
+        if(Array.isArray(data.file_ids)) data.file_ids = this.postService.joinFileIds(data.file_ids)
 
         const post = await this.postService.create(data)
 
@@ -28,10 +29,10 @@ export class PostsController {
     @GrpcMethod(MODULE_SERVICE_NAME, MODULE_SERVICE_METHODS.UPDATE_POST)
     async updatePost(data: PostUpdateDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Posts> {
         if(data.id) {
-
             const post = await this.postService.findOne({id: data.id})
 
-            if(post || post.user_id !== data.user_id) {
+            if(Array.isArray(data.file_ids)) data.file_ids = this.postService.joinFileIds(data.file_ids)
+            if(post && post.user_id === data.user_id) {
                 
                 return await this.postService.update(Object.assign(post, data))
 

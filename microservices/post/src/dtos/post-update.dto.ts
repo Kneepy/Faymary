@@ -5,4 +5,5 @@ export class PostUpdateDTO implements Omit<Partial<Posts>, "user_id" | "createdA
     user_id: string;
     title?: string;
     desc?: string;
+    file_ids: string
 }

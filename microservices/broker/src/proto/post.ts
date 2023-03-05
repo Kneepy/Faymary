@@ -8,6 +8,7 @@ export interface PostCreateDTO {
   user_id: string;
   title?: string | undefined;
   desc?: string | undefined;
+  file_ids?: string | undefined;
 }
 
 export interface PostUpdateDTO {
@@ -15,6 +16,7 @@ export interface PostUpdateDTO {
   user_id: string;
   title?: string | undefined;
   desc?: string | undefined;
+  file_ids?: string | undefined;
 }
 
 export interface PostDeleteDTO {
@@ -39,6 +41,11 @@ export interface Post {
   title: string;
   createdAt: number;
   desc: string;
+  file_ids: string;
+}
+
+export interface Posts {
+  posts: Post[];
 }
 
 export interface Empty {
@@ -55,7 +62,7 @@ export interface PostServiceClient {
 
   getPost(request: GetOnePostDTO): Observable<Post>;
 
-  getPosts(request: GetManyPostsDTO): Observable<Post>;
+  getPosts(request: GetManyPostsDTO): Observable<Posts>;
 }
 
 export interface PostServiceController {
@@ -67,7 +74,7 @@ export interface PostServiceController {
 
   getPost(request: GetOnePostDTO): Observable<Post>;
 
-  getPosts(request: GetManyPostsDTO): Observable<Post>;
+  getPosts(request: GetManyPostsDTO): Observable<Posts>;
 }
 
 export function PostServiceControllerMethods() {

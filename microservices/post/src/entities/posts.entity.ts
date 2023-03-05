@@ -14,6 +14,9 @@ export class Posts {
     @Column({ nullable: false, type: "bigint" })
     createdAt: number
 
+    @Column({nullable: true})
+    file_ids: string
+
     @Column({nullable: false})
     desc: string
 }

@@ -29,4 +29,12 @@ export class PostsService {
     async delete(id: string): Promise<any> {
         return await this.repository.delete(id)
     }
+
+    getFileIds(file_ids: string): string[] {
+        return file_ids.split(",")
+    }
+
+    joinFileIds(file_ids: string[]): string {
+        return file_ids.join(",")
+    }
 }
