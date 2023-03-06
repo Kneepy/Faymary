@@ -1,5 +1,4 @@
 import { INestApplication } from "@nestjs/common";
-import { NestApplication } from "@nestjs/core";
 import { ICustomRequest } from "./types";
 
 export function middlware(app: INestApplication): INestApplication {

@@ -21,7 +21,7 @@ import { StoriesService } from "./providers";
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [Story, Mark],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Story, Mark])
     ],

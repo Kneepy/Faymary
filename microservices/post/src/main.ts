@@ -17,5 +17,5 @@ import { MODULE_HOST, MODULE_PACKAGE_NAME, POST_PROTO_PATH } from "./constants";
         }
     })
     await app.listen();
-    Logger.log("Stories service successfully started")
+    Logger.log("Posts service successfully started")
 })()

@@ -23,7 +23,7 @@ export class StoreController {
         return file.savedAs
     }
 
-    @Post()
+    @Post("/multiply")
     @SaveFiles()
     async createFiles(@UploadedFiles() files: ICustomFile[]): Promise<File[]> {
         return files.map(file => file.savedAs)

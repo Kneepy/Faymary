@@ -14,7 +14,7 @@ import { PostsService } from "./post.service";
             password: "root",
             database: "posts",
             entities: [Posts],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Posts])
     ],

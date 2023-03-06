@@ -5,6 +5,7 @@ import { StoreController } from "./store.controller";
 import { StoreResource } from "./providers";
 import { MulterModule } from "@nestjs/platform-express";
 import { GetMulterConfig } from "./multer.config";
+import { UserExistHttp } from "./user-exist.guard";
 
 @Module({
     imports: [
@@ -16,7 +17,7 @@ import { GetMulterConfig } from "./multer.config";
             password: "root",
             database: "store",
             entities: [File],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([File]),
         MulterModule.registerAsync({
@@ -24,6 +25,6 @@ import { GetMulterConfig } from "./multer.config";
         })
     ],
     controllers: [StoreController],
-    providers: [StoreResource]
+    providers: [StoreResource, UserExistHttp]
 })
 export class StoreModule {}
