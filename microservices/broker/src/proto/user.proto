@@ -45,7 +45,7 @@ message FollowUserDTO {
 }
 
 message FindUsersDTO {
-    optional int32 take = 1;
+    optional bool addSubs = 1;
     optional string email = 2;
     optional string username = 3;
     optional string lastName = 4;
@@ -54,7 +54,7 @@ message FindUsersDTO {
     optional User subscriptions = 7;
     optional UserState state = 8;
     optional int32 skip = 9;
-    optional bool addSubs = 10;
+    optional int32 take = 10;
 }
 
 message UserIsFollowResult {

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { DEFAULT_SKIP_POSTS, DEFAULT_TAKE_POSTS } from "./constants";
 import { Posts } from "./entities";
 import { PostCreationData, PostUpdateData, FindPostCriteria } from "./interfaces";
 
@@ -14,7 +15,10 @@ export class PostsService {
         return await this.repository.findOne({where, ...otherOptions})
     }
 
-    async find(where: FindOptionsWhere<FindPostCriteria>, otherOptions?: Omit<FindManyOptions<Posts>, "where">): Promise<Posts[]> {
+    async find(where: FindOptionsWhere<FindPostCriteria>, otherOptions: Omit<FindManyOptions<Posts>, "where"> = {take: DEFAULT_TAKE_POSTS, skip: DEFAULT_SKIP_POSTS}): Promise<Posts[]> {
+        // костыль но хз как сделать по другому
+        Object.keys(where).forEach(key => (key === "take" || key === "skip") && delete where[key])
+
         return await this.repository.find({where, ...otherOptions})
     }
 

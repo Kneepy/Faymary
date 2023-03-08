@@ -13,6 +13,7 @@ export class PostController {
 
     @Post()
     async createPost(@Req() req: ICustomRequest, @Body() data: Omit<PostCreateDTO, "user_id">): Promise<PostEntity> {
+        console.log(data)
         if(Array.isArray(data.file_ids)) data.file_ids = data.file_ids.join(",")
 
         return await this.postService.createPost({...data, user_id: req.user_id}).toPromise()

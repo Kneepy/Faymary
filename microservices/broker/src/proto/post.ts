@@ -33,6 +33,8 @@ export interface GetManyPostsDTO {
   title?: string | undefined;
   ids?: string | undefined;
   desc?: string | undefined;
+  take: number;
+  skip: number;
 }
 
 export interface Post {

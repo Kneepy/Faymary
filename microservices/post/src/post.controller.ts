@@ -53,19 +53,19 @@ export class PostsController {
     }
 
     @GrpcMethod(MODULE_SERVICE_NAME, MODULE_SERVICE_METHODS.GET_POST)
-    async getPost(data: GetOnePostDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Posts> {
-        return await this.postService.findOne(data)
+    async getPost(data: GetOnePostDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Posts | {}> {
+        return await this.postService.findOne(data) ?? {}
     }
 
     @GrpcMethod(MODULE_SERVICE_NAME, MODULE_SERVICE_METHODS.GET_POSTS)
-    async getPosts(data: GetManyPostsDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Posts[]> {
+    async getPosts(data: GetManyPostsDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<{posts: Posts[]}> {
         const criteria: any = {}
-
+        
         if(data.ids) {
             criteria.id = In(data.ids)
             delete data.ids
         }
-
-        return await this.postService.find({...data, ...criteria})
+        
+        return {posts: await this.postService.find({...data, ...criteria}, {take: data.take, skip: data.skip})}
     }
 }

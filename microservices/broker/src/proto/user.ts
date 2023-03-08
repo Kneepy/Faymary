@@ -40,7 +40,7 @@ export interface FollowUserDTO {
 }
 
 export interface FindUsersDTO {
-  take?: number | undefined;
+  addSubs?: boolean | undefined;
   email?: string | undefined;
   username?: string | undefined;
   lastName?: string | undefined;
@@ -49,7 +49,7 @@ export interface FindUsersDTO {
   subscriptions?: User | undefined;
   state?: UserState | undefined;
   skip?: number | undefined;
-  addSubs?: boolean | undefined;
+  take?: number | undefined;
 }
 
 export interface UserIsFollowResult {

@@ -39,6 +39,8 @@ message GetManyPostsDTO {
     optional string title = 2;
     optional string ids = 3;
     optional string desc = 4;
+    int32 take = 5;
+    int32 skip = 6;
 }
 
 message Post {

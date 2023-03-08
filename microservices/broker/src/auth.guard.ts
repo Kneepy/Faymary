@@ -13,12 +13,13 @@ export class AuthGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: ICustomRequest = context.switchToHttp().getRequest();
+        
         if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
         else {
             const accessToken = request.headers.authorization
             const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
-            if(!refreshToken) throw UnauthorizedException
+            if(!refreshToken) throw new UnauthorizedException
             else {
                 const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
                 const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
