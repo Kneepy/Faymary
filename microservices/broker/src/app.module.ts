@@ -1,3 +1,4 @@
+import { CommentsGateway, ServerGateway } from './gateways';
 import { Module } from '@nestjs/common';
 import { ClientsModule} from "@nestjs/microservices";
 import {
@@ -13,16 +14,18 @@ import {
     StoreClientDependency, StoriesClient, StoriesClientDependency, UsersClient,
     UsersClientDependency
 } from './app-clients.providers';
-import {PostController, UserController} from "./controllers";
+import {PostController, StoriesController, UserController} from "./controllers";
 import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
+
+const Gateways = [CommentsGateway, ServerGateway]
 
 @Module({
     imports: [
         ClientsModule.register([LikesClientDependency, UsersClientDependency, StoreClientDependency, SessionClientDependency, PostClientDependency, NotificationsClientDependency, MessagesClientDependency, DialogsClientDependency, StoriesClientDependency, CommentsClientDependency, MailClientDependency])
     ],
-    controllers: [UserController, PostController],
+    controllers: [UserController, PostController, StoriesController],
     providers: [
         {
             provide: APP_FILTER,
@@ -32,7 +35,8 @@ import { AuthGuard } from './auth.guard';
             provide: APP_GUARD,
             useClass: AuthGuard
         },
-        LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient
+        LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient,
+        ...Gateways
     ]
 })
 export class AppModule {}

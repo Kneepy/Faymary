@@ -47,7 +47,7 @@ message Post {
     string id = 1;
     string user_id = 2;
     string title = 3;
-    int32 createdAt = 4;
+    string createdAt = 4;
     string desc = 5;
     string file_ids = 6;
 }

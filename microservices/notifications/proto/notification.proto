@@ -13,7 +13,7 @@ message Notification {
     string item_id = 3;
     string to_id = 4;
     string from_id = 5;
-    int32 createdAt = 6;
+    string createdAt = 6;
 }
 
 message NotificationGetDTO {

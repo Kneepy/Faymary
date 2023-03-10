@@ -7,12 +7,12 @@ import { CreateStoryDTO, MarkType, StoriesServiceClient, Story, UpdateStoryDTO, 
 import { ICustomRequest } from "src/types/request.type";
 import { DisableAuth } from 'src/disable-auth.decorator';
 
-@Controller()
+@Controller("story")
 export class StoriesController {
     constructor(
-        @Inject(STORIES_MODULE_CONFIG) private storiesService: StoriesServiceClient,
-        @Inject(POST_MODULE_CONFIG) private postService: PostServiceClient,
-        @Inject(USER_MODULE_CONFIG) private userService: UserServiceClient,
+        @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
+        @Inject(POST_MODULE_CONFIG.PROVIDER) private postService: PostServiceClient,
+        @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
     ) {}
 
     @Post()
@@ -31,6 +31,7 @@ export class StoriesController {
                 }
             })
         }
+
         return await this.storiesService.createStory({...data, user_id: req.user_id}).toPromise()
     }
 

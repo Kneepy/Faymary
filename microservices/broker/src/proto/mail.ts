@@ -6,8 +6,8 @@ export const protobufPackage = "mail";
 
 export interface AccessCode {
   id: string;
-  createdAt: number;
-  expiresIn: number;
+  createdAt: string;
+  expiresIn: string;
   code: number;
   user_id: string;
 }

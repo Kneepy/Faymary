@@ -24,7 +24,7 @@ export interface Comment {
   user_id: string;
   item_id: string;
   type: CommentType;
-  createdAt: number;
+  createdAt: string;
   state: CommentState;
 }
 

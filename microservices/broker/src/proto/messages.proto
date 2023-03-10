@@ -11,8 +11,8 @@ service MessagesSerivce {
 
 message Get {
     string dialog_id = 1;
-    optional int64 take = 2;
-    optional int64 skip = 3;
+    optional int32 take = 2;
+    optional int32 skip = 3;
 }
 
 message Create {
@@ -43,7 +43,7 @@ message Messages {
     string dialog_id = 4;
     string user_id = 5;
     string message = 6;
-    int64 createdAt = 7;
+    string createdAt = 7;
 }
 
 enum MessagesEnumType {

@@ -22,7 +22,7 @@ export class StoriesController {
     constructor(private storiesService: StoriesService) {}
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.GET_STORIES)
-    async getStories(data: GetStoriesDTO): Promise<Story[]> {
+    async getStories(data: GetStoriesDTO): Promise<{stories: Story[]}> {
         const stories = await this.storiesService.find(
             {
                 user_id: data.user_id
@@ -30,7 +30,7 @@ export class StoriesController {
             { relations: { marks: true } }
         );
 
-        return stories;
+        return {stories};
     }
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.GET_STORY)
@@ -59,6 +59,8 @@ export class StoriesController {
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.UPDATE_STORY)
     async updateStory(data: UpdateStoryDTO): Promise<Story> {
+        if(!data.id) throw StoryNotFound
+
         const story = await this.storiesService.findOne({id: data.id})
 
         if(story.user_id === data.user_id) 

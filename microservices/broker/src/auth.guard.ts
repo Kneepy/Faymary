@@ -26,6 +26,9 @@ export class AuthGuard implements CanActivate {
                 const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
                 const verifedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
 
+                request.headers.refresh_token = tokens.refresh_token
+                request.headers.authorization = tokens.access_token
+
                 if(verifedTokens.user_id !== null) {
                     request.user_id = verifedTokens.user_id
                 }

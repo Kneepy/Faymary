@@ -9,8 +9,8 @@ service MailService {
 
 message AccessCode {
     string id = 1;
-    int64 createdAt = 2;
-    int64 expiresIn = 3;
+    string createdAt = 2;
+    string expiresIn = 3;
     int32 code = 4;
     string user_id = 5;
 }

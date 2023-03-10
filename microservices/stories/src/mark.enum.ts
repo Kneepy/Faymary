@@ -1,5 +1,5 @@
 export enum MarkEnumType {
-    user = "user",
-    post = "post",
-    story = "story"
+    user = 0,
+    story = 1,
+    post = 2
 }

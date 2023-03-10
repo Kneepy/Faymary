@@ -27,7 +27,7 @@ export class UserController {
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient
     ) {}
 
-    @Put("/login")
+    @Put("login")
     @DisableAuth()
     async loginUser(@Body() data: LoginUserDTO, @Req() req: ICustomRequest, @Res({ passthrough: true }) res: Response): Promise<{user_id: string}> {
         const isLogined = await this.userService.loginUser({email: data.email, password: data.password}).toPromise()
@@ -38,7 +38,7 @@ export class UserController {
         } else throw UnauthorizedException
     }
 
-    @Put("/confirm")
+    @Put("confirm")
     @DisableAuth()
     async confirmUser(@Req() req: ICustomRequest, @Res({ passthrough: true }) res: Response, @Query() data: ConfirmAccessCodeDTO): Promise<VerifyTokensDTO> {
         const { isConfirmed } = await this.mailService.confirmAccessCode({user_id: data.user_id, code: data.code}).toPromise()
@@ -63,6 +63,16 @@ export class UserController {
         const code = await (this.mailService.sendAccessCode({user_id: user.id, email: user.email}).toPromise())
 
         return {user_id: user.id}
+    }
+
+    @Post("auth")
+    async getTokensByOldSessionAndAccessToken(@Req() req: ICustomRequest): Promise<VerifyTokensDTO> {
+
+        // получаются из AuthGuard
+        return {
+            refresh_token: req.headers.refresh_token,
+            access_token: req.headers.authorization
+        }
     }
 
     @Get("/me")

@@ -33,7 +33,7 @@ export interface DialogHistory {
   action: DialogActionEnum;
   item_id?: string | undefined;
   desc?: string | undefined;
-  createdAt: number;
+  createdAt: string;
   dialog: Dialog | undefined;
 }
 

@@ -1,3 +1,4 @@
+import { WsAdapter } from '@nestjs/platform-ws';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -9,6 +10,7 @@ import { ICustomRequest } from './types/request.type';
     const app = await NestFactory.create(AppModule);
 
     app.use(cookieParser());
+    app.useWebSocketAdapter(new WsAdapter(app));
 
     app.use((req: ICustomRequest, res, next) => {
         if (req.headers.authorization) {

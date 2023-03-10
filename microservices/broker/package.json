@@ -27,11 +27,15 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/microservices": "^9.3.9",
     "@nestjs/platform-express": "^9.3.9",
+    "@nestjs/platform-ws": "^9.3.9",
+    "@nestjs/websockets": "^9.3.9",
+    "@types/ws": "^8.5.4",
     "cookie-parser": "^1.4.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "ts-proto": "^1.139.0"
+    "ts-proto": "^1.139.0",
+    "ws": "^8.12.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

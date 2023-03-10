@@ -16,7 +16,7 @@ message Comment {
     string user_id = 4;
     string item_id = 5;
     CommentType type = 6;
-    int64 createdAt = 7;
+    string createdAt = 7;
     CommentState state = 8;
 }
 
@@ -45,8 +45,8 @@ message DeleteCommentDTO {
 message GetCommentsDTO {
     string item_id = 1;
     CommentType type = 2;
-    int64 take = 3;
-    int64 skip = 4;
+    int32 take = 3;
+    int32 skip = 4;
 }
 
 message IsDeleted {

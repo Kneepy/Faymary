@@ -17,7 +17,7 @@ export interface Notification {
   item_id: string;
   to_id: string;
   from_id: string;
-  createdAt: number;
+  createdAt: string;
 }
 
 export interface NotificationGetDTO {

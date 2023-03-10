@@ -40,7 +40,7 @@ export interface UpdateStoryDTO {
 export interface Story {
   id: string;
   user_id: string;
-  ctratedAt: number;
+  createdAt: string;
   file_id: string;
   marks: Mark[];
 }

@@ -46,7 +46,7 @@ export interface Messages {
   dialog_id: string;
   user_id: string;
   message: string;
-  createdAt: number;
+  createdAt: string;
 }
 
 export const MESSAGES_PACKAGE_NAME = "messages";

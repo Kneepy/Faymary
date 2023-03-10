@@ -41,7 +41,7 @@ export interface Post {
   id: string;
   user_id: string;
   title: string;
-  createdAt: number;
+  createdAt: string;
   desc: string;
   file_ids: string;
 }

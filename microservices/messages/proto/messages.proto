@@ -43,7 +43,7 @@ message Messages {
     string dialog_id = 4;
     string user_id = 5;
     string message = 6;
-    int32 createdAt = 7;
+    string createdAt = 7;
 }
 
 enum MessagesEnumType {

@@ -29,9 +29,9 @@ export class StoreController {
         return files.map(file => file.savedAs)
     }
 
-    @Get(":filename")
-    async getFiles(@Param("filename") filename: string, @Res() res: ICustomResponse) {
-        const file = await this.storeResource.findOne({filename})
+    @Get(":file_id")
+    async getFiles(@Param("file_id") file_id: string, @Res() res: ICustomResponse) {
+        const file = await this.storeResource.findOne({id: file_id})
 
         if(file) {
             const stream = createReadStream(path.join(STORE_FOLDER_PATH, file.filename + file.extname))
