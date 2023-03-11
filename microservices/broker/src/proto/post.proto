@@ -14,7 +14,7 @@ message PostCreateDTO {
     string user_id = 1;
     optional string title = 2;
     optional string desc = 3;
-    optional string file_ids = 4;
+    repeated string file_ids = 4;
 }
 
 message PostUpdateDTO {
@@ -22,7 +22,7 @@ message PostUpdateDTO {
     string user_id = 2;
     optional string title = 3;
     optional string desc = 4;
-    optional string file_ids = 5;
+    repeated string file_ids = 5;
 }
 
 message PostDeleteDTO {
@@ -49,7 +49,7 @@ message Post {
     string title = 3;
     string createdAt = 4;
     string desc = 5;
-    string file_ids = 6;
+    repeated string file_ids = 6;
 }
 
 message Posts {

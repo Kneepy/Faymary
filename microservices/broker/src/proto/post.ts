@@ -8,7 +8,7 @@ export interface PostCreateDTO {
   user_id: string;
   title?: string | undefined;
   desc?: string | undefined;
-  file_ids?: string | undefined;
+  file_ids: string[];
 }
 
 export interface PostUpdateDTO {
@@ -16,7 +16,7 @@ export interface PostUpdateDTO {
   user_id: string;
   title?: string | undefined;
   desc?: string | undefined;
-  file_ids?: string | undefined;
+  file_ids: string[];
 }
 
 export interface PostDeleteDTO {
@@ -43,7 +43,7 @@ export interface Post {
   title: string;
   createdAt: string;
   desc: string;
-  file_ids: string;
+  file_ids: string[];
 }
 
 export interface Posts {

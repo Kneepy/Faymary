@@ -20,7 +20,7 @@ export enum CommentType {
 export interface Comment {
   id: string;
   msg: string;
-  file_ids: string;
+  file_ids: string[];
   user_id: string;
   item_id: string;
   type: CommentType;
@@ -28,9 +28,17 @@ export interface Comment {
   state: CommentState;
 }
 
+export interface Comments {
+  comments: Comment[];
+}
+
+export interface GetCommentDTO {
+  id: string;
+}
+
 export interface CreateCommentDTO {
   msg: string;
-  file_ids: string;
+  file_ids: string[];
   user_id: string;
   item_id: string;
   type: CommentType;
@@ -39,7 +47,7 @@ export interface CreateCommentDTO {
 export interface UpdateCommentDTO {
   id: string;
   msg: string;
-  file_ids: string;
+  file_ids: string[];
   user_id: string;
   item_id: string;
   type: CommentType;
@@ -48,6 +56,7 @@ export interface UpdateCommentDTO {
 
 export interface DeleteCommentDTO {
   id: string;
+  user_id: string;
 }
 
 export interface GetCommentsDTO {
@@ -70,7 +79,9 @@ export interface CommentsServiceClient {
 
   deleteComment(request: DeleteCommentDTO): Observable<IsDeleted>;
 
-  getComments(request: GetCommentsDTO): Observable<Comment>;
+  getComments(request: GetCommentsDTO): Observable<Comments>;
+
+  getComment(request: GetCommentDTO): Observable<Comment>;
 }
 
 export interface CommentsServiceController {
@@ -80,12 +91,14 @@ export interface CommentsServiceController {
 
   deleteComment(request: DeleteCommentDTO): Observable<IsDeleted>;
 
-  getComments(request: GetCommentsDTO): Observable<Comment>;
+  getComments(request: GetCommentsDTO): Observable<Comments>;
+
+  getComment(request: GetCommentDTO): Observable<Comment>;
 }
 
 export function CommentsServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createComment", "updateComment", "deleteComment", "getComments"];
+    const grpcMethods: string[] = ["createComment", "updateComment", "deleteComment", "getComments", "getComment"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("CommentsService", method)(constructor.prototype[method], method, descriptor);

@@ -20,12 +20,14 @@ import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
 
 const Gateways = [CommentsGateway, ServerGateway]
+const Clients = [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient]
+const Controllers = [UserController, PostController, StoriesController]
 
 @Module({
     imports: [
         ClientsModule.register([LikesClientDependency, UsersClientDependency, StoreClientDependency, SessionClientDependency, PostClientDependency, NotificationsClientDependency, MessagesClientDependency, DialogsClientDependency, StoriesClientDependency, CommentsClientDependency, MailClientDependency])
     ],
-    controllers: [UserController, PostController, StoriesController],
+    controllers: Controllers,
     providers: [
         {
             provide: APP_FILTER,
@@ -35,7 +37,7 @@ const Gateways = [CommentsGateway, ServerGateway]
             provide: APP_GUARD,
             useClass: AuthGuard
         },
-        LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient,
+        ...Clients,
         ...Gateways
     ]
 })

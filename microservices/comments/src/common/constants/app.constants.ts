@@ -20,5 +20,6 @@ export enum COMMENTS_SERVICE_METHODS {
     CREATE_COMMENT = "CreateComment",
     UPDATE_COMMENT = "UpdateComment",
     DELETE_COMMENT = "DeleteComment",
-    GET_COMMENTS_ITEM = "GetComments"
+    GET_COMMENTS_ITEM = "GetComments",
+    GET_COMMENT = "GetComment"
 }

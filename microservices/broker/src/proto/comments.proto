@@ -6,13 +6,14 @@ service CommentsService {
     rpc CreateComment (CreateCommentDTO) returns (stream Comment);
     rpc UpdateComment (UpdateCommentDTO) returns (stream Comment);
     rpc DeleteComment (DeleteCommentDTO) returns (stream IsDeleted);
-    rpc GetComments (GetCommentsDTO) returns (stream Comment);
+    rpc GetComments (GetCommentsDTO) returns (stream Comments);
+    rpc GetComment (GetCommentDTO) returns (stream Comment);
 }
 
 message Comment {
     string id = 1;
     string msg = 2;
-    string file_ids = 3;
+    repeated string file_ids = 3;
     string user_id = 4;
     string item_id = 5;
     CommentType type = 6;
@@ -20,9 +21,17 @@ message Comment {
     CommentState state = 8;
 }
 
+message Comments {
+    repeated Comment comments = 1;
+}
+
+message GetCommentDTO {
+    string id = 1;
+}
+
 message CreateCommentDTO {
     string msg = 1;
-    string file_ids = 2;
+    repeated string file_ids = 2;
     string user_id = 3;
     string item_id = 4;
     CommentType type = 5;
@@ -31,7 +40,7 @@ message CreateCommentDTO {
 message UpdateCommentDTO {
     string id = 1;
     string msg = 2;
-    string file_ids = 3;
+    repeated string file_ids = 3;
     string user_id = 4;
     string item_id = 5;
     CommentType type = 6;
@@ -40,6 +49,7 @@ message UpdateCommentDTO {
 
 message DeleteCommentDTO {
     string id = 1;
+    string user_id = 2;
 }
 
 message GetCommentsDTO {

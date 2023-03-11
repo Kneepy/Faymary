@@ -5,9 +5,10 @@ import { Observable } from "rxjs";
 export const protobufPackage = "notifications";
 
 export enum NotificationEnumType {
-  user = 0,
-  story = 1,
-  post = 2,
+  USER = 0,
+  STORY = 1,
+  POST = 2,
+  COMMENT = 3,
   UNRECOGNIZED = -1,
 }
 
@@ -29,7 +30,7 @@ export interface NotificationGetDTO {
 export interface NotificationCreate {
   from_id: string;
   to_id: string;
-  item_id: string;
+  item_id?: string | undefined;
   type: NotificationEnumType;
 }
 

@@ -1,18 +1,37 @@
+import { WEVENTS } from './events.enum';
+import { NOTIFICATIONS_MODULE_CONFIG } from './../app.constants';
 import { Inject, Injectable } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
+import { NotificationCreate, NotificationsServiceClient, Notification } from 'src/proto/notification';
 
 @Injectable()
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
-        @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient
+        @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
+        @Inject(NOTIFICATIONS_MODULE_CONFIG.PROVIDER) private notificationsService: NotificationsServiceClient
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
+
+    async sendNotification(data: NotificationCreate, event: string): Promise<boolean> {
+        return this.broadcastUser<Notification>(data.to_id, {event, data: await this.notificationsService.createNotification(data).toPromise()})
+    }
+
+
+    // эта штука зменяет нам return из функции т.к пользователь может быть подлюченн к сокетам с разных устройст и об изменениях на одном устройстве должны знать сразу все устройства пользователя
+    async broadcastUser<T>(user_id: string, data: WsResponse<T>): Promise<boolean> {
+        const wsSessions = this.users.get(user_id)
+
+        if(!wsSessions) return false
+        wsSessions.forEach(socket => socket.send(JSON.stringify(data)))
+
+        return true
+    }
 
     async handleConnection(@ConnectedSocket() client: ICustomSocket, ...[args]: [IncomingMessage]) {
         const {session_id, authorization, fingerprint} = args.headers

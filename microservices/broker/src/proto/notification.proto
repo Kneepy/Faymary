@@ -25,12 +25,13 @@ message NotificationGetDTO {
 message NotificationCreate {
     string from_id = 1;
     string to_id = 2;
-    string item_id = 3;
+    optional string item_id = 3;
     NotificationEnumType type = 4;
 }
 
 enum NotificationEnumType {
-    user = 0;
-    story = 1;
-    post = 2;
+    USER = 0;
+    STORY = 1;
+    POST = 2;
+    COMMENT = 3;
 }

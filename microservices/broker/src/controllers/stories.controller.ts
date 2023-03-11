@@ -28,6 +28,7 @@ export class StoriesController {
                         break
                     case MarkType.user:
                         if(!(await this.userService.findUser({id: mark.item_id}).toPromise())) throw NotFoundException
+                        break
                 }
             })
         }

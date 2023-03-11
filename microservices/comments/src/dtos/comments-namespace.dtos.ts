@@ -19,8 +19,9 @@ export namespace CommentDTOs {
         file_ids: string;
     }
 
-    export class DeleteCommentDTO implements Pick<Comments, "id"> {
+    export class DeleteCommentDTO implements Pick<Comments, "id" | "user_id"> {
         id: string;
+        user_id: string
     }
 
     export class GetCommentsDTO implements Pick<Comments, "type" | "item_id"> {
@@ -28,5 +29,9 @@ export namespace CommentDTOs {
         type: CommentTypeEnum;
         take: number
         skip: number
+    }
+
+    export class GetCommentDTO implements Pick<Comments, "id"> {
+        id: string;
     }
 }

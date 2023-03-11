@@ -9,9 +9,9 @@ export class Comments {
     @Column()
     msg: string
 
-    @Column({nullable: true})
+    @Column({nullable: true, type: "string"})
     file_ids: string
-
+    
     @Column()
     user_id: string
 

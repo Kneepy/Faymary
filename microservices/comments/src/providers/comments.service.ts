@@ -24,10 +24,7 @@ export class CommentsService {
         return await this.repository.findOne({where: criterias})
     }
 
-    async find(criterias: CommentType.FindManyCommentsInterface, otherOpt: Omit<FindManyOptions<Comments>, "where">): Promise<Comments[]> {
-        otherOpt.take = otherOpt.take ?? DEFAULT_TAKE_COMMENTS
-        otherOpt.skip = otherOpt.skip ?? DEFAULT_SKIP_COMMENTS
-
+    async find(criterias: CommentType.FindManyCommentsInterface, otherOpt: Omit<FindManyOptions<Comments>, "where"> = {take: DEFAULT_TAKE_COMMENTS, skip: DEFAULT_SKIP_COMMENTS}): Promise<Comments[]> {
         return await this.repository.find({where: criterias, ...otherOpt})
     }
 

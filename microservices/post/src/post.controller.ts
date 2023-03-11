@@ -53,8 +53,13 @@ export class PostsController {
     }
 
     @GrpcMethod(MODULE_SERVICE_NAME, MODULE_SERVICE_METHODS.GET_POST)
-    async getPost(data: GetOnePostDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Posts | {}> {
-        return await this.postService.findOne(data) ?? {}
+    async getPost(data: GetOnePostDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Posts> {
+        if(!data.id) throw POST_NOT_FOUND
+
+        const post = await this.postService.findOne(data)
+        post.file_ids = this.postService.getFileIds(post.file_ids) as any
+
+        return post
     }
 
     @GrpcMethod(MODULE_SERVICE_NAME, MODULE_SERVICE_METHODS.GET_POSTS)
@@ -65,7 +70,11 @@ export class PostsController {
             criteria.id = In(data.ids)
             delete data.ids
         }
+        if(Array.isArray(data.file_ids)) data.file_ids = this.postService.joinFileIds(data.file_ids)
+
+        const posts = await this.postService.find({...data, ...criteria}, {take: data.take, skip: data.skip})
+        posts.forEach(post => post.file_ids = this.postService.getFileIds(post.file_ids) as any)
         
-        return {posts: await this.postService.find({...data, ...criteria}, {take: data.take, skip: data.skip})}
+        return {posts: posts}
     }
 }

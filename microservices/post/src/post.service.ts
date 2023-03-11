@@ -35,10 +35,10 @@ export class PostsService {
     }
 
     getFileIds(file_ids: string): string[] {
-        return file_ids.split(",")
+        return file_ids?.split(",")
     }
 
     joinFileIds(file_ids: string[]): string {
-        return file_ids.join(",")
+        return file_ids?.join(",")
     }
 }

@@ -5,6 +5,7 @@ import {
     FileNotFound,
     STORIES_SERVICE,
     STORIES_SERVICE_METHODS,
+    STORY_EXPIRES_AFTER,
     UserDoesNotMatch
 } from "src/constants";
 import {
@@ -16,6 +17,7 @@ import {
 } from "src/dtos";
 import { Story } from "src/entities";
 import { StoriesService } from "src/providers";
+import { Raw } from 'typeorm';
 
 @Controller()
 export class StoriesController {
@@ -25,7 +27,12 @@ export class StoriesController {
     async getStories(data: GetStoriesDTO): Promise<{stories: Story[]}> {
         const stories = await this.storiesService.find(
             {
-                user_id: data.user_id
+                user_id: data.user_id,
+
+                // получение только историй выложенных в течении одного дня
+                createdAt: Raw(
+                    alias => `${alias} < ${alias} + ${STORY_EXPIRES_AFTER}`
+                )
             },
             { relations: { marks: true } }
         );
