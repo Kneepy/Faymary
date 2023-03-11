@@ -60,5 +60,4 @@ export const GetClientProvider = <T>(moduleConfig: ConfigModule): FactoryProvide
 /*
     @returns путь к соответсутвуещему прото-файлу   
 */
-
 export const GetProtoPath = (protoFileName: string) => path.join(process.cwd(), `src/proto/${protoFileName}.proto`)

@@ -68,7 +68,7 @@ export class UserController {
     @Post("auth")
     async getTokensByOldSessionAndAccessToken(@Req() req: ICustomRequest): Promise<VerifyTokensDTO> {
 
-        // получаются из AuthGuard
+        // получаются при применении к этому маршруту AuthGuard
         return {
             refresh_token: req.headers.refresh_token,
             access_token: req.headers.authorization
