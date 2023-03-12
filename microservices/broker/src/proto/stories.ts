@@ -5,9 +5,9 @@ import { Observable } from "rxjs";
 export const protobufPackage = "stories";
 
 export enum MarkType {
-  user = 0,
-  story = 1,
-  post = 2,
+  USER = 0,
+  STORY = 1,
+  POST = 2,
   UNRECOGNIZED = -1,
 }
 

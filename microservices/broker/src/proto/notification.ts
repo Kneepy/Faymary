@@ -17,6 +17,8 @@ export interface Notification {
   type: NotificationEnumType;
   item_id: string;
   to_id: string;
+  parent_id: string;
+  parent_type: NotificationEnumType;
   from_id: string;
   createdAt: string;
 }
@@ -32,6 +34,8 @@ export interface NotificationCreate {
   to_id: string;
   item_id?: string | undefined;
   type: NotificationEnumType;
+  parent_id: string;
+  parent_type: NotificationEnumType;
 }
 
 export const NOTIFICATIONS_PACKAGE_NAME = "notifications";

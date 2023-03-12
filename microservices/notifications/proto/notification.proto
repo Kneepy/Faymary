@@ -12,8 +12,10 @@ message Notification {
     NotificationEnumType type = 2;
     string item_id = 3;
     string to_id = 4;
-    string from_id = 5;
-    string createdAt = 6;
+    string parent_id = 5;
+    NotificationEnumType parent_type = 6;
+    string from_id = 7;
+    string createdAt = 8;
 }
 
 message NotificationGetDTO {
@@ -27,6 +29,8 @@ message NotificationCreate {
     string to_id = 2;
     optional string item_id = 3;
     NotificationEnumType type = 4;
+    string parent_id = 5;
+    NotificationEnumType parent_type = 6;
 }
 
 enum NotificationEnumType {

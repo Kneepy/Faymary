@@ -1,3 +1,5 @@
 export enum CommentTypeEnum {
-    POST = 0, STORY = 1, COMMENT = 2,
+    STORY = 1,
+    POST = 2,
+    COMMENT = 3,
 }

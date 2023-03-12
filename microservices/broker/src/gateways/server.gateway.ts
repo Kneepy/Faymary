@@ -1,13 +1,17 @@
 import { UseFilters } from '@nestjs/common';
-import { NOTIFICATIONS_MODULE_CONFIG } from '../constants/app.constants';
+import { COMMENTS_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
-import { NotificationCreate, NotificationsServiceClient, Notification } from 'src/proto/notification';
+import { NotificationCreate, NotificationsServiceClient, Notification, NotificationEnumType } from 'src/proto/notification';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
+import { CommentsServiceClient } from 'src/proto/comments';
+import { PostServiceClient } from 'src/proto/post';
+import { StoriesServiceClient } from 'src/proto/stories';
+import { UserServiceClient } from 'src/proto/user';
 
 @Injectable()
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
@@ -15,12 +19,34 @@ import { WsExceptionFilter } from './filters/ws-exception.filter';
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
-        @Inject(NOTIFICATIONS_MODULE_CONFIG.PROVIDER) private notificationsService: NotificationsServiceClient
+        @Inject(NOTIFICATIONS_MODULE_CONFIG.PROVIDER) private notificationsService: NotificationsServiceClient,
+        @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,
+        @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
+        @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
+        @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
 
     async sendNotification(data: NotificationCreate, event: string): Promise<boolean> {
+        /**
+         * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
+         * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
+        */
+        switch (data.parent_type) {
+            case NotificationEnumType.COMMENT: 
+                data.to_id = (await this.commentsService.getComment({id: data.parent_id}).toPromise()).user_id
+                break
+            case NotificationEnumType.POST: 
+                data.to_id = (await this.postsService.getPost({id: data.parent_id}).toPromise()).user_id
+                break
+            case NotificationEnumType.STORY: 
+                data.to_id = (await this.storiesService.getStory({id: data.parent_id}).toPromise()).user_id
+                break
+            case NotificationEnumType.USER: 
+                data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
+        }
+
         if(data.to_id !== data.from_id) {
             return this.broadcastUser<Notification>(data.to_id, {event, data: await this.notificationsService.createNotification(data).toPromise()})
         }

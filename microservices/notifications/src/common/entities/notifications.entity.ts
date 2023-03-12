@@ -6,11 +6,29 @@ export class Notifications {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    /**
+     * id элемента который добавили к какой либо записи
+    */
+    @Column()
+    item_id: string;
+
+    /**
+     * тип элемента который добавили к какой либо записи
+    */
     @Column()
     type: NotificationEnumType;
 
+    /**
+     * id элемента к которому добавили какую либо запись
+    */
     @Column()
-    item_id: string;
+    parent_id: string
+
+    /**
+     * тип элемента к которому добавили какую либо запись
+    */
+    @Column()
+    parent_type: NotificationEnumType
 
     @Column()
     to_id: string;

@@ -1,6 +1,7 @@
 export enum MessagesEnumType {
-    user = "user",
-    post = "post",
-    story = "story",
-    messages = "messages"
+    USER = 0,
+    STORY = 1,
+    POST = 2,
+    COMMENT = 3,
+    MESSAGE = 4
 }

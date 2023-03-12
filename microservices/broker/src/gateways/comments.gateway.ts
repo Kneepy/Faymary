@@ -19,27 +19,17 @@ import { WsExceptionFilter } from './filters/ws-exception.filter';
 export class CommentsGateway {
     constructor(
         @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,
-        @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
-        @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
         private serverGateway: ServerGateway
     ) {}
 
     @SubscribeMessage(WEVENTS.COMMENTS.CREATE)
     async createComment(@MessageBody() data: Omit<CreateCommentDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
         const comment = await this.commentsService.createComment({...data, user_id}).toPromise()
-        const notificationData: NotificationCreate = {from_id: user_id, type: NotificationEnumType.COMMENT, item_id: comment.id, to_id: null}
 
-        switch (comment.type) {
-            case CommentType.COMMENT: 
-                notificationData.to_id = (await this.commentsService.getComment({id: comment.item_id}).toPromise()).user_id
-                break
-            case CommentType.POST: 
-                notificationData.to_id = (await this.postsService.getPost({id: comment.item_id}).toPromise()).user_id
-                break
-            case CommentType.STORY: 
-                notificationData.to_id = (await this.storiesService.getStory({id: comment.item_id}).toPromise()).user_id
-                break
-        }
+        /**
+         * Могу себе позволить создавать такие штуки т.к все enum'ы типов записей (post, user, story и т.п) должны быть одинаковыми на всех микросервисах
+         */
+        const notificationData: NotificationCreate = {from_id: user_id, type: NotificationEnumType.COMMENT, item_id: comment.id, to_id: null, parent_type: comment.type as any, parent_id: comment.item_id}
 
         this.serverGateway.sendNotification(notificationData, WEVENTS.NOTIFICATIONS_TYPE.CREATE_COMMENT)
         this.serverGateway.broadcastUser(user_id, {

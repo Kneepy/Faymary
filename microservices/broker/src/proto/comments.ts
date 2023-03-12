@@ -11,9 +11,10 @@ export enum CommentState {
 }
 
 export enum CommentType {
-  POST = 0,
+  USER = 0,
   STORY = 1,
-  COMMENT = 2,
+  POST = 2,
+  COMMENT = 3,
   UNRECOGNIZED = -1,
 }
 

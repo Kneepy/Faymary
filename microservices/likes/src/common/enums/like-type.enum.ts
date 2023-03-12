@@ -1,3 +1,7 @@
 export enum LikeTypeEnum {
-    POST = 0, COMMENT = 1, STORY = 2, MESSAGE = 3
+    USER = 0,
+    STORY = 1,
+    POST = 2,
+    COMMENT = 3,
+    MESSAGE = 4
 }

@@ -34,13 +34,14 @@ export class NotificationController {
     async createNotification(
         data: NotificationCreateDTO
     ): Promise<Notifications> {
-        console.log(data)
-        if (!data.from_id || !data.to_id || !data.type) {
+        if (!data.from_id || !data.to_id || !data.type || !data.parent_id || !data.parent_type) {
             throw ImpossibleCreateNotification;
         } else {
             const existNotification = await this.notificationService.findOne({
                 from_id: data.from_id,
                 type: data.type,
+                parent_id: data.parent_id,
+                parent_type: data.parent_type,
                 createdAt: Raw(
                     alias => `${Date.now()} >= ${alias} + ${NOTIFICATION_LIFETIME}`
                 ) as FindOperator<any>
@@ -52,8 +53,8 @@ export class NotificationController {
                 return updatedNotification
             }
             else {
-                const {from_id, type, to_id, item_id} = data
-                const newNotification = await this.notificationService.create({from_id, type, to_id, item_id})
+                const {from_id, type, to_id, item_id, parent_id, parent_type} = data
+                const newNotification = await this.notificationService.create({from_id, type, to_id, item_id, parent_id, parent_type})
 
                 return newNotification
             }

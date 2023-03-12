@@ -5,10 +5,11 @@ import { Observable } from "rxjs";
 export const protobufPackage = "messages";
 
 export enum MessagesEnumType {
-  user = 0,
-  post = 1,
-  story = 2,
-  messages = 3,
+  USER = 0,
+  STORY = 1,
+  POST = 2,
+  COMMENT = 3,
+  MESSAGE = 4,
   UNRECOGNIZED = -1,
 }
 
