@@ -34,6 +34,7 @@ export class NotificationController {
     async createNotification(
         data: NotificationCreateDTO
     ): Promise<Notifications> {
+        console.log(data)
         if (!data.from_id || !data.to_id || !data.type) {
             throw ImpossibleCreateNotification;
         } else {

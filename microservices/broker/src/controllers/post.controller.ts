@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Query, Req } from '@nestjs/common';
 import { PostCreateDTO, PostServiceClient, Post as PostEntity, Posts as PostsEntity, PostUpdateDTO, GetManyPostsDTO, GetOnePostDTO, PostDeleteDTO } from './../proto/post';
-import { POST_MODULE_CONFIG } from './../app.constants';
+import { POST_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject, Post } from '@nestjs/common';
 import { ICustomRequest } from 'src/types/request.type';
 import { DisableAuth } from 'src/disable-auth.decorator';

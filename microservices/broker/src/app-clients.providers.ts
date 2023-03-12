@@ -7,7 +7,7 @@ import {
     SESSION_MODULE_CONFIG,
     STORE_MODULE_CONFIG, STORIES_MODULE_CONFIG,
     USER_MODULE_CONFIG
-} from "./app.constants";
+} from "./constants/app.constants";
 import { CommentsServiceClient } from "./proto/comments";
 import { DialogsServiceClient } from "./proto/dialogs";
 import {LikesServiceClient} from "./proto/likes";

@@ -1,15 +1,17 @@
-import { WEVENTS } from './events.enum';
-import { NOTIFICATIONS_MODULE_CONFIG } from './../app.constants';
+import { UseFilters } from '@nestjs/common';
+import { NOTIFICATIONS_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject, Injectable } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
-import { SESSION_MODULE_CONFIG } from 'src/app.constants';
+import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
 import { NotificationCreate, NotificationsServiceClient, Notification } from 'src/proto/notification';
+import { WsExceptionFilter } from './filters/ws-exception.filter';
 
 @Injectable()
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
+@UseFilters(WsExceptionFilter)
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
@@ -19,11 +21,14 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
 
     async sendNotification(data: NotificationCreate, event: string): Promise<boolean> {
-        return this.broadcastUser<Notification>(data.to_id, {event, data: await this.notificationsService.createNotification(data).toPromise()})
+        if(data.to_id !== data.from_id) {
+            return this.broadcastUser<Notification>(data.to_id, {event, data: await this.notificationsService.createNotification(data).toPromise()})
+        }
     }
 
-
-    // эта штука зменяет нам return из функции т.к пользователь может быть подлюченн к сокетам с разных устройст и об изменениях на одном устройстве должны знать сразу все устройства пользователя
+    /*
+        эта штука зменяет нам return из функции т.к пользователь может быть подлюченн к сокетам с разных устройст и об изменениях на одном устройстве должны знать сразу все устройства пользователя
+    */
     async broadcastUser<T>(user_id: string, data: WsResponse<T>): Promise<boolean> {
         const wsSessions = this.users.get(user_id)
 
@@ -35,6 +40,13 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     async handleConnection(@ConnectedSocket() client: ICustomSocket, ...[args]: [IncomingMessage]) {
         const {session_id, authorization, fingerprint} = args.headers
+
+        // если токены не переданы то закрываем соединение
+        if(!authorization || !session_id || !fingerprint) {
+            client.close()
+            return false
+        }
+
         const access_token = authorization.trim().split(" ")[1] ?? authorization  
         const tokens = await this.sessionService.generateTokensBySession({
             access_token, refresh_token: session_id as string,
@@ -54,6 +66,6 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleDisconnect(@ConnectedSocket() client: ICustomSocket) {
-        this.users.get(client.user_id).delete(client.session_id)
+        this.users.get(client.user_id)?.delete(client.session_id)
     }
 }

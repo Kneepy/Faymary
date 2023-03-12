@@ -20,7 +20,7 @@ import {CommentsService} from "./providers";
             username: MYSQL_USER,
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
-            entities: [],
+            entities: [Comments],
             synchronize: true
         }),
         TypeOrmModule.forFeature([Comments])

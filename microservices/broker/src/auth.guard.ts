@@ -1,8 +1,9 @@
 import { Reflector } from '@nestjs/core';
-import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
-import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./app.constants";
+import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
+import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./constants/app.constants";
 import { SessionServiceClient } from "./proto/session";
 import { ICustomRequest } from './types/request.type';
+import { UnautorizedError } from './constants/errors.constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -13,13 +14,13 @@ export class AuthGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: ICustomRequest = context.switchToHttp().getRequest();
-        
+
         if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
         else {
             const accessToken = request.headers.authorization
             const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
-            if(!refreshToken) throw new UnauthorizedException
+            if(!refreshToken) throw UnautorizedError
             else {
                 const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
                 const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}

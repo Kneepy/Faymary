@@ -1,3 +1,4 @@
+import { NotEnoughParms } from './../common/constants/errors.constants';
 import {CommentsService} from "../providers";
 import {Controller} from "@nestjs/common";
 import {GrpcMethod} from "@nestjs/microservices";
@@ -12,7 +13,11 @@ export class CommentsController {
     async createComment(data: CommentDTOs.CreateCommentDTO): Promise<Comments> {
         if(Array.isArray(data.file_ids)) data.file_ids = data.file_ids.join(",")
 
-        return await this.commentsService.create(data)
+        const comment = await this.commentsService.create(data)
+
+        comment.file_ids = comment.file_ids?.split(",") as any
+
+        return comment
     }
 
     @GrpcMethod(COMMENTS_SERVICE_NAME, COMMENTS_SERVICE_METHODS.UPDATE_COMMENT)
@@ -40,6 +45,8 @@ export class CommentsController {
 
     @GrpcMethod(COMMENTS_SERVICE_NAME, COMMENTS_SERVICE_METHODS.GET_COMMENTS_ITEM)
     async getCommentsByTypeAndItem({skip, take, item_id, type}: CommentDTOs.GetCommentsDTO): Promise<{comments: Comments[]}> {
+        if(!type || !item_id) throw NotEnoughParms
+
         const comments = await this.commentsService.find({type, item_id}, {skip, take})
         comments.forEach(comment => comment.file_ids = comment.file_ids?.split(",") as any)
 

@@ -1,4 +1,4 @@
-import {GetModuleConfig, GetProtoPath} from "./app-clients.utils";
+import {GetModuleConfig, GetProtoPath} from "../app-clients.utils";
 
 export const APP_PORT = 5000;
 

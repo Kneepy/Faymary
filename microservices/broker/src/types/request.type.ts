@@ -1,7 +1,7 @@
-import { Request } from 'express';
+import { FastifyRequest } from 'fastify';
 
 
-export interface ICustomRequest extends Request {
+export interface ICustomRequest extends FastifyRequest {
     headers: {
         fingerprint: string
         authorization: string

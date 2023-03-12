@@ -11,7 +11,7 @@ import {
     Res,
     UnauthorizedException,
 } from "@nestjs/common";
-import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/app.constants";
+import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
 import {Response} from "express"
 import {CreateUserDTO, FindFollowersDTO, FindUserDTO, FollowUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowDTO, UserIsFollowResult, Users, UserServiceClient, UsersIsFollowDTO, UserState} from "src/proto/user";

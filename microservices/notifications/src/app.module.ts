@@ -21,7 +21,7 @@ import { NotificationController } from "./controllers";
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [Notifications],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Notifications])
     ],

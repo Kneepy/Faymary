@@ -1,16 +1,21 @@
+import { WebSocketGateway } from '@nestjs/websockets';
+import { UseFilters } from '@nestjs/common';
 import { StoriesServiceClient } from 'src/proto/stories';
-import { STORIES_MODULE_CONFIG } from 'src/app.constants';
+import { STORIES_MODULE_CONFIG } from 'src/constants/app.constants';
 import { PostServiceClient } from './../proto/post';
-import { COMMENTS_MODULE_CONFIG, POST_MODULE_CONFIG } from './../app.constants';
+import { COMMENTS_MODULE_CONFIG, POST_MODULE_CONFIG } from '../constants/app.constants';
 import { ConnectedSocket, MessageBody, SubscribeMessage } from '@nestjs/websockets';
 import { Inject, Injectable } from '@nestjs/common';
-import { CommentsServiceClient, CreateCommentDTO, Comment, UpdateCommentDTO, Comments, GetCommentsDTO, DeleteCommentDTO, IsDeleted, CommentType } from 'src/proto/comments';
+import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO, CommentType } from 'src/proto/comments';
 import { ICustomSocket } from './types/socket.type';
-import { WEVENTS } from './events.enum';
+import { WEVENTS } from './enums/events.enum';
 import { ServerGateway } from './server.gateway';
 import { NotificationCreate, NotificationEnumType } from 'src/proto/notification';
+import { WsExceptionFilter } from './filters/ws-exception.filter';
 
 @Injectable()
+@UseFilters(WsExceptionFilter)
+@WebSocketGateway()
 export class CommentsGateway {
     constructor(
         @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,
@@ -22,7 +27,7 @@ export class CommentsGateway {
     @SubscribeMessage(WEVENTS.COMMENTS.CREATE)
     async createComment(@MessageBody() data: Omit<CreateCommentDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
         const comment = await this.commentsService.createComment({...data, user_id}).toPromise()
-        const notificationData: NotificationCreate = {from_id: user_id, type: NotificationEnumType.COMMENT, to_id: null}
+        const notificationData: NotificationCreate = {from_id: user_id, type: NotificationEnumType.COMMENT, item_id: comment.id, to_id: null}
 
         switch (comment.type) {
             case CommentType.COMMENT: 

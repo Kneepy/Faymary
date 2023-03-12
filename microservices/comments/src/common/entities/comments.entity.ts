@@ -9,7 +9,7 @@ export class Comments {
     @Column()
     msg: string
 
-    @Column({nullable: true, type: "string"})
+    @Column({nullable: true})
     file_ids: string
     
     @Column()

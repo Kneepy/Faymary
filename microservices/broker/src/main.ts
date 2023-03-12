@@ -2,16 +2,15 @@ import { WsAdapter } from '@nestjs/platform-ws';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {APP_PORT} from "./app.constants";
-import * as cookieParser from "cookie-parser"
+import {APP_PORT} from "./constants/app.constants";
 import { ICustomRequest } from './types/request.type';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import fastifyCookie from '@fastify/cookie';
 
 (async () => {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
-    app.use(cookieParser());
     app.useWebSocketAdapter(new WsAdapter(app));
-
     app.use((req: ICustomRequest, res, next) => {
         if (req.headers.authorization) {
             const authorizationHeader = req.headers.authorization.split(" ");
@@ -27,6 +26,7 @@ import { ICustomRequest } from './types/request.type';
         }
         next();
     });
+    await app.register(fastifyCookie)
 
     await app.listen(APP_PORT);
     Logger.log("Broker service successfully started")
