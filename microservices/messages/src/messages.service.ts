@@ -4,12 +4,12 @@ import {
     MessageFindManyInterface,
     MessageFindOneInterface,
     MessageUpdateInterface
-} from "../interfaces";
+} from "./interfaces";
 import {
     DEFAULT_SKIP_MESSAGES,
     DEFAULT_TAKE_MESSAGES,
     Messages
-} from "../common";
+} from "./common";
 import { Injectable } from "@nestjs/common";
 import { FindManyOptions, Repository } from "typeorm";
 

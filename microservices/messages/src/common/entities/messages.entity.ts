@@ -19,7 +19,7 @@ export class Messages {
     user_id: string;
 
     @Column()
-    message: string;
+    msg: string;
 
     @Column({ type: "bigint" })
     createdAt: number;

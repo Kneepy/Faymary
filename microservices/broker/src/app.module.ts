@@ -1,4 +1,4 @@
-import { CommentsGateway, ServerGateway } from './gateways';
+import { CommentsGateway, DialogsGateway, ServerGateway } from './gateways';
 import { Module } from '@nestjs/common';
 import { ClientsModule} from "@nestjs/microservices";
 import {
@@ -19,7 +19,7 @@ import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
 
-const Gateways = [CommentsGateway, ServerGateway]
+const Gateways = [CommentsGateway, ServerGateway, DialogsGateway]
 const Clients = [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient]
 const Controllers = [UserController, PostController, StoriesController, CommentsController]
 

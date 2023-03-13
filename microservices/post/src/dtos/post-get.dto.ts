@@ -1,10 +1,11 @@
 import { Posts } from "src/entities"
 
 export class GetManyPostsDTO implements Omit<Posts, "id" | "createdAt"> {
-    file_ids: string
-    desc: string
-    title: string
     user_id: string
+    file_ids: string
+    msg: string
+
+    // other fields
     ids: string[]
     take: number
     skip: number

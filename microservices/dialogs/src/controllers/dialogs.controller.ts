@@ -2,12 +2,13 @@ import {Controller} from "@nestjs/common";
 import {GrpcMethod} from "@nestjs/microservices";
 import {
     DialogActionEnum,
-    DialogHistory,
     Dialogs,
     DIALOGS_SERVICE_METHODS,
     DIALOGS_SERVICE_NAME,
     ImpossibleAddUserDialog,
     InsufficientRightToMoveDialog,
+    ModifiedDialog,
+    ModifiedDialogHistory,
     NotFoundDialog,
     NotFoundUserDialogs
 } from "src/common";
@@ -29,11 +30,11 @@ export class DialogsController {
     constructor(private dialogsService: DialogsService) {}
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.ADD_USER_TO_DIALOG)
-    async addUserToDialog(data: AddUserDialogDTO): Promise<DialogHistory> {
+    async addUserToDialog(data: AddUserDialogDTO): Promise<ModifiedDialogHistory> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
         if(dialog) {
-            const historyNote = await this.dialogsService.createHistoryNote({dialog, user_id: data.user_id, action: DialogActionEnum.ADD_USER, item_id: data.who_adds_id})
+            const historyNote = await this.dialogsService.createHistoryNote({dialog: dialog, user_id: data.user_id, action: DialogActionEnum.ADD_USER, item_id: data.who_adds_id})
 
             if(await this.dialogsService.addUserDialog(dialog.id, data.who_adds_id))
                 return historyNote
@@ -42,54 +43,51 @@ export class DialogsController {
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CREATE_DIALOG)
-    async createDialog(data: CreateDialogDTO): Promise<Dialogs> {
-        if(!Array.isArray(data.user_ids)) {
-            data.user_ids = this.dialogsService.getUserIds(data.user_ids)
-        }
-        data.user_ids.push(data.creator_id)
-        data.user_ids = this.dialogsService.joinUserIds(data.user_ids)
-
-        const dialog = await this.dialogsService.create({user_ids: (data.user_ids) as string, creator_id: data.creator_id})
-        const historyNotes = await this.dialogsService.createHistoryNote({dialog, user_id: data.creator_id, action: DialogActionEnum.CREATE_DIALOG})
+    async createDialog({user_ids, creators_ids}: CreateDialogDTO): Promise<ModifiedDialog> {
+        const dialog = await this.dialogsService.create({user_ids, creators_ids})
+        const historyNotes = await this.dialogsService.createHistoryNote({dialog, user_id: creators_ids[0], action: DialogActionEnum.CREATE_DIALOG})
 
         return dialog
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_DIALOG)
-    async getDialog(data: GetDialogDTO): Promise<Dialogs> {
-        if(!data.dialog_id)
-            throw NotFoundDialog
+    async getDialog(data: GetDialogDTO): Promise<ModifiedDialog> {
+        const dialog = await this.dialogsService.findOne({id: data.id})
 
-        return await this.dialogsService.findOne({id: data.dialog_id})
+        if(!data.id && !dialog) throw NotFoundDialog
+
+        return dialog
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_ALL_USER_DIALOGS)
     async getUserDialogs({take, skip, ...data}: GetUserDialogsDTO): Promise<Dialogs[]> {
-        if(!data.user_id)
+        const dialogs = await this.dialogsService.findByUserId({user_id: data.user_id}, {take, skip});
+
+        if(!data.user_id && !dialogs.length)
             throw NotFoundUserDialogs
 
-        return await this.dialogsService.findByUserId({user_id: data.user_id}, {take, skip})
+        return dialogs
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.DELETE_DILAOG)
     async deleteDialog(data: DeleteDialogDTO): Promise<any> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
-        if(data.user_id === dialog.creator_id && dialog) {
+        if(dialog.creators_ids.includes(data.user_id) && dialog) {
             return await this.dialogsService.remove(dialog.id)
         } else throw InsufficientRightToMoveDialog
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.REMOVE_USER_DIALOG)
-    async deleteUserFromDialog(data: DeleteUserDialogDTO): Promise<Dialogs> {
+    async deleteUserFromDialog(data: DeleteUserDialogDTO): Promise<ModifiedDialog> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
+        const userIncludeIndex = dialog.user_ids.indexOf(data.delete_id)
 
-        if(dialog) {
-            if(dialog.creator_id === data.user_id) {
-                const userIds = this.dialogsService.getUserIds(dialog.user_ids)
+        if(dialog && userIncludeIndex !== -1) {
+            if(dialog.creators_ids.includes(data.user_id)) {
                 const historyNote = await this.dialogsService.createHistoryNote({dialog, item_id: data.delete_id, action: DialogActionEnum.REMOVE_USER, user_id: data.user_id})
 
-                dialog.user_ids = this.dialogsService.joinUserIds(userIds.splice(userIds.indexOf(data.delete_id), 1))
+                dialog.user_ids = dialog.user_ids.splice(userIncludeIndex, 1)
 
                 return await this.dialogsService.update(dialog)
             } else throw InsufficientRightToMoveDialog
@@ -97,7 +95,7 @@ export class DialogsController {
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CHANGE_NAME_DIALOG)
-    async changeNameDialog(data: ChangeNameDialogDTO): Promise<Dialogs> {
+    async changeNameDialog(data: ChangeNameDialogDTO): Promise<ModifiedDialog> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
         if(dialog) {
@@ -110,7 +108,7 @@ export class DialogsController {
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CHANGE_FILE_DIALOG)
-    async changeFileDialog(data: ChangeFileDialogDTO): Promise<Dialogs> {
+    async changeFileDialog(data: ChangeFileDialogDTO): Promise<ModifiedDialog> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
         if(dialog) {
@@ -123,7 +121,7 @@ export class DialogsController {
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_HISTORY_DIALOG)
-    async getHistoryDialog({take, skip, ...data}: GetHistoryDialogDTO): Promise<DialogHistory[]> {
-        return await this.dialogsService.findHistoryNotes({dialog_id: data.dialog_id}, {take, skip})
+    async getHistoryDialog({take, skip, ...data}: GetHistoryDialogDTO): Promise<ModifiedDialogHistory[]> {
+        return await this.dialogsService.findHistoryNotes({dialog: {id: data.dialog_id}}, {take, skip})
     }
 }

@@ -1,6 +1,6 @@
-export class CreateDialogDTO {
-    creator_id: string
+import { ModifiedDialog } from "src/common"
 
-    // without creator_id!!
-    user_ids: string | string[]
+export class CreateDialogDTO implements Pick<ModifiedDialog, "creators_ids" | "user_ids"> {
+    creators_ids: string[]
+    user_ids: string[]
 }

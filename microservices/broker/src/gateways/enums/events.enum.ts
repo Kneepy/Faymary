@@ -4,6 +4,9 @@ export const WEVENTS = {
         UPDATE: "comment.update",
         DELETE: "comment.delete"
     },
+    DIALOGS: {
+        CREATE: "dialog.create"
+    },
     NOTIFICATIONS_TYPE: {
         CREATE_COMMENT: "notification.comment"
     },

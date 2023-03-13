@@ -3,13 +3,15 @@ import {
     DEFAULT_SKIP_DIALOGS,
     DEFAULT_SKIP_HISTORY_DIALOG,
     DEFAULT_TAKE_DIALOGS,
-    DEFAULT_TAKE_HISTORY_DIALOG, DialogActionEnum,
+    DEFAULT_TAKE_HISTORY_DIALOG,
     DialogHistory,
     Dialogs,
-    StateDialogEnum
+    ModifiedDialog,
+    StateDialogEnum,
+    ModifiedDialogHistory
 } from "src/common";
 import {CreateDialogInterface, FindDialogInterface, FindOneDialogInterface} from "src/interfaces";
-import {FindManyOptions, FindOneOptions, Raw, Repository} from "typeorm";
+import {DeepPartial, FindManyOptions, FindOneOptions, Raw, Repository} from "typeorm";
 
 export class DialogsService {
     constructor(
@@ -21,10 +23,7 @@ export class DialogsService {
         const dialog = await this.findOne({id: dialogId})
 
         if(dialog) {
-            const userIds = dialog.user_ids.split(",")
-
-            userIds.push(user_id)
-            dialog.user_ids = userIds.join()
+            dialog.user_ids.push(user_id)
             await this.update(dialog)
 
             return true
@@ -34,41 +33,50 @@ export class DialogsService {
     }
 
     // CRUD for history
-    async createHistoryNote(args: Omit<DialogHistory, "id" | "createdAt">): Promise<DialogHistory> {
-        return await this.historyRepostiory.save({...args, createdAt: Date.now()})
+    async createHistoryNote({dialog, ...data}: Omit<ModifiedDialogHistory, "id" | "createdAt">): Promise<ModifiedDialogHistory> {
+        const dialogHistory = await this.historyRepostiory.save({dialog: this.convertModifiedDialogToDialog(dialog), createdAt: Date.now(),  ...data})
+
+        return this.convertHistoryDialogToModifiedHistoryDialog(dialogHistory)
     }
-    async findHistoryNotes(data: Partial<Pick<DialogHistory, "action">> & {dialog_id?: string}, otherOptions: Omit<FindManyOptions<DialogHistory>, "where">): Promise<DialogHistory[]> {
-        const req: any = {}
-
-        if(!otherOptions.take) otherOptions.take = DEFAULT_TAKE_HISTORY_DIALOG;
-        if(!otherOptions.skip) otherOptions.skip = DEFAULT_SKIP_HISTORY_DIALOG;
-        if(data.dialog_id) {
-            req.dialog = {id: data.dialog_id}
-            otherOptions.relations = Object.assign(otherOptions.relations, {dialog: true}) // хз править надо
-        }
-
-            return await this.historyRepostiory.find({where: data, ...otherOptions})
+    async findHistoryNotes(data: DeepPartial<ModifiedDialogHistory>, otherOptions: Omit<FindManyOptions<DialogHistory>, "where"> = {take: DEFAULT_TAKE_HISTORY_DIALOG, skip: DEFAULT_SKIP_HISTORY_DIALOG}): Promise<ModifiedDialogHistory[]> {
+        const dialogHistories = await this.historyRepostiory.find({where: this.convertModifiedHistoryDialogToHistoryDialog(data as ModifiedDialogHistory), ...otherOptions})
+        dialogHistories.forEach(dialogHistory => dialogHistory = this.convertHistoryDialogToModifiedHistoryDialog(dialogHistory) as any)
+        
+        return dialogHistories as any
     }
 
     // CRUD for dialogs
-    async create(args: CreateDialogInterface): Promise<Dialogs> {
-        return await this.repository.save({...args, state: StateDialogEnum.ACTIVE})
+    async create(args: CreateDialogInterface): Promise<ModifiedDialog> {
+        return this.convertDialogToModifiedDialog(await this.repository.save({user_ids: this.joinUserIds(args.user_ids), creators_ids: this.joinUserIds(args.creators_ids), state: StateDialogEnum.ACTIVE}))
     }
 
-    async update(dialog: Dialogs): Promise<Dialogs> {
-        return await this.repository.save(dialog)
+    async update(dialog: ModifiedDialog): Promise<ModifiedDialog> {
+        const updatedDialog = await this.repository.save(this.convertModifiedDialogToDialog(dialog))
+
+        return this.convertDialogToModifiedDialog(updatedDialog)
     }
 
-    async findOne(args: FindOneDialogInterface, otherOptions?: Omit<FindOneOptions<Dialogs>, "where">): Promise<Dialogs> {
-        return await this.repository.findOne({where: args})
+    async findOne(args: FindOneDialogInterface, otherOptions?: Omit<FindOneOptions<Dialogs>, "where">): Promise<ModifiedDialog> {
+        const dialog = await this.repository.findOne({where: args})
+
+        return this.convertDialogToModifiedDialog(dialog)
     }
 
-    async findByUserId(args: FindDialogInterface, otherOptions: Omit<FindManyOptions<Dialogs>, "where">): Promise<Dialogs[]> {
-        if(!otherOptions.take) otherOptions.take = DEFAULT_TAKE_DIALOGS;
-        if(!otherOptions.skip) otherOptions.skip = DEFAULT_SKIP_DIALOGS;
+    async find(data: Omit<Dialogs, "id" | "user_ids" | "creators_ids">, otherOptions: Omit<FindManyOptions<Dialogs>, "where"> = {take: DEFAULT_TAKE_DIALOGS, skip: DEFAULT_SKIP_DIALOGS}): Promise<ModifiedDialog[]> {
+        const dialogs = await this.repository.find({where: data, ...otherOptions})
 
+        dialogs.forEach(dialog => dialog = this.convertDialogToModifiedDialog(dialog) as any)
+
+        return dialogs as any
+    }
+
+    async findByUserId(args: FindDialogInterface, otherOptions: Omit<FindManyOptions<Dialogs>, "where"> = {take: DEFAULT_TAKE_DIALOGS, skip: DEFAULT_SKIP_DIALOGS}): Promise<Dialogs[]> {
         if(args.user_id) {
-            return await this.repository.find({where: {user_ids: Raw((alias) => `FIND_IN_SET(${args.user_id}, ${alias}) <> 0`)}, ...otherOptions})
+            const dialogs = await this.repository.find({where: {user_ids: Raw((alias) => `FIND_IN_SET(${args.user_id}, ${alias}) <> 0`)}, ...otherOptions})
+
+            dialogs.forEach(dialog => dialog = this.convertDialogToModifiedDialog(dialog) as any)
+
+            return dialogs as any
         }
     }
 
@@ -76,7 +84,7 @@ export class DialogsService {
     async remove(id: string): Promise<boolean> {
         const dialog = await this.findOne({id: id})
 
-        if(dialog) {
+        if(dialog && id) {
             dialog.state = StateDialogEnum.DELETED
 
             await this.update(dialog)
@@ -90,8 +98,17 @@ export class DialogsService {
         return await this.repository.delete(id)
     }
 
-    getUserIds = (userIds: string): string[] => userIds.split(",")
+    getUserIds = (userIds: string): string[] => userIds?.split(",")
+    joinUserIds = (userIds: string[]): string => userIds?.join(",")
 
-    joinUserIds = (userIds: string[]): string => userIds.join(",")
+    // фига из-за этого говна навалено, всякие новые ModifiedDialog и т.п
+    // из не модифицированного в модифицированное
+    convertDialogToModifiedDialog = (dialog: Dialogs): ModifiedDialog => Object.assign(dialog, {creators_ids: this.getUserIds(dialog?.creators_ids), user_ids: this.getUserIds(dialog?.user_ids)})
+    // из модифицированного в не модифицированное
+    convertModifiedDialogToDialog = (ModifiedDialog: ModifiedDialog): Dialogs => Object.assign(ModifiedDialog, {creators_ids: this.joinUserIds(ModifiedDialog?.creators_ids), user_ids: this.joinUserIds(ModifiedDialog?.user_ids)}) 
 
+    // из модифицированного в не модифицированное    
+    convertModifiedHistoryDialogToHistoryDialog = (modifiedHistoryDialog: ModifiedDialogHistory): DialogHistory => Object.assign(modifiedHistoryDialog, {dialog: this.convertModifiedDialogToDialog(modifiedHistoryDialog.dialog)})
+    // из не модифицированного в модифицированное
+    convertHistoryDialogToModifiedHistoryDialog = (historyDialog: DialogHistory): ModifiedDialogHistory => Object.assign(historyDialog, {dialog: this.convertDialogToModifiedDialog(historyDialog.dialog)})
 }

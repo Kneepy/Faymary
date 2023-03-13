@@ -8,9 +8,6 @@ export class Posts {
     @Column({nullable: false})
     user_id: string 
 
-    @Column({nullable: false})
-    title: string 
-
     @Column({ nullable: false, type: "bigint" })
     createdAt: number
 
@@ -18,5 +15,5 @@ export class Posts {
     file_ids: string
 
     @Column({nullable: false})
-    desc: string
+    msg: string
 }

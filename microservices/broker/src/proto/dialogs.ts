@@ -20,8 +20,8 @@ export enum StateDialogEnum {
 
 export interface Dialog {
   id: string;
-  user_ids: string;
-  creator_id: string;
+  user_ids: string[];
+  creators_ids: string[];
   state: StateDialogEnum;
   name: string;
   file_id: string;
@@ -44,8 +44,8 @@ export interface AddUserDialogDTO {
 }
 
 export interface CreateDialogDTO {
-  creator_id: string;
-  user_ids: string;
+  creators_ids: string[];
+  user_ids: string[];
 }
 
 export interface GetDialogDTO {

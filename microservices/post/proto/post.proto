@@ -12,17 +12,15 @@ service PostService {
 
 message PostCreateDTO {
     string user_id = 1;
-    optional string title = 2;
-    optional string desc = 3;
-    repeated string file_ids = 4;
+    optional string msg = 2;
+    repeated string file_ids = 3;
 }
 
 message PostUpdateDTO {
     string id = 1;
     string user_id = 2;
-    optional string title = 3;
-    optional string desc = 4;
-    repeated string file_ids = 5;
+    optional string msg = 3;
+    repeated string file_ids = 4;
 }
 
 message PostDeleteDTO {
@@ -36,20 +34,18 @@ message GetOnePostDTO {
 
 message GetManyPostsDTO {
     optional string user_id = 1;
-    optional string title = 2;
-    optional string ids = 3;
-    optional string desc = 4;
-    int32 take = 5;
-    int32 skip = 6;
+    optional string ids = 2;
+    optional string msg = 3;
+    int32 take = 4;
+    int32 skip = 5;
 }
 
 message Post {
     string id = 1;
     string user_id = 2;
-    string title = 3;
-    string createdAt = 4;
-    string desc = 5;
-    repeated string file_ids = 6;
+    string createdAt = 3;
+    string msg = 4;
+    repeated string file_ids = 5;
 }
 
 message Posts {

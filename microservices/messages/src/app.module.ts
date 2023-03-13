@@ -1,3 +1,4 @@
+import { MessagesController } from './messages.controller';
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
@@ -8,6 +9,7 @@ import {
     MYSQL_PORT,
     MYSQL_USER
 } from "./common";
+import { MessagesService } from "./messages.service";
 
 @Module({
     imports: [
@@ -22,6 +24,8 @@ import {
             synchronize: true
         }),
         TypeOrmModule.forFeature([Messages])
-    ]
+    ],
+    providers: [MessagesService],
+    controllers: [MessagesController]
 })
 export class AppModule {}

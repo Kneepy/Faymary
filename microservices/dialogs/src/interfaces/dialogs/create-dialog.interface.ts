@@ -1,3 +1,3 @@
-import { Dialogs } from "src/common";
+import { ModifiedDialog } from "src/common";
 
-export interface CreateDialogInterface extends Pick<Dialogs, "creator_id" | "user_ids"> {}
+export interface CreateDialogInterface extends Pick<ModifiedDialog, "creators_ids" | "user_ids"> {}

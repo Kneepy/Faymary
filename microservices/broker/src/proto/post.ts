@@ -6,16 +6,14 @@ export const protobufPackage = "posts";
 
 export interface PostCreateDTO {
   user_id: string;
-  title?: string | undefined;
-  desc?: string | undefined;
+  msg?: string | undefined;
   file_ids: string[];
 }
 
 export interface PostUpdateDTO {
   id: string;
   user_id: string;
-  title?: string | undefined;
-  desc?: string | undefined;
+  msg?: string | undefined;
   file_ids: string[];
 }
 
@@ -30,9 +28,8 @@ export interface GetOnePostDTO {
 
 export interface GetManyPostsDTO {
   user_id?: string | undefined;
-  title?: string | undefined;
   ids?: string | undefined;
-  desc?: string | undefined;
+  msg?: string | undefined;
   take: number;
   skip: number;
 }
@@ -40,9 +37,8 @@ export interface GetManyPostsDTO {
 export interface Post {
   id: string;
   user_id: string;
-  title: string;
   createdAt: string;
-  desc: string;
+  msg: string;
   file_ids: string[];
 }
 

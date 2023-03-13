@@ -13,7 +13,6 @@ import { PostServiceClient } from 'src/proto/post';
 import { StoriesServiceClient } from 'src/proto/stories';
 import { UserServiceClient } from 'src/proto/user';
 
-@Injectable()
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
 @UseFilters(WsExceptionFilter)
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {

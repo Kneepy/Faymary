@@ -16,8 +16,8 @@ service DialogsService {
 
 message Dialog {
     string id = 1;
-    string user_ids = 2;
-    string creator_id = 3;
+    repeated string user_ids = 2;
+    repeated string creators_ids = 3;
     StateDialogEnum state = 4;
     string name = 5;
     string file_id = 6;
@@ -40,8 +40,8 @@ message AddUserDialogDTO {
 }
 
 message CreateDialogDTO {
-    string creator_id = 1;
-    string user_ids = 2;
+    repeated string creators_ids = 1;
+    repeated string user_ids = 2;
 }
 
 message GetDialogDTO {

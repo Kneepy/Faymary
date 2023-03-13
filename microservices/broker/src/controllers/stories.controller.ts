@@ -20,13 +20,13 @@ export class StoriesController {
         if(data.marks.length) {
             data.marks.forEach(async mark => {
                 switch(mark.type){
-                    case MarkType.post:
+                    case MarkType.POST:
                         if(!(await this.postService.getPost({id: mark.item_id}).toPromise())) throw NotFoundException
                         break
-                    case MarkType.story: 
+                    case MarkType.STORY: 
                         if(!(await this.storiesService.getStory({id: mark.item_id}).toPromise())) throw NotFoundException
                         break
-                    case MarkType.user:
+                    case MarkType.USER:
                         if(!(await this.userService.findUser({id: mark.item_id}).toPromise())) throw NotFoundException
                         break
                 }

@@ -13,63 +13,67 @@ export enum MessagesEnumType {
   UNRECOGNIZED = -1,
 }
 
-export interface Get {
+export interface GetMessagesDTO {
   dialog_id: string;
   take?: number | undefined;
   skip?: number | undefined;
 }
 
-export interface Create {
+export interface CreateMessageDTO {
   attachment?: MessagesEnumType | undefined;
   dialog_id: string;
   item_id?: string | undefined;
-  message: string;
+  msg: string;
   user_id: string;
 }
 
-export interface Update {
+export interface UpdateMessageDTO {
   attachment?: MessagesEnumType | undefined;
   dialog_id: string;
   id: string;
-  message: string;
+  msg: string;
   item_id?: string | undefined;
   user_id: string;
 }
 
-export interface Delete {
+export interface DeleteMessageDTO {
   id: string;
+}
+
+export interface Message {
+  id: string;
+  attachment?: MessagesEnumType | undefined;
+  item_id?: string | undefined;
+  dialog_id: string;
+  user_id: string;
+  msg: string;
+  createdAt: string;
 }
 
 export interface Messages {
-  id: string;
-  attachment?: MessagesEnumType | undefined;
-  item_id?: string | undefined;
-  dialog_id: string;
-  user_id: string;
-  message: string;
-  createdAt: string;
+  messages: Message[];
 }
 
 export const MESSAGES_PACKAGE_NAME = "messages";
 
 export interface MessagesSerivceClient {
-  createMessage(request: Create): Observable<Messages>;
+  createMessage(request: CreateMessageDTO): Observable<Message>;
 
-  getDialogMessages(request: Get): Observable<Messages>;
+  getDialogMessages(request: GetMessagesDTO): Observable<Messages>;
 
-  updateMessage(request: Update): Observable<Messages>;
+  updateMessage(request: UpdateMessageDTO): Observable<Message>;
 
-  deleteMessage(request: Delete): Observable<Messages>;
+  deleteMessage(request: DeleteMessageDTO): Observable<Message>;
 }
 
 export interface MessagesSerivceController {
-  createMessage(request: Create): Observable<Messages>;
+  createMessage(request: CreateMessageDTO): Observable<Message>;
 
-  getDialogMessages(request: Get): Observable<Messages>;
+  getDialogMessages(request: GetMessagesDTO): Observable<Messages>;
 
-  updateMessage(request: Update): Observable<Messages>;
+  updateMessage(request: UpdateMessageDTO): Observable<Message>;
 
-  deleteMessage(request: Delete): Observable<Messages>;
+  deleteMessage(request: DeleteMessageDTO): Observable<Message>;
 }
 
 export function MessagesSerivceControllerMethods() {

@@ -1,21 +1,17 @@
 import { WebSocketGateway } from '@nestjs/websockets';
 import { UseFilters } from '@nestjs/common';
-import { StoriesServiceClient } from 'src/proto/stories';
-import { STORIES_MODULE_CONFIG } from 'src/constants/app.constants';
-import { PostServiceClient } from './../proto/post';
-import { COMMENTS_MODULE_CONFIG, POST_MODULE_CONFIG } from '../constants/app.constants';
+import { COMMENTS_MODULE_CONFIG } from '../constants/app.constants';
 import { ConnectedSocket, MessageBody, SubscribeMessage } from '@nestjs/websockets';
-import { Inject, Injectable } from '@nestjs/common';
-import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO, CommentType } from 'src/proto/comments';
+import { Inject } from '@nestjs/common';
+import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO } from 'src/proto/comments';
 import { ICustomSocket } from './types/socket.type';
 import { WEVENTS } from './enums/events.enum';
 import { ServerGateway } from './server.gateway';
 import { NotificationCreate, NotificationEnumType } from 'src/proto/notification';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 
-@Injectable()
 @UseFilters(WsExceptionFilter)
-@WebSocketGateway()
+@WebSocketGateway() 
 export class CommentsGateway {
     constructor(
         @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,

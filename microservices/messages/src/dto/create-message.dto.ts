@@ -4,6 +4,6 @@ export class CreateMessageDTO implements Omit<Messages, "id" | "createdAt"> {
     attachment: MessagesEnumType;
     dialog_id!: string;
     item_id: string;
-    message: string;
+    msg: string;
     user_id: string;
 }
