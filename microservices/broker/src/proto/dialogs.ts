@@ -62,15 +62,16 @@ export interface DialogHistories {
 export interface AddUserDialogDTO {
   user_id: string;
   dialog_id: string;
-  who_adds_id: string;
+  user_invited_id: string;
 }
 
 export interface CreateDialogDTO {
   participants: DialogParticipants[];
+  name?: string | undefined;
 }
 
 export interface GetDialogDTO {
-  dialog_id: string;
+  id: string;
 }
 
 export interface GetUserDialogsDTO {

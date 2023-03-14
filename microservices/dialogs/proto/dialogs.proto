@@ -48,15 +48,16 @@ message DialogHistories {
 message AddUserDialogDTO {
     string user_id = 1;
     string dialog_id = 2;
-    string who_adds_id = 3;
+    string user_invited_id = 3;
 }
 
 message CreateDialogDTO {
     repeated DialogParticipants participants = 1;
+    optional string name = 2;
 }
 
 message GetDialogDTO {
-    string dialog_id = 1;
+    string id = 1;
 }
 
 message GetUserDialogsDTO {

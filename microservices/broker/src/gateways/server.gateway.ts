@@ -27,23 +27,30 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
 
+
+    /**
+     * Эта функция сама создаёт уведомления в микросервисе
+     */
     async sendNotification(data: NotificationCreate, event: string): Promise<boolean> {
         /**
          * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
          * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
         */
-        switch (data.parent_type) {
-            case NotificationEnumType.COMMENT: 
-                data.to_id = (await this.commentsService.getComment({id: data.parent_id}).toPromise()).user_id
-                break
-            case NotificationEnumType.POST: 
-                data.to_id = (await this.postsService.getPost({id: data.parent_id}).toPromise()).user_id
-                break
-            case NotificationEnumType.STORY: 
-                data.to_id = (await this.storiesService.getStory({id: data.parent_id}).toPromise()).user_id
-                break
-            case NotificationEnumType.USER: 
-                data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
+        if(data.parent_type && data.parent_id && !data.to_id) {
+            switch (data.parent_type) {
+                case NotificationEnumType.COMMENT: 
+                    data.to_id = (await this.commentsService.getComment({id: data.parent_id}).toPromise()).user_id
+                    break
+                case NotificationEnumType.POST: 
+                    data.to_id = (await this.postsService.getPost({id: data.parent_id}).toPromise()).user_id
+                    break
+                case (NotificationEnumType.USER) as NotificationEnumType: 
+                    data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
+                    break
+                case NotificationEnumType.STORY: 
+                    data.to_id = (await this.storiesService.getStory({id: data.parent_id}).toPromise()).user_id
+                    break
+            }
         }
 
         if(data.to_id !== data.from_id) {

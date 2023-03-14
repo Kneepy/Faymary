@@ -1,6 +1,9 @@
 export enum NotificationEnumType {
-    user = 0,
-    post = 2,
-    story = 1,
-    comment = 3,
+    USER = 0,
+    STORY = 1,
+    POST = 2,
+    COMMENT = 3,
+    MESSAGE = 4,
+    DIALOG = 5,
+    LIKE = 6,
 }

@@ -34,17 +34,17 @@ export class DialogsController {
 
         if(!dialog) throw NotFoundDialog
 
-        const historyNote = await this.dialogsService.createHistoryNote({dialog: dialog, user_id: data.user_id, action: DialogActionEnum.ADD_USER, item_id: data.who_adds_id})
+        const historyNote = await this.dialogsService.createHistoryNote({dialog: dialog, user_id: data.user_id, action: DialogActionEnum.ADD_USER, item_id: data.user_invited_id})
         await this.dialogsService.addUserToDialog(dialog, {user_id: data.user_id, rights: ParticipantRights.USER})
     
         return historyNote
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CREATE_DIALOG)
-    async createDialog({participants}: CreateDialogDTO): Promise<Dialogs> {
-        const dialog = await this.dialogsService.create({participants})
+    async createDialog({participants, name}: CreateDialogDTO): Promise<Dialogs> {
+        const dialog = await this.dialogsService.create({participants, name})
         const creatorId = participants.find(participant => participant.rights === ParticipantRights.CREATOR).user_id ?? participants.find(participant => participant.rights === ParticipantRights.ADMIN).user_id
-        const historyNotes = await this.dialogsService.createHistoryNote({dialog, user_id: creatorId, action: DialogActionEnum.CREATE_DIALOG})
+        const historyNote = await this.dialogsService.createHistoryNote({dialog, user_id: creatorId, action: DialogActionEnum.CREATE_DIALOG})
 
         return dialog
     }

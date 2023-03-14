@@ -2,7 +2,6 @@ import { Dialogs } from "src/common"
 
 export class GetDialogDTO implements Pick<Dialogs, "id"> {
     id: string
-    
 }
 
 export class GetUserDialogsDTO {

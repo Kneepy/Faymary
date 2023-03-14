@@ -3,7 +3,7 @@ import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG } from '../constants/app.constants';
 import { ConnectedSocket, MessageBody, SubscribeMessage } from '@nestjs/websockets';
 import { Inject } from '@nestjs/common';
-import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO } from 'src/proto/comments';
+import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO, Comment } from 'src/proto/comments';
 import { ICustomSocket } from './types/socket.type';
 import { WEVENTS } from './enums/events.enum';
 import { ServerGateway } from './server.gateway';
@@ -25,10 +25,17 @@ export class CommentsGateway {
         /**
          * Могу себе позволить создавать такие штуки т.к все enum'ы типов записей (post, user, story и т.п) должны быть одинаковыми на всех микросервисах
          */
-        const notificationData: NotificationCreate = {from_id: user_id, type: NotificationEnumType.COMMENT, item_id: comment.id, to_id: null, parent_type: comment.type as any, parent_id: comment.item_id}
+        const notificationData: NotificationCreate = {
+            from_id: user_id, 
+            type: NotificationEnumType.COMMENT, 
+            item_id: comment.id, 
+            to_id: null, 
+            parent_type: comment.type as any, 
+            parent_id: comment.item_id
+        }
 
         this.serverGateway.sendNotification(notificationData, WEVENTS.NOTIFICATIONS_TYPE.CREATE_COMMENT)
-        this.serverGateway.broadcastUser(user_id, {
+        this.serverGateway.broadcastUser<Comment>(user_id, {
             event: WEVENTS.COMMENTS.CREATE, 
             data: comment
         })
