@@ -1,6 +1,7 @@
-import { ModifiedDialog } from "src/common"
+import { DialogParticipants, Dialogs } from "src/common"
 
-export class CreateDialogDTO implements Pick<ModifiedDialog, "creators_ids" | "user_ids"> {
-    creators_ids: string[]
-    user_ids: string[]
+export class CreateDialogDTO implements Pick<Dialogs, "participants"> {
+
+    // всегда должен быть пользователь у которого будут права создателя или админа
+    participants: DialogParticipants[]
 }

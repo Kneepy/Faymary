@@ -1,1 +1,1 @@
-export * from "./dialogs"
+export * from "./dialogs-interfaces.namespace"

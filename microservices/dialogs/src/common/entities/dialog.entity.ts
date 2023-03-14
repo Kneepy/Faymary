@@ -1,6 +1,7 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { DialogHistory } from "./dialog-history.entity";
 import { StateDialogEnum } from "../enums";
+import { DialogParticipants } from "./dialog-participants.entity";
 
 
 // кароче если вкратце то эта штука только для сервера, клиенту же отдаётся ModifyDialog к нему все в сервисах и приводится
@@ -9,11 +10,8 @@ export class Dialogs {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @Column()
-    user_ids: string
-
-    @Column()
-    creators_ids: string
+    @OneToMany(() => DialogParticipants, (participant: DialogParticipants) => participant.dialog)
+    participants: DialogParticipants[]
 
     @Column()
     state: StateDialogEnum

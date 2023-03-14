@@ -18,13 +18,27 @@ export enum StateDialogEnum {
   UNRECOGNIZED = -1,
 }
 
+export enum ParticipantRights {
+  LISTENER = 0,
+  USER = 1,
+  ADMIN = 2,
+  CREATOR = 3,
+  UNRECOGNIZED = -1,
+}
+
 export interface Dialog {
   id: string;
-  user_ids: string[];
-  creators_ids: string[];
+  participants: DialogParticipants[];
   state: StateDialogEnum;
   name: string;
   file_id: string;
+}
+
+export interface DialogParticipants {
+  id: string;
+  rights: ParticipantRights;
+  user_id: string;
+  dialog: Dialog | undefined;
 }
 
 export interface DialogHistory {
@@ -37,6 +51,14 @@ export interface DialogHistory {
   dialog: Dialog | undefined;
 }
 
+export interface Dialogs {
+  dialogs: Dialog[];
+}
+
+export interface DialogHistories {
+  notes: DialogHistory[];
+}
+
 export interface AddUserDialogDTO {
   user_id: string;
   dialog_id: string;
@@ -44,8 +66,7 @@ export interface AddUserDialogDTO {
 }
 
 export interface CreateDialogDTO {
-  creators_ids: string[];
-  user_ids: string[];
+  participants: DialogParticipants[];
 }
 
 export interface GetDialogDTO {
@@ -99,17 +120,17 @@ export interface DialogsServiceClient {
 
   getDialog(request: GetDialogDTO): Observable<Dialog>;
 
-  getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialog>;
+  getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
   deleteDialog(request: DeleteDialogDTO): Observable<Empty>;
 
-  removeUserDialog(request: DeleteUserDialogDTO): Observable<Dialog>;
+  removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
 
   changeNameDialog(request: ChangeNameDialogDTO): Observable<Dialog>;
 
-  getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistory>;
-
   changeFileDialog(request: ChangeFileDialogDTO): Observable<Dialog>;
+
+  getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
 }
 
 export interface DialogsServiceController {
@@ -119,17 +140,17 @@ export interface DialogsServiceController {
 
   getDialog(request: GetDialogDTO): Observable<Dialog>;
 
-  getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialog>;
+  getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
   deleteDialog(request: DeleteDialogDTO): Observable<Empty>;
 
-  removeUserDialog(request: DeleteUserDialogDTO): Observable<Dialog>;
+  removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
 
   changeNameDialog(request: ChangeNameDialogDTO): Observable<Dialog>;
 
-  getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistory>;
-
   changeFileDialog(request: ChangeFileDialogDTO): Observable<Dialog>;
+
+  getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
 }
 
 export function DialogsServiceControllerMethods() {
@@ -142,8 +163,8 @@ export function DialogsServiceControllerMethods() {
       "deleteDialog",
       "removeUserDialog",
       "changeNameDialog",
-      "getHistoryDialog",
       "changeFileDialog",
+      "getHistoryDialog",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

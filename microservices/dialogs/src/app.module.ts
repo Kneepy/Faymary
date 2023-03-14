@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
     DialogHistory,
+    DialogParticipants,
     Dialogs,
     MODULE_PACKAGE_NAME,
     MYSQL_HOST,
@@ -9,8 +10,8 @@ import {
     MYSQL_PORT,
     MYSQL_USER,
 } from "./common";
-import {DialogsController} from "./controllers";
-import {DialogsService} from "./providers";
+import { DialogsController } from "./dialogs.controller";
+import { DialogsService } from "./dialogs.service";
 
 @Module({
     imports: [
@@ -21,10 +22,10 @@ import {DialogsService} from "./providers";
             username: MYSQL_USER,
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
-            entities: [DialogHistory, Dialogs],
+            entities: [DialogHistory, Dialogs, DialogParticipants],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([DialogHistory, Dialogs])
+        TypeOrmModule.forFeature([DialogHistory, Dialogs, DialogParticipants])
     ],
     controllers: [DialogsController],
     providers: [DialogsService]

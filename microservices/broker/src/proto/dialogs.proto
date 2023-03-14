@@ -6,23 +6,27 @@ service DialogsService {
     rpc AddUserToDialog (AddUserDialogDTO) returns (stream DialogHistory);
     rpc CreateDialog (CreateDialogDTO) returns (stream Dialog);
     rpc GetDialog (GetDialogDTO) returns (stream Dialog);
-    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialog);
+    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialogs);
     rpc DeleteDialog (DeleteDialogDTO) returns (stream Empty);
-    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream Dialog);
+    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream DialogHistory);
     rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream Dialog);
-    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistory);
     rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream Dialog);
+    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistories);
 }
 
 message Dialog {
     string id = 1;
-    repeated string user_ids = 2;
-    repeated string creators_ids = 3;
-    StateDialogEnum state = 4;
-    string name = 5;
-    string file_id = 6;
+    repeated DialogParticipants participants = 2;
+    StateDialogEnum state = 3;
+    string name = 4;
+    string file_id = 5;
 }
-
+message DialogParticipants {
+    string id = 1;
+    ParticipantRights rights = 2;
+    string user_id = 3;
+    Dialog dialog = 4;
+}
 message DialogHistory {
     string id = 1;
     string user_id = 2;
@@ -33,6 +37,14 @@ message DialogHistory {
     Dialog dialog = 7;
 }
 
+message Dialogs {
+    repeated Dialog dialogs = 1;
+}
+
+message DialogHistories {
+    repeated DialogHistory notes = 1;
+}
+
 message AddUserDialogDTO {
     string user_id = 1;
     string dialog_id = 2;
@@ -40,8 +52,7 @@ message AddUserDialogDTO {
 }
 
 message CreateDialogDTO {
-    repeated string creators_ids = 1;
-    repeated string user_ids = 2;
+    repeated DialogParticipants participants = 1;
 }
 
 message GetDialogDTO {
@@ -93,6 +104,12 @@ enum DialogActionEnum {
 enum StateDialogEnum {
     DELETED = 0;
     ACTIVE = 1;
+}
+
+enum ParticipantRights {
+    LISTENER = 0; 
+    USER = 1; ADMIN = 2;
+    CREATOR = 3;
 }
 
 message Empty {}
