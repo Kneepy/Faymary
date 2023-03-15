@@ -7,13 +7,14 @@ export const WEVENTS = {
     DIALOGS: {
         CREATE: "dialog.create",
         ADD_USER: "dialog.add_user",
+        REMOVE_USER: "dialog.remove_user",
         CHANGE_NAME: "dialog.change_name",
-        CHANGE_FILE: "dialog.change_file"
+        CHANGE_FILE: "dialog.change_file",
+        DELETE: "dialog.delete"
     },
     NOTIFICATIONS_TYPE: {
         CREATE_COMMENT: "notification.comment.create",
-        DIALOG: {
-        }
+        DELETE_DIALOG: "notification.dialog.delete"
     },
     ERROR: "error"
 }

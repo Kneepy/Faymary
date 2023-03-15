@@ -7,11 +7,12 @@ service DialogsService {
     rpc CreateDialog (CreateDialogDTO) returns (stream Dialog);
     rpc GetDialog (GetDialogDTO) returns (stream Dialog);
     rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialogs);
-    rpc DeleteDialog (DeleteDialogDTO) returns (stream Empty);
+    rpc DeleteDialog (DeleteDialogDTO) returns (stream DialogHistory);
     rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream DialogHistory);
     rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream DialogHistory);
     rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream DialogHistory);
     rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistories);
+    rpc DialogIncludesUser (DialogIncludesUserDTO) returns (stream DialogIsIncludesUser);
 }
 
 message Dialog {
@@ -43,6 +44,15 @@ message Dialogs {
 
 message DialogHistories {
     repeated DialogHistory notes = 1;
+}
+
+message DialogIncludesUserDTO {
+    string user_id = 1;
+    string dialog_id = 2;
+}
+
+message DialogIsIncludesUser {
+    bool isIncluded = 1;
 }
 
 message AddUserDialogDTO {
@@ -97,9 +107,11 @@ message ChangeFileDialogDTO {
 
 enum DialogActionEnum {
     CREATE_DIALOG = 0;
-    ADD_USER = 1;
-    REMOVE_USER = 2;
-    CHANGE_NAME_DIALOG = 3;
+    DELETE_DIALOG = 1;
+    ADD_USER = 2;
+    REMOVE_USER = 3;
+    CHANGE_NAME_DIALOG = 4;
+    CHANGE_FILE_DIALOG = 5;
 }
 
 enum StateDialogEnum {

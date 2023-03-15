@@ -30,5 +30,6 @@ export enum DIALOGS_SERVICE_METHODS {
     REMOVE_USER_DIALOG = "RemoveUserDialog",
     CHANGE_NAME_DIALOG = "ChangeNameDialog",
     GET_HISTORY_DIALOG = "GetHistoryDialog",
-    CHANGE_FILE_DIALOG = "ChangeFileDialog"
+    CHANGE_FILE_DIALOG = "ChangeFileDialog",
+    DIALOG_INCLUDE_USER = "DialogIncludesUser"
 }

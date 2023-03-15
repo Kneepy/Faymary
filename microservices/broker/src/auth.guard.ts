@@ -15,6 +15,10 @@ export class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: ICustomRequest = context.switchToHttp().getRequest();
 
+
+        // типо защита от лоха
+        delete request.user_id
+
         if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
         else {
             const accessToken = request.headers.authorization

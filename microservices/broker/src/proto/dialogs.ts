@@ -6,9 +6,11 @@ export const protobufPackage = "dialogs";
 
 export enum DialogActionEnum {
   CREATE_DIALOG = 0,
-  ADD_USER = 1,
-  REMOVE_USER = 2,
-  CHANGE_NAME_DIALOG = 3,
+  DELETE_DIALOG = 1,
+  ADD_USER = 2,
+  REMOVE_USER = 3,
+  CHANGE_NAME_DIALOG = 4,
+  CHANGE_FILE_DIALOG = 5,
   UNRECOGNIZED = -1,
 }
 
@@ -57,6 +59,15 @@ export interface Dialogs {
 
 export interface DialogHistories {
   notes: DialogHistory[];
+}
+
+export interface DialogIncludesUserDTO {
+  user_id: string;
+  dialog_id: string;
+}
+
+export interface DialogIsIncludesUser {
+  isIncluded: boolean;
 }
 
 export interface AddUserDialogDTO {
@@ -123,7 +134,7 @@ export interface DialogsServiceClient {
 
   getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
-  deleteDialog(request: DeleteDialogDTO): Observable<Empty>;
+  deleteDialog(request: DeleteDialogDTO): Observable<DialogHistory>;
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
 
@@ -132,6 +143,8 @@ export interface DialogsServiceClient {
   changeFileDialog(request: ChangeFileDialogDTO): Observable<DialogHistory>;
 
   getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
+
+  dialogIncludesUser(request: DialogIncludesUserDTO): Observable<DialogIsIncludesUser>;
 }
 
 export interface DialogsServiceController {
@@ -143,7 +156,7 @@ export interface DialogsServiceController {
 
   getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
-  deleteDialog(request: DeleteDialogDTO): Observable<Empty>;
+  deleteDialog(request: DeleteDialogDTO): Observable<DialogHistory>;
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
 
@@ -152,6 +165,8 @@ export interface DialogsServiceController {
   changeFileDialog(request: ChangeFileDialogDTO): Observable<DialogHistory>;
 
   getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
+
+  dialogIncludesUser(request: DialogIncludesUserDTO): Observable<DialogIsIncludesUser>;
 }
 
 export function DialogsServiceControllerMethods() {
@@ -166,6 +181,7 @@ export function DialogsServiceControllerMethods() {
       "changeNameDialog",
       "changeFileDialog",
       "getHistoryDialog",
+      "dialogIncludesUser",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

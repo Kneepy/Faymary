@@ -59,9 +59,9 @@ export class DialogsService {
         return await this.repository.find({where: data, ...otherOptions})
     }
 
-    async findByUserId({user_id}: DialogsInterfaces.FindManyDialogsByUserId, otherOptions: Omit<FindManyOptions<Dialogs>, "where"> = {take: DEFAULT_TAKE_DIALOGS, skip: DEFAULT_SKIP_DIALOGS}): Promise<Dialogs[]> {
+    async findByUserId({user_id, state = StateDialogEnum.ACTIVE}: DialogsInterfaces.FindManyDialogsByUserId, otherOptions: Omit<FindManyOptions<Dialogs>, "where"> = {take: DEFAULT_TAKE_DIALOGS, skip: DEFAULT_SKIP_DIALOGS}): Promise<Dialogs[]> {
         if(user_id) {
-            return await this.repository.find({where: {participants: {user_id}}, ...otherOptions})
+            return await this.repository.find({where: {participants: {user_id}, state}, ...otherOptions})
         }
     }
 

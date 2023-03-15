@@ -1,13 +1,12 @@
 import { ServerGateway } from './server.gateway';
 import { ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { WEVENTS } from './enums/events.enum';
-import { AddUserDialogDTO, ChangeFileDialogDTO, ChangeNameDialogDTO, CreateDialogDTO, Dialog, DialogHistory, DialogParticipants, DialogsServiceClient, GetUserDialogsDTO, ParticipantRights } from './../proto/dialogs';
+import { AddUserDialogDTO, ChangeFileDialogDTO, ChangeNameDialogDTO, CreateDialogDTO, DeleteDialogDTO, DeleteUserDialogDTO, Dialog, DialogHistory, DialogParticipants, DialogsServiceClient, GetUserDialogsDTO, ParticipantRights } from './../proto/dialogs';
 import { DIALOGS_MODULE_CONFIG } from './../constants/app.constants';
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Inject } from '@nestjs/common';
 import { ICustomSocket } from './types/socket.type';
 import { NotificationEnumType } from 'src/proto/notification';
-
 
 @WebSocketGateway()
 export class DialogsGateway {
@@ -53,6 +52,27 @@ export class DialogsGateway {
         )
     }
 
+    /**
+     * Эта функция удаляет пользователя из диалога
+     * @returns Запись из истории диалога о удалении пользователя
+     */
+    @SubscribeMessage(WEVENTS.DIALOGS.REMOVE_USER)
+    async removeUserFromDialog(@MessageBody() {delete_id, dialog_id}: Omit<DeleteUserDialogDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
+        const dialogHistoryNote = await this.dialogsService.removeUserDialog({user_id, delete_id, dialog_id}).toPromise()
+        const dialog = await this.dialogsService.getDialog({id: dialog_id}).toPromise()
+
+        dialog.participants.forEach(async participant => 
+            await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
+                data: dialogHistoryNote,
+                event: WEVENTS.DIALOGS.REMOVE_USER
+            })
+        )
+    }
+
+    /**
+     * Эта функция изменяет название диалога
+     * @returns Запись из истории диалога о изменении названия диалога
+     */
     @SubscribeMessage(WEVENTS.DIALOGS.CHANGE_NAME)
     async changeNameDialog(@MessageBody() data: Omit<ChangeNameDialogDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
         const historyNote = await this.dialogsService.changeNameDialog({user_id, dialog_id: data.dialog_id, name: data.name}).toPromise()
@@ -66,16 +86,45 @@ export class DialogsGateway {
         )
     }
 
+    /**
+     * Эта функция изменяет картинку (превьюшку хз) диалога
+     * @returns Запись из истории диалога о изменении заставки
+     */
     @SubscribeMessage(WEVENTS.DIALOGS.CHANGE_FILE)
     async changeFileDialog(@MessageBody() data: Omit<ChangeFileDialogDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
         const historyNote = await this.dialogsService.changeFileDialog({user_id, dialog_id: data.dialog_id, file_id: data.file_id}).toPromise()
         const dialog = await this.dialogsService.getDialog({id: data.dialog_id}).toPromise()
 
-        dialog.participants.forEach(async participants => 
-            await this.serverGateway.broadcastUser<DialogHistory>(participants.user_id, {
+        dialog.participants.forEach(async participant => 
+            await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
                 data: historyNote,
                 event: WEVENTS.DIALOGS.CHANGE_FILE
             })
         )
+    }
+    
+    /**
+     * Эта функция изменяет состояние диалога на неактивное (типо удалили)
+     * @returns Каждому пользователю состоявшему в диалоге присылается уведомление о его удалении и запись в истории диалога
+     */
+    @SubscribeMessage(WEVENTS.DIALOGS.DELETE)
+    async deleteDialog(@MessageBody() {dialog_id}: Omit<DeleteDialogDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
+        const historyNote = await this.dialogsService.deleteDialog({user_id, dialog_id}).toPromise()
+        const dialog = await this.dialogsService.getDialog({id: dialog_id}).toPromise()
+
+        dialog.participants.forEach(async participant => {
+            await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
+                data: historyNote,
+                event: WEVENTS.DIALOGS.DELETE
+            })
+            await this.serverGateway.sendNotification({
+                from_id: user_id,
+                to_id: participant.user_id,
+                type: NotificationEnumType.USER,
+                item_id: user_id,
+                parent_id: dialog.id,
+                parent_type: NotificationEnumType.DIALOG,
+            }, WEVENTS.NOTIFICATIONS_TYPE.DELETE_DIALOG)
+        })
     }
 }
