@@ -1,7 +1,7 @@
 import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject, Injectable } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';

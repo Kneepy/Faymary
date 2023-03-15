@@ -127,9 +127,9 @@ export interface DialogsServiceClient {
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
 
-  changeNameDialog(request: ChangeNameDialogDTO): Observable<Dialog>;
+  changeNameDialog(request: ChangeNameDialogDTO): Observable<DialogHistory>;
 
-  changeFileDialog(request: ChangeFileDialogDTO): Observable<Dialog>;
+  changeFileDialog(request: ChangeFileDialogDTO): Observable<DialogHistory>;
 
   getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
 }
@@ -147,9 +147,9 @@ export interface DialogsServiceController {
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
 
-  changeNameDialog(request: ChangeNameDialogDTO): Observable<Dialog>;
+  changeNameDialog(request: ChangeNameDialogDTO): Observable<DialogHistory>;
 
-  changeFileDialog(request: ChangeFileDialogDTO): Observable<Dialog>;
+  changeFileDialog(request: ChangeFileDialogDTO): Observable<DialogHistory>;
 
   getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
 }

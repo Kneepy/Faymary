@@ -9,8 +9,8 @@ service DialogsService {
     rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialogs);
     rpc DeleteDialog (DeleteDialogDTO) returns (stream Empty);
     rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream DialogHistory);
-    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream Dialog);
-    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream Dialog);
+    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream DialogHistory);
+    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream DialogHistory);
     rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistories);
 }
 

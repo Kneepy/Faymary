@@ -96,27 +96,29 @@ export class DialogsController {
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CHANGE_NAME_DIALOG)
-    async changeNameDialog(data: ChangeNameDialogDTO): Promise<Dialogs> {
+    async changeNameDialog(data: ChangeNameDialogDTO): Promise<DialogHistory> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
         if(!dialog && !data.dialog_id) throw NotFoundDialog
 
         dialog.name = data.name
         const historyNote = await this.dialogsService.createHistoryNote({dialog, action: DialogActionEnum.CHANGE_NAME_DIALOG, user_id: data.user_id, desc: data.name})
+        await this.dialogsService.update(dialog)
 
-        return await this.dialogsService.update(dialog)
+        return historyNote 
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CHANGE_FILE_DIALOG)
-    async changeFileDialog(data: ChangeFileDialogDTO): Promise<Dialogs> {
+    async changeFileDialog(data: ChangeFileDialogDTO): Promise<DialogHistory> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
 
         if(!dialog && !data.dialog_id) throw NotFoundDialog
         
         dialog.file_id = data.file_id
         const historyNote = await this.dialogsService.createHistoryNote({dialog, action: DialogActionEnum.CHANGE_FILE_DIALOG, user_id: data.user_id, item_id: data.file_id})
+        await this.dialogsService.update(dialog)
 
-        return await this.dialogsService.update(dialog)
+        return historyNote
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_HISTORY_DIALOG)
