@@ -10,7 +10,7 @@ export class Dialogs {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @OneToMany(() => DialogParticipants, (participant: DialogParticipants) => participant.dialog)
+    @OneToMany(() => DialogParticipants, (participant: DialogParticipants) => participant.dialog, {cascade: true})
     participants: DialogParticipants[]
 
     @Column()
@@ -19,7 +19,7 @@ export class Dialogs {
     @Column()
     name: string
 
-    @Column()
+    @Column({nullable: true})
     file_id: string
 
     @OneToOne(() => DialogHistory, (history: DialogHistory) => history.dialog)

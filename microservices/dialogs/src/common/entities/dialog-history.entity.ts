@@ -1,4 +1,4 @@
-import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import { DialogActionEnum } from "../enums";
 import { Dialogs } from "./dialog.entity";
 
@@ -22,6 +22,7 @@ export class DialogHistory {
     @Column({type: "bigint"})
     createdAt: number
 
-    @OneToOne(() => Dialogs, (dialog: Dialogs) => dialog.history)
+    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.history)
+    @JoinColumn()
     dialog: Dialogs
 }

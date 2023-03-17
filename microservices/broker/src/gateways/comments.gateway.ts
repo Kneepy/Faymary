@@ -7,7 +7,7 @@ import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO, Comment } fr
 import { ICustomSocket } from './types/socket.type';
 import { WEVENTS } from './enums/events.enum';
 import { ServerGateway } from './server.gateway';
-import { NotificationCreate, NotificationEnumType } from 'src/proto/notification';
+import { NotificationAdditionsEnumType, NotificationCreate, NotificationEnumType } from 'src/proto/notification';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 
 @UseFilters(WsExceptionFilter)
@@ -27,11 +27,12 @@ export class CommentsGateway {
          */
         const notificationData: NotificationCreate = {
             from_id: user_id, 
-            type: NotificationEnumType.COMMENT, 
+            type: NotificationAdditionsEnumType.COMMENT, 
             item_id: comment.id, 
             to_id: null, 
             parent_type: comment.type as any, 
-            parent_id: comment.item_id
+            parent_id: comment.item_id,
+            notification_type: NotificationEnumType.ADD_COMMENT
         }
 
         this.serverGateway.sendNotification(notificationData, WEVENTS.NOTIFICATIONS_TYPE.CREATE_COMMENT)

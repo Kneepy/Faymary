@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { NotificationEnumType } from "../enums";
+import { NotificationAdditionsEnumType, NotificationEnumType } from "../enums";
 
 @Entity()
 export class Notifications {
@@ -16,7 +16,7 @@ export class Notifications {
      * тип элемента который добавили к какой либо записи
     */
     @Column()
-    type: NotificationEnumType;
+    type: NotificationAdditionsEnumType;
 
     /**
      * id элемента к которому добавили какую либо запись
@@ -28,7 +28,10 @@ export class Notifications {
      * тип элемента к которому добавили какую либо запись
     */
     @Column()
-    parent_type: NotificationEnumType
+    parent_type: NotificationAdditionsEnumType
+
+    @Column()
+    notification_type: NotificationEnumType
 
     @Column()
     to_id: string;

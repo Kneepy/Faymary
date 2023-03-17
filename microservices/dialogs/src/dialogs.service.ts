@@ -20,11 +20,17 @@ export class DialogsService {
     ) {}
 
     async addUserToDialog(dialog: Dialogs, participant: Omit<DialogParticipants, "id" | "dialog">): Promise<void> {
-        this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).add(participant)
+        const existParticipant = await this.findOneParticipantDialog({user_id: participant.user_id, dialog_id: dialog.id})
+        const addedParticipant = !!existParticipant ? existParticipant : await this.createParticipantDialog({dialog, user_id: participant.user_id, rights: participant.rights})
+
+        this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).add(addedParticipant)
     }
 
     async removeUserToDialog(dialog: Dialogs, participant: Omit<DialogParticipants, "id" | "dialog">): Promise<void> {
-        this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).remove(participant)
+        const removedParticipant = await this.findOneParticipantDialog({dialog_id: dialog.id, user_id: participant.user_id})
+
+        this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).remove(removedParticipant)
+        this.deleteParticipantDialog(removedParticipant.id)
     }
 
     // CRUD for participants
@@ -32,6 +38,12 @@ export class DialogsService {
         if(user_id && dialog_id) return await this.participantsRepository.findOne({where: {user_id, dialog: {id: dialog_id}}, ...otherOptions})
         
         return {} as any
+    }
+    async createParticipantDialog(participatnt: Omit<DialogParticipants, "id">): Promise<DialogParticipants> {
+        return await this.participantsRepository.save(participatnt)
+    }
+    async deleteParticipantDialog(id: string): Promise<any> {
+        return await this.participantsRepository.delete(id)
     }
 
     // CRUD for history
@@ -43,8 +55,8 @@ export class DialogsService {
     }
 
     // CRUD for dialogs
-    async create({participants}: DialogsInterfaces.CreateDialog): Promise<Dialogs> {
-        return await this.repository.save({participants, state: StateDialogEnum.ACTIVE})
+    async create({participants, name}: DialogsInterfaces.CreateDialog): Promise<Dialogs> {
+        return await this.repository.save({participants, name, state: StateDialogEnum.ACTIVE})
     }
 
     async update(dialog: Dialogs): Promise<Dialogs> {

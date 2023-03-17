@@ -23,7 +23,7 @@ import { DialogsService } from "./dialogs.service";
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [DialogHistory, Dialogs, DialogParticipants],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([DialogHistory, Dialogs, DialogParticipants])
     ],

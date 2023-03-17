@@ -6,6 +6,7 @@ import {
     Dialogs,
     DIALOGS_SERVICE_METHODS,
     DIALOGS_SERVICE_NAME,
+    ImpossibleAddUserDialog,
     InsufficientRightToMoveDialog,
     NotFoundDialog,
     NotFoundUserDialogs,
@@ -33,11 +34,13 @@ export class DialogsController {
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.ADD_USER_TO_DIALOG)
     async addUserToDialog(data: AddUserDialogDTO): Promise<DialogHistory> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
+        const existInviter = await this.dialogsService.findOneParticipantDialog({dialog_id: data.dialog_id, user_id: data.user_id})
 
+        if(!existInviter.id) throw ImpossibleAddUserDialog
         if(!dialog) throw NotFoundDialog
 
         const historyNote = await this.dialogsService.createHistoryNote({dialog: dialog, user_id: data.user_id, action: DialogActionEnum.ADD_USER, item_id: data.user_invited_id})
-        await this.dialogsService.addUserToDialog(dialog, {user_id: data.user_id, rights: ParticipantRights.USER})
+        await this.dialogsService.addUserToDialog(dialog, {user_id: data.user_invited_id, rights: ParticipantRights.USER})
     
         return historyNote
     }

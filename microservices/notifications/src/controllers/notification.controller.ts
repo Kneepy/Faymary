@@ -5,7 +5,9 @@ import {
     Notifications,
     NotFoundNotification,
     ImpossibleCreateNotification,
-    NOTIFICATION_LIFETIME
+    NOTIFICATION_LIFETIME,
+    NotificationAdditionsEnumType,
+    NotificationEnumType
 } from "src/common";
 import { NotificationService } from "../providers";
 import { GrpcMethod } from "@nestjs/microservices";
@@ -34,7 +36,8 @@ export class NotificationController {
     async createNotification(
         data: NotificationCreateDTO
     ): Promise<Notifications> {
-        if (!data.from_id || !data.to_id || !data.type || !data.parent_id || !data.parent_type) {
+        console.log(data)
+        if (!data.from_id || !data.to_id || !(data.type in NotificationAdditionsEnumType) || !data.parent_id || !(data.parent_type in NotificationAdditionsEnumType) || !(data.notification_type in NotificationEnumType)) {
             throw ImpossibleCreateNotification;
         } else {
             const existNotification = await this.notificationService.findOne({
@@ -53,8 +56,8 @@ export class NotificationController {
                 return updatedNotification
             }
             else {
-                const {from_id, type, to_id, item_id, parent_id, parent_type} = data
-                const newNotification = await this.notificationService.create({from_id, type, to_id, item_id, parent_id, parent_type})
+                const {from_id, type, to_id, item_id, parent_id, parent_type, notification_type} = data
+                const newNotification = await this.notificationService.create({from_id, type, to_id, item_id, parent_id, parent_type, notification_type})
 
                 return newNotification
             }

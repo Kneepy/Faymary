@@ -6,7 +6,7 @@ import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
-import { NotificationCreate, NotificationsServiceClient, Notification, NotificationEnumType } from 'src/proto/notification';
+import { NotificationCreate, NotificationsServiceClient, Notification, NotificationAdditionsEnumType } from 'src/proto/notification';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { CommentsServiceClient } from 'src/proto/comments';
 import { PostServiceClient } from 'src/proto/post';
@@ -38,16 +38,16 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         */
         if(data.parent_type && data.parent_id && !data.to_id) {
             switch (data.parent_type) {
-                case NotificationEnumType.COMMENT: 
+                case NotificationAdditionsEnumType.COMMENT: 
                     data.to_id = (await this.commentsService.getComment({id: data.parent_id}).toPromise()).user_id
                     break
-                case NotificationEnumType.POST: 
+                case NotificationAdditionsEnumType.POST: 
                     data.to_id = (await this.postsService.getPost({id: data.parent_id}).toPromise()).user_id
                     break
-                case (NotificationEnumType.USER) as NotificationEnumType: 
+                case (NotificationAdditionsEnumType.USER) as NotificationAdditionsEnumType: 
                     data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
                     break
-                case NotificationEnumType.STORY: 
+                case NotificationAdditionsEnumType.STORY: 
                     data.to_id = (await this.storiesService.getStory({id: data.parent_id}).toPromise()).user_id
                     break
             }
@@ -89,7 +89,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
         }).toPromise()
         const verifedTokens = await this.sessionService.verifyTokens({access_token: tokens.access_token, refresh_token: tokens.refresh_token}).toPromise()
-        
+
         if(!this.users.has(verifedTokens.user_id)) this.users.set(verifedTokens.user_id, new Map())
 
         client.session_id = tokens.refresh_token

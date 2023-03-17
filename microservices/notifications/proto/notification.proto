@@ -9,13 +9,14 @@ service NotificationsService {
 
 message Notification {
     string id = 1;
-    NotificationEnumType type = 2;
+    NotificationAdditionsEnumType type = 2;
     string item_id = 3;
     string to_id = 4;
     string parent_id = 5;
-    NotificationEnumType parent_type = 6;
+    NotificationAdditionsEnumType parent_type = 6;
     string from_id = 7;
     string createdAt = 8;
+    NotificationEnumType notification_type = 9;
 }
 
 message NotificationGetDTO {
@@ -28,12 +29,13 @@ message NotificationCreate {
     string from_id = 1;
     string to_id = 2;
     optional string item_id = 3;
-    NotificationEnumType type = 4;
+    NotificationAdditionsEnumType type = 4;
     string parent_id = 5;
-    NotificationEnumType parent_type = 6;
+    NotificationAdditionsEnumType parent_type = 6;
+    NotificationEnumType notification_type = 7;
 }
 
-enum NotificationEnumType {
+enum NotificationAdditionsEnumType {
     USER = 0;
     STORY = 1;
     POST = 2;
@@ -41,4 +43,12 @@ enum NotificationEnumType {
     MESSAGE = 4;
     DIALOG = 5;
     LIKE = 6;
+}
+
+enum NotificationEnumType {
+    ADD_COMMENT = 0;
+    DELETE_USER_FROM_DIALOG = 1;
+    DELETE_DIALOG = 2;
+    SUB_USER = 3;
+    ADD_LIKE = 4;
 }

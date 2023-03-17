@@ -6,7 +6,7 @@ import { DIALOGS_MODULE_CONFIG } from './../constants/app.constants';
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Inject } from '@nestjs/common';
 import { ICustomSocket } from './types/socket.type';
-import { NotificationEnumType } from 'src/proto/notification';
+import { NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
 
 @WebSocketGateway()
 export class DialogsGateway {
@@ -61,6 +61,10 @@ export class DialogsGateway {
         const dialogHistoryNote = await this.dialogsService.removeUserDialog({user_id, delete_id, dialog_id}).toPromise()
         const dialog = await this.dialogsService.getDialog({id: dialog_id}).toPromise()
 
+        await this.serverGateway.sendNotification(
+            {to_id: delete_id, from_id: user_id, type: NotificationAdditionsEnumType.USER, item_id: delete_id, parent_type: NotificationAdditionsEnumType.DIALOG, parent_id: dialog_id, notification_type: NotificationEnumType.DELETE_USER_FROM_DIALOG},
+            WEVENTS.NOTIFICATIONS_TYPE.YOU_REMOVE_FROM_DIALOG
+        )
         dialog.participants.forEach(async participant => 
             await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
                 data: dialogHistoryNote,
@@ -120,10 +124,11 @@ export class DialogsGateway {
             await this.serverGateway.sendNotification({
                 from_id: user_id,
                 to_id: participant.user_id,
-                type: NotificationEnumType.USER,
+                type: NotificationAdditionsEnumType.USER,
                 item_id: user_id,
                 parent_id: dialog.id,
-                parent_type: NotificationEnumType.DIALOG,
+                parent_type: NotificationAdditionsEnumType.DIALOG,
+                notification_type: NotificationEnumType.DELETE_DIALOG
             }, WEVENTS.NOTIFICATIONS_TYPE.DELETE_DIALOG)
         })
     }

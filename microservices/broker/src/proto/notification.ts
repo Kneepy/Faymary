@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "notifications";
 
-export enum NotificationEnumType {
+export enum NotificationAdditionsEnumType {
   USER = 0,
   STORY = 1,
   POST = 2,
@@ -15,15 +15,25 @@ export enum NotificationEnumType {
   UNRECOGNIZED = -1,
 }
 
+export enum NotificationEnumType {
+  ADD_COMMENT = 0,
+  DELETE_USER_FROM_DIALOG = 1,
+  DELETE_DIALOG = 2,
+  SUB_USER = 3,
+  ADD_LIKE = 4,
+  UNRECOGNIZED = -1,
+}
+
 export interface Notification {
   id: string;
-  type: NotificationEnumType;
+  type: NotificationAdditionsEnumType;
   item_id: string;
   to_id: string;
   parent_id: string;
-  parent_type: NotificationEnumType;
+  parent_type: NotificationAdditionsEnumType;
   from_id: string;
   createdAt: string;
+  notification_type: NotificationEnumType;
 }
 
 export interface NotificationGetDTO {
@@ -36,9 +46,10 @@ export interface NotificationCreate {
   from_id: string;
   to_id: string;
   item_id?: string | undefined;
-  type: NotificationEnumType;
+  type: NotificationAdditionsEnumType;
   parent_id: string;
-  parent_type: NotificationEnumType;
+  parent_type: NotificationAdditionsEnumType;
+  notification_type: NotificationEnumType;
 }
 
 export const NOTIFICATIONS_PACKAGE_NAME = "notifications";

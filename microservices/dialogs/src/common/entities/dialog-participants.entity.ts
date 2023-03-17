@@ -13,7 +13,7 @@ export class DialogParticipants {
     @Column()
     user_id: string
 
-    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.participants, {cascade: true})
+    @ManyToOne(() => Dialogs, (dialog: Dialogs) => dialog.participants)
     @JoinColumn()
     dialog: Dialogs
 }

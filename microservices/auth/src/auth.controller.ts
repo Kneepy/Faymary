@@ -54,9 +54,10 @@ export class AuthController {
                 }
             }
             else {
-                if(session.fingerprint !== data.session.fingerprint || session.createdAt + EXPIRES_IN_REFRESH_TOKEN > Date.now()) {
+                if(session.fingerprint !== data.session.fingerprint || session.createdAt + EXPIRES_IN_REFRESH_TOKEN < Date.now()) {
                     throw Unauthorized
                 } else {
+                    await this.sessionService.delete(session.id)
                     return {
                         access_token: this.authService.getAccessToken(session.user_id),
                         refresh_token: (await this.authService.getRefreshToken({

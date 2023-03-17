@@ -14,7 +14,8 @@ export const WEVENTS = {
     },
     NOTIFICATIONS_TYPE: {
         CREATE_COMMENT: "notification.comment.create",
-        DELETE_DIALOG: "notification.dialog.delete"
+        DELETE_DIALOG: "notification.dialog.delete",
+        YOU_REMOVE_FROM_DIALOG: "notification.dialog.you_removed"
     },
     ERROR: "error"
 }
