@@ -10,12 +10,15 @@ export const WEVENTS = {
         REMOVE_USER: "dialog.remove_user",
         CHANGE_NAME: "dialog.change_name",
         CHANGE_FILE: "dialog.change_file",
-        DELETE: "dialog.delete"
+        DELETE: "dialog.delete",
+        MESSAGES: {
+            CREATE: "dialog.create.message"
+        }
     },
     NOTIFICATIONS_TYPE: {
         CREATE_COMMENT: "notification.comment.create",
         DELETE_DIALOG: "notification.dialog.delete",
-        YOU_REMOVE_FROM_DIALOG: "notification.dialog.you_removed"
+        REMOVE_USER_FROM_DIALOG: "notification.dialog.you_removed"
     },
     ERROR: "error"
 }

@@ -26,7 +26,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
-
+    private dialogs: Map<string, Set<string>> = new Map()
 
     /**
      * Эта функция сама создаёт уведомления в микросервисе
@@ -94,6 +94,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         client.session_id = tokens.refresh_token
         client.user_id = verifedTokens.user_id
+
         this.users.get(verifedTokens.user_id).set(tokens.refresh_token, client)  
     }
 

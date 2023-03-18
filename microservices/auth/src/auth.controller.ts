@@ -25,7 +25,7 @@ export class AuthController {
 
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS)
     async generateTokens(data: GenerateTokensDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<TokensPayload> {
-        const oldRefreshToken = await this.sessionService.findOne([{ua: data.ua, user_id: data.user_id}, {ip: data.ip, user_id: data.user_id}])
+        const oldRefreshToken = await this.sessionService.findOne([{ua: data.ua, user_id: data.user_id}, {ip: data.ip, user_id: data.user_id}, {fingerprint: data.fingerprint, user_id: data.user_id}])
 
         if(!!oldRefreshToken) {
             await this.sessionService.delete(oldRefreshToken.id)
@@ -39,36 +39,37 @@ export class AuthController {
 
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS_BY_SESSION)
     async generateTokensBySession(data: GenerateTokensBySessionDTO): Promise<TokensPayload> {
+        if(!data.refresh_token) throw Unauthorized
+
         const session = await this.sessionService.findOne({id: data.refresh_token})
         const accessCodeIsVerify = this.authService.verifyAccessToken(data.access_token)
 
-        if(session) {
-            if(accessCodeIsVerify) {
-                if((accessCodeIsVerify as UserAccessTokenPayload).user_id === session.user_id && data.session.fingerprint === session.fingerprint) {
-                    return {
-                        access_token: data.access_token,
-                        refresh_token: data.refresh_token
-                    }
-                } else {
-                    throw Unauthorized
+        if(!!session) throw Unauthorized
+
+        if(accessCodeIsVerify) {
+            if((accessCodeIsVerify as UserAccessTokenPayload).user_id === session.user_id && data.session.fingerprint === session.fingerprint) {
+                return {
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token
                 }
+            } else {
+                throw Unauthorized
             }
-            else {
-                if(session.fingerprint !== data.session.fingerprint || session.createdAt + EXPIRES_IN_REFRESH_TOKEN < Date.now()) {
-                    throw Unauthorized
-                } else {
-                    await this.sessionService.delete(session.id)
-                    return {
-                        access_token: this.authService.getAccessToken(session.user_id),
-                        refresh_token: (await this.authService.getRefreshToken({
-                            ua: data.session.ua,
-                            fingerprint: data.session.fingerprint,
-                            ip: data.session.ip,
-                            user_id: session.user_id
-                        })).id
-                    }
-                }
+        }
+        else {
+            if(session.fingerprint !== data.session.fingerprint || session.createdAt + EXPIRES_IN_REFRESH_TOKEN < Date.now()) {
+                throw Unauthorized
+            } 
+            await this.sessionService.delete(session.id)
+            return {
+                access_token: this.authService.getAccessToken(session.user_id),
+                refresh_token: (await this.authService.getRefreshToken({
+                    ua: data.session.ua,
+                    fingerprint: data.session.fingerprint,
+                    ip: data.session.ip,
+                    user_id: session.user_id
+                })).id
             }
-        } else throw Unauthorized
+        }
     }
 }
