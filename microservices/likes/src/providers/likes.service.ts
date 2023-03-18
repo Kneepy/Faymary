@@ -15,7 +15,11 @@ export class LikesService {
     }
 
     async find(args: LikeTypes.FindManyLikesInterface, otherOptions: LikeTypes.FindManyOptionsInterface): Promise<Likes[]> {
-        return await this.repository.find({where: {...args, state: args.state ?? DEFAULT_LIKE_STATE}, take: otherOptions.take ?? DEFAULT_TAKE_LIKES, skip: otherOptions.skip ?? DEFAULT_SKIP_LIKES})
+        return await this.repository.find({where: {...args, state: args.state ?? DEFAULT_LIKE_STATE}})
+    }
+
+    async count(args: LikeTypes.GetCountLikesInterface): Promise<number> {
+        return await this.repository.countBy({type: args.type, item_id: args.item_id})
     }
 
     async findOne(args: LikeTypes.FindOneLikeInterface): Promise<Likes> {

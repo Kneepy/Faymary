@@ -8,10 +8,8 @@ export namespace LikeTypes {
 
     export interface FindManyOptionsInterface extends FindManyOptions {}
     export interface CreateLikeInterface extends Omit<Likes, "id" | "createdAt" | "state"> {}
-
     export interface UpdateLikeInterface extends Omit<Likes, "createdAt"> {}
-
     export interface FindManyLikesInterface extends Partial<Omit<Likes, "id">> {}
-
     export interface FindOneLikeInterface extends Partial<Likes> {}
+    export interface GetCountLikesInterface extends Pick<Likes, "type" | "item_id"> {}
 }

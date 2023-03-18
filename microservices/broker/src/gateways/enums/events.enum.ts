@@ -1,4 +1,5 @@
 export const WEVENTS = {
+    ADD_LIKE: "like.add",
     COMMENTS: {
         CREATE: "comment.create",
         UPDATE: "comment.update",
@@ -20,7 +21,8 @@ export const WEVENTS = {
     NOTIFICATIONS_TYPE: {
         CREATE_COMMENT: "notification.comment.create",
         DELETE_DIALOG: "notification.dialog.delete",
-        REMOVE_USER_FROM_DIALOG: "notification.dialog.you_removed"
+        REMOVE_USER_FROM_DIALOG: "notification.dialog.you_removed",
+        ADD_LIKE: "notification.add_like"
     },
     ERROR: "error"
 }

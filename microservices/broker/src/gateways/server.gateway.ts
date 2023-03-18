@@ -1,5 +1,5 @@
 import { UseFilters } from '@nestjs/common';
-import { COMMENTS_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
+import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
@@ -12,6 +12,7 @@ import { CommentsServiceClient } from 'src/proto/comments';
 import { PostServiceClient } from 'src/proto/post';
 import { StoriesServiceClient } from 'src/proto/stories';
 import { UserServiceClient } from 'src/proto/user';
+import { MessagesSerivceClient } from 'src/proto/messages';
 
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
 @UseFilters(WsExceptionFilter)
@@ -22,7 +23,8 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,
         @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
         @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
-        @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient
+        @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
+        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
@@ -37,17 +39,20 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         */
         if(data.parent_type && data.parent_id && !data.to_id) {
             switch (data.parent_type) {
+                case NotificationAdditionsEnumType.USER as NotificationAdditionsEnumType: 
+                    data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
+                    break
                 case NotificationAdditionsEnumType.COMMENT: 
                     data.to_id = (await this.commentsService.getComment({id: data.parent_id}).toPromise()).user_id
                     break
                 case NotificationAdditionsEnumType.POST: 
                     data.to_id = (await this.postsService.getPost({id: data.parent_id}).toPromise()).user_id
                     break
-                case (NotificationAdditionsEnumType.USER) as NotificationAdditionsEnumType: 
-                    data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
-                    break
                 case NotificationAdditionsEnumType.STORY: 
                     data.to_id = (await this.storiesService.getStory({id: data.parent_id}).toPromise()).user_id
+                    break
+                case NotificationAdditionsEnumType.MESSAGE: 
+                    data.to_id = (await this.messagesService.getMessage({id: data.parent_id}).toPromise()).user_id
                     break
             }
         }

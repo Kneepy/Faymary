@@ -22,5 +22,7 @@ export const MYSQL_PORT = 3306;
 export const MYSQL_HOST = "localhost";
 
 export enum  SERVICE_METHODS {
-    ADD_LIKE = "AddLike"
+    ADD_LIKE = "AddLike",
+    GET_COUNT_LIKES = "GetCountLikes",
+    CHECK_LIKE = "CheckLike"
 }

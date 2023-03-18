@@ -28,6 +28,25 @@ export interface Like {
   state: LikeState;
 }
 
+export interface GetCountLikesDTO {
+  type: LikeType;
+  item_id: string;
+}
+
+export interface CountLikes {
+  count: number;
+}
+
+export interface CheckLikeDTO {
+  user_id: string;
+  item_id: string;
+  type: LikeType;
+}
+
+export interface IsLiked {
+  isLiked: boolean;
+}
+
 export interface AddLikeDTO {
   user_id: string;
   item_id: string;
@@ -38,15 +57,23 @@ export const LIKES_PACKAGE_NAME = "likes";
 
 export interface LikesServiceClient {
   addLike(request: AddLikeDTO): Observable<Like>;
+
+  getCountLikes(request: GetCountLikesDTO): Observable<CountLikes>;
+
+  checkLike(request: CheckLikeDTO): Observable<IsLiked>;
 }
 
 export interface LikesServiceController {
   addLike(request: AddLikeDTO): Observable<Like>;
+
+  getCountLikes(request: GetCountLikesDTO): Observable<CountLikes>;
+
+  checkLike(request: CheckLikeDTO): Observable<IsLiked>;
 }
 
 export function LikesServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["addLike"];
+    const grpcMethods: string[] = ["addLike", "getCountLikes", "checkLike"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("LikesService", method)(constructor.prototype[method], method, descriptor);
