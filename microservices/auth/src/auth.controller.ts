@@ -44,7 +44,7 @@ export class AuthController {
         const session = await this.sessionService.findOne({id: data.refresh_token})
         const accessCodeIsVerify = this.authService.verifyAccessToken(data.access_token)
 
-        if(!!session) throw Unauthorized
+        if(!session) throw Unauthorized
 
         if(accessCodeIsVerify) {
             if((accessCodeIsVerify as UserAccessTokenPayload).user_id === session.user_id && data.session.fingerprint === session.fingerprint) {

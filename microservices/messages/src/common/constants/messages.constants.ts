@@ -20,6 +20,7 @@ export const MESSAGES_SERVICE_NAME = "MessagesSerivce";
 export enum MESSAGES_SERVICE_METHODS {
     CREATE_MESSAGE = "CreateMessage",
     GET_DIALOG_MESSAGES = "GetDialogMessages",
+    GET_MESSAGE = "GetMessage",
     UPDATE_MESSAGE = "UpdateMessage",
     DELETE_MESSAGE = "DeleteMessage",
 }

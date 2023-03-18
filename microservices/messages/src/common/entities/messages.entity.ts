@@ -6,10 +6,10 @@ export class Messages {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({nullable: true})
     attachment: MessagesEnumType;
 
-    @Column()
+    @Column({nullable: true})
     item_id: string;
 
     @Column()

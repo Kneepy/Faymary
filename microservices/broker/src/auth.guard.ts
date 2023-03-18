@@ -1,9 +1,11 @@
+import { COOKIE_REFRESH_TOKEN_NAME } from 'src/constants/app.constants';
 import { Reflector } from '@nestjs/core';
 import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
 import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./constants/app.constants";
 import { SessionServiceClient } from "./proto/session";
 import { ICustomRequest } from './types/request.type';
 import { UnautorizedError } from './constants/errors.constants';
+import { ICustomResponse } from './types/response.type';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -14,7 +16,7 @@ export class AuthGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: ICustomRequest = context.switchToHttp().getRequest();
-
+        const response: ICustomResponse = context.switchToHttp().getResponse()
 
         // типо защита от лоха
         delete request.user_id
@@ -33,6 +35,8 @@ export class AuthGuard implements CanActivate {
 
                 request.headers.refresh_token = tokens.refresh_token
                 request.headers.authorization = tokens.access_token
+
+                response.setCookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token)
 
                 if(verifedTokens.user_id !== null) {
                     request.user_id = verifedTokens.user_id

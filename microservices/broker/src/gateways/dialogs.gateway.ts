@@ -4,11 +4,13 @@ import { WEVENTS } from './enums/events.enum';
 import { AddUserDialogDTO, ChangeFileDialogDTO, ChangeNameDialogDTO, CreateDialogDTO, DeleteDialogDTO, DeleteUserDialogDTO, Dialog, DialogHistory, DialogParticipants, DialogsServiceClient, GetUserDialogsDTO, ParticipantRights } from './../proto/dialogs';
 import { DIALOGS_MODULE_CONFIG } from './../constants/app.constants';
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
-import { Inject } from '@nestjs/common';
+import { Inject, UseFilters } from '@nestjs/common';
 import { ICustomSocket } from './types/socket.type';
 import { NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
+import { WsExceptionFilter } from './filters/ws-exception.filter';
 
 @WebSocketGateway()
+@UseFilters(WsExceptionFilter)
 export class DialogsGateway {
     constructor(
         @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient,

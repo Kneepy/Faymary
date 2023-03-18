@@ -1,7 +1,7 @@
 import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
-import { Inject, Injectable } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
+import { Inject } from '@nestjs/common';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
@@ -26,7 +26,6 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
-    private dialogs: Map<string, Set<string>> = new Map()
 
     /**
      * Эта функция сама создаёт уведомления в микросервисе
@@ -95,7 +94,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.session_id = tokens.refresh_token
         client.user_id = verifedTokens.user_id
 
-        this.users.get(verifedTokens.user_id).set(tokens.refresh_token, client)  
+        this.users.get(verifedTokens.user_id).set(tokens.refresh_token, client)
     }
 
     handleDisconnect(@ConnectedSocket() client: ICustomSocket) {

@@ -3,7 +3,7 @@ import { PostServiceClient } from './../proto/post';
 import { POST_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Body, Controller, Delete, Get, Inject, NotFoundException, Patch, Post, Query, Req } from "@nestjs/common";
 import { STORIES_MODULE_CONFIG } from "src/constants/app.constants";
-import { CreateStoryDTO, MarkType, StoriesServiceClient, Story, UpdateStoryDTO, GetStoriesDTO, Stories, DeleteStoryDTO } from "src/proto/stories";
+import { CreateStoryDTO, MarkType, StoriesServiceClient, Story, UpdateStoryDTO, GetStoriesDTO, Stories, DeleteStoryDTO, GetStoryDTO } from "src/proto/stories";
 import { ICustomRequest } from "src/types/request.type";
 import { DisableAuth } from 'src/disable-auth.decorator';
 
@@ -46,9 +46,15 @@ export class StoriesController {
         return !!(await this.storiesService.deleteStory({id: data.id, user_id: req.user_id}).toPromise())
     }
 
-    @Get()
+    @Get("all")
     @DisableAuth()
     async getStories(@Query() data: GetStoriesDTO): Promise<Stories> {
         return await this.storiesService.getStories(data).toPromise()
+    }
+
+    @Get()
+    @DisableAuth()
+    async getStory(@Query() data: GetStoryDTO): Promise<Story> {
+        return await this.storiesService.getStory(data).toPromise()
     }
 }

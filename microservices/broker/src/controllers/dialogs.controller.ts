@@ -1,12 +1,15 @@
+import { MESSAGES_MODULE_CONFIG } from './../constants/app.constants';
 import { Controller, ForbiddenException, Get, Inject, Query, Req } from "@nestjs/common";
 import { DIALOGS_MODULE_CONFIG } from "src/constants/app.constants";
 import { DialogHistories, Dialogs, DialogsServiceClient, GetHistoryDialogDTO, GetUserDialogsDTO } from "src/proto/dialogs";
+import { GetMessageDTO, GetMessagesDTO, Message, Messages, MessagesSerivceClient } from "src/proto/messages";
 import { ICustomRequest } from "src/types/request.type";
 
 @Controller("dialog")
 export class DialogsControllerer {
     constructor(
-        @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient
+        @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient,
+        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient
     ) {}
 
     @Get("many")
@@ -25,5 +28,22 @@ export class DialogsControllerer {
         if(!userIsIncludedIntoDialog.isIncluded) throw new ForbiddenException()
 
         return historyNotes
+    }
+
+    @Get("messages")
+    async getMessagesDialog(@Query() data: GetMessagesDTO, @Req() {user_id}: ICustomRequest): Promise<Messages> {
+        const dialog = await this.dialogsService.getDialog({id: data.dialog_id}).toPromise()
+
+        /**
+         * Проверка на наличие пользователя в идалоге, если его там нет то и сообщения он не получит
+         */
+        if(!dialog.participants.find(user => user.user_id === user_id).user_id) throw new ForbiddenException()
+
+        return await this.messagesService.getDialogMessages(data).toPromise()
+    }
+
+    @Get("message")
+    async getMessage(@Query() data: GetMessageDTO): Promise<Message> {
+        return await this.messagesService.getMessage(data).toPromise()
     }
 }

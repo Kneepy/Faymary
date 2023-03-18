@@ -1,6 +1,7 @@
 import { Controller } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import {
+    FailedDeleteMessage,
     Messages,
     MESSAGES_SERVICE_METHODS,
     MESSAGES_SERVICE_NAME,
@@ -10,6 +11,7 @@ import {
 import {
     CreateMessageDTO,
     GetDialogMessagesDTO,
+    GetMessageDTO,
     UpdateMessageDTO
 } from "./dto";
 import { MessagesService } from "./messages.service";
@@ -26,13 +28,18 @@ export class MessagesController {
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_DIALOG_MESSAGES)
-    async getDialogMessages(data: GetDialogMessagesDTO): Promise<Messages[]> {
+    async getDialogMessages(data: GetDialogMessagesDTO): Promise<{messages: Messages[]}> {
         if (!data.dialog_id) throw NotFoundDialog;
 
-        return await this.messagesService.find(
+        return {messages: await this.messagesService.find(
             { dialog_id: data.dialog_id },
             { take: data.take, skip: data.skip }
-        );
+        )}
+    }
+
+    @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_MESSAGE)
+    async getMessage(data: GetMessageDTO): Promise<Messages> {
+        return await this.messagesService.findOne({id: data.id})
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.UPDATE_MESSAGE)
@@ -43,7 +50,13 @@ export class MessagesController {
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.DELETE_MESSAGE)
-    async deleteMessage(data: Pick<Messages, "id">): Promise<any> {
-        return await this.messagesService.delete(data.id);
+    async deleteMessage(data: Pick<Messages, "id" | "user_id">): Promise<any> {
+        const message = await this.messagesService.findOne({id: data.id})
+
+        if(message.user_id !== data.user_id) throw FailedDeleteMessage
+
+        await this.messagesService.delete(message.id);
+
+        return message
     }
 }

@@ -10,4 +10,5 @@ COMMENT = 3;
 MESSAGE = 4;
 DIALOG = 5;
 LIKE = 6;
+FILE = 7;
 ```

@@ -1,6 +1,5 @@
 import { FastifyRequest } from 'fastify';
 
-
 export interface ICustomRequest extends FastifyRequest {
     headers: {
         fingerprint: string

@@ -10,6 +10,7 @@ export enum MessagesEnumType {
   POST = 2,
   COMMENT = 3,
   MESSAGE = 4,
+  FILE = 7,
   UNRECOGNIZED = -1,
 }
 
@@ -17,6 +18,10 @@ export interface GetMessagesDTO {
   dialog_id: string;
   take?: number | undefined;
   skip?: number | undefined;
+}
+
+export interface GetMessageDTO {
+  id: string;
 }
 
 export interface CreateMessageDTO {
@@ -31,13 +36,14 @@ export interface UpdateMessageDTO {
   attachment?: MessagesEnumType | undefined;
   dialog_id: string;
   id: string;
-  msg: string;
+  msg?: string | undefined;
   item_id?: string | undefined;
   user_id: string;
 }
 
 export interface DeleteMessageDTO {
   id: string;
+  user_id: string;
 }
 
 export interface Message {
@@ -61,6 +67,8 @@ export interface MessagesSerivceClient {
 
   getDialogMessages(request: GetMessagesDTO): Observable<Messages>;
 
+  getMessage(request: GetMessageDTO): Observable<Message>;
+
   updateMessage(request: UpdateMessageDTO): Observable<Message>;
 
   deleteMessage(request: DeleteMessageDTO): Observable<Message>;
@@ -71,6 +79,8 @@ export interface MessagesSerivceController {
 
   getDialogMessages(request: GetMessagesDTO): Observable<Messages>;
 
+  getMessage(request: GetMessageDTO): Observable<Message>;
+
   updateMessage(request: UpdateMessageDTO): Observable<Message>;
 
   deleteMessage(request: DeleteMessageDTO): Observable<Message>;
@@ -78,7 +88,13 @@ export interface MessagesSerivceController {
 
 export function MessagesSerivceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createMessage", "getDialogMessages", "updateMessage", "deleteMessage"];
+    const grpcMethods: string[] = [
+      "createMessage",
+      "getDialogMessages",
+      "getMessage",
+      "updateMessage",
+      "deleteMessage",
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("MessagesSerivce", method)(constructor.prototype[method], method, descriptor);

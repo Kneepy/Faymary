@@ -7,7 +7,7 @@ import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO, Comment } fr
 import { ICustomSocket } from './types/socket.type';
 import { WEVENTS } from './enums/events.enum';
 import { ServerGateway } from './server.gateway';
-import { NotificationAdditionsEnumType, NotificationCreate, NotificationEnumType } from 'src/proto/notification';
+import { NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 
 @UseFilters(WsExceptionFilter)
@@ -25,7 +25,7 @@ export class CommentsGateway {
         /**
          * Могу себе позволить создавать такие штуки т.к все enum'ы типов записей (post, user, story и т.п) должны быть одинаковыми на всех микросервисах
          */
-        const notificationData: NotificationCreate = {
+        this.serverGateway.sendNotification({
             from_id: user_id, 
             type: NotificationAdditionsEnumType.COMMENT, 
             item_id: comment.id, 
@@ -33,9 +33,7 @@ export class CommentsGateway {
             parent_type: comment.type as any, 
             parent_id: comment.item_id,
             notification_type: NotificationEnumType.ADD_COMMENT
-        }
-
-        this.serverGateway.sendNotification(notificationData, WEVENTS.NOTIFICATIONS_TYPE.CREATE_COMMENT)
+        }, WEVENTS.NOTIFICATIONS_TYPE.CREATE_COMMENT)
         this.serverGateway.broadcastUser<Comment>(user_id, {
             event: WEVENTS.COMMENTS.CREATE, 
             data: comment

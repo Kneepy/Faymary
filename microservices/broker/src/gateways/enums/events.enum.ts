@@ -12,7 +12,9 @@ export const WEVENTS = {
         CHANGE_FILE: "dialog.change_file",
         DELETE: "dialog.delete",
         MESSAGES: {
-            CREATE: "dialog.create.message"
+            CREATE: "dialog.create.message",
+            UPDATE: "dialog.update.message",
+            DELETE: "dialog.delete.message"
         }
     },
     NOTIFICATIONS_TYPE: {
