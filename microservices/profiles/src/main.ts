@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
-import { MODULE_PACKAGE_NAME, PROFILES_PROTO_PATH, MODULE_HOST } from './constants/app.constants';
+import { MODULE_PACKAGE_NAME, PROFILES_PROTO_PATH, MODULE_HOST } from './common/constants/app.constants';
 
 (async () => {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {

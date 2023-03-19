@@ -9,7 +9,7 @@ import {
     LikesClientDependency, MailClient, MailClientDependency, MessagesClient,
     MessagesClientDependency, NotificationsClient,
     NotificationsClientDependency, PostClient,
-    PostClientDependency, SessionClient,
+    PostClientDependency, ProfilesClient, ProfilesClientDependency, SessionClient,
     SessionClientDependency, StoreClient,
     StoreClientDependency, StoriesClient, StoriesClientDependency, UsersClient,
     UsersClientDependency
@@ -20,12 +20,12 @@ import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
 
 const Gateways = [CommentsGateway, ServerGateway, DialogsGateway, MessagesGateway, LikesGateway]
-const Clients = [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient]
+const Clients = [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient, ProfilesClient]
 const Controllers = [UserController, PostController, StoriesController, CommentsController, DialogsControllerer]
 
 @Module({
     imports: [
-        ClientsModule.register([LikesClientDependency, UsersClientDependency, StoreClientDependency, SessionClientDependency, PostClientDependency, NotificationsClientDependency, MessagesClientDependency, DialogsClientDependency, StoriesClientDependency, CommentsClientDependency, MailClientDependency])
+        ClientsModule.register([LikesClientDependency, UsersClientDependency, StoreClientDependency, SessionClientDependency, PostClientDependency, NotificationsClientDependency, MessagesClientDependency, DialogsClientDependency, StoriesClientDependency, CommentsClientDependency, MailClientDependency, ProfilesClientDependency])
     ],
     controllers: Controllers,
     providers: [

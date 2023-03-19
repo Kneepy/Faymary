@@ -4,6 +4,7 @@ import {
     DIALOGS_MODULE_CONFIG,
     LIKES_MODULE_CONFIG, MAIL_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG,
     POST_MODULE_CONFIG,
+    PROFILES_MODULE_CONFIG,
     SESSION_MODULE_CONFIG,
     STORE_MODULE_CONFIG, STORIES_MODULE_CONFIG,
     USER_MODULE_CONFIG
@@ -15,6 +16,7 @@ import { MailServiceClient } from "./proto/mail";
 import { MessagesSerivceClient } from "./proto/messages";
 import { NotificationsServiceClient } from "./proto/notification";
 import { PostServiceClient } from "./proto/post";
+import { ProfilesServiceClient } from "./proto/profiles";
 import { SessionServiceClient } from "./proto/session";
 import { StoreServiceClient } from "./proto/store";
 import { StoriesServiceClient } from "./proto/stories";
@@ -55,3 +57,6 @@ export const CommentsClientDependency = GetClientOptionsByConfig(COMMENTS_MODULE
 
 export const MailClient = GetClientProvider<MailServiceClient>(MAIL_MODULE_CONFIG)
 export const MailClientDependency = GetClientOptionsByConfig(MAIL_MODULE_CONFIG)
+
+export const ProfilesClient = GetClientProvider<ProfilesServiceClient>(PROFILES_MODULE_CONFIG)
+export const ProfilesClientDependency = GetClientOptionsByConfig(PROFILES_MODULE_CONFIG)

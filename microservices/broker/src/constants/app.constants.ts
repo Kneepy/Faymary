@@ -19,3 +19,4 @@ export const DIALOGS_MODULE_CONFIG = GetModuleConfig({port: 5003, pkgName: "dial
 export const STORIES_MODULE_CONFIG = GetModuleConfig({port: 5009, pkgName: "stories", host: DEFAULT_HOST, protoPath: GetProtoPath("stories"), serviceName: "StoriesService"})
 export const COMMENTS_MODULE_CONFIG = GetModuleConfig({port: 5010, pkgName: "comments", host: DEFAULT_HOST, protoPath: GetProtoPath("comments"), serviceName: "CommentsService"})
 export const MAIL_MODULE_CONFIG = GetModuleConfig({port: 5011, pkgName: "mail", host: DEFAULT_HOST, protoPath: GetProtoPath("mail"), serviceName: "MailService"})
+export const PROFILES_MODULE_CONFIG = GetModuleConfig({port: 5012, pkgName: "profiles", host: DEFAULT_HOST, protoPath: GetProtoPath("profiles"), serviceName: "ProfilesService"})
