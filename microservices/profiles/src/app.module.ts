@@ -14,7 +14,7 @@ import { ProfilesController } from './profiles.controller';
             password: MYSQL_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [Accounts, Profiles],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Accounts, Profiles])
     ],

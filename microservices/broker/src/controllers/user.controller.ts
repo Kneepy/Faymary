@@ -11,19 +11,22 @@ import {
     Res,
     UnauthorizedException,
 } from "@nestjs/common";
-import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
+import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
 import {Response} from "express"
 import {CreateUserDTO, FindFollowersDTO, FindUserDTO, FollowUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowDTO, UserIsFollowResult, Users, UserServiceClient, UsersIsFollowDTO, UserState} from "src/proto/user";
 import { ICustomRequest } from "src/types/request.type";
 import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
+import { PoorDataError } from "src/constants/errors.constants";
+import { ProfilesServiceClient } from "src/proto/profiles";
 
 @Controller("/user")
 export class UserController {
     constructor(
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
         @Inject(MAIL_MODULE_CONFIG.PROVIDER) private mailService: MailServiceClient,
+        @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profilesService: ProfilesServiceClient,
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient
     ) {}
 
@@ -41,14 +44,15 @@ export class UserController {
     @Put("confirm")
     @DisableAuth()
     async confirmUser(@Req() req: ICustomRequest, @Res({ passthrough: true }) res: Response, @Query() data: ConfirmAccessCodeDTO): Promise<VerifyTokensDTO> {
+        if(!req.headers["fingerprint"]) throw PoorDataError
+
         const { isConfirmed } = await this.mailService.confirmAccessCode({user_id: data.user_id, code: data.code}).toPromise()
         const ip = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for']
+
         if(isConfirmed) {
             await this.userService.updateUser({id: data.user_id, state: UserState.ACTIVE}).toPromise()
-
             const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: data.user_id, ip}).toPromise()
-
-            res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token)
+            res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, {httpOnly: true})
 
             return tokens
         } else {
@@ -60,6 +64,7 @@ export class UserController {
     @DisableAuth()
     async createUser(@Body() data: Omit<CreateUserDTO, "state">): Promise<{user_id: string}> {
         const user = await (this.userService.createUser({...data, state: UserState.UNACTIVE}).toPromise())
+        const profileUser = await this.profilesService.createProfile({user_id: user.id}).toPromise()
         const code = await (this.mailService.sendAccessCode({user_id: user.id, email: user.email}).toPromise())
 
         return {user_id: user.id}

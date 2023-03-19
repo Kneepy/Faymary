@@ -3,6 +3,7 @@ syntax = "proto3";
 package profiles;
 
 service ProfilesService {
+    rpc CreateProfile (CreateProfileDTO) returns (stream Profile);
     rpc GetProfile (GetProfileDTO) returns (stream Profile);
     rpc UpdateProfile (UpdateProfileDTO) returns (stream Profile);
     rpc AddUserAccount (MoveUserAccountDTO) returns (stream Account);
@@ -10,6 +11,9 @@ service ProfilesService {
 }
 
 message GetProfileDTO {
+    string user_id = 1;
+}
+message CreateProfileDTO {
     string user_id = 1;
 }
 message UpdateProfileDTO {

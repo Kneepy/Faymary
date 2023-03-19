@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { Logger } from "@nestjs/common"
 import { AppModule } from './app.module';
 import { MODULE_PACKAGE_NAME, PROFILES_PROTO_PATH, MODULE_HOST } from './common/constants/app.constants';
 
@@ -16,4 +17,6 @@ import { MODULE_PACKAGE_NAME, PROFILES_PROTO_PATH, MODULE_HOST } from './common/
         }
     });
     await app.listen();
+
+    Logger.log("Profiles service successfully started")
 })()

@@ -8,6 +8,10 @@ export interface GetProfileDTO {
   user_id: string;
 }
 
+export interface CreateProfileDTO {
+  user_id: string;
+}
+
 export interface UpdateProfileDTO {
   id: string;
   user_id: string;
@@ -43,6 +47,8 @@ export interface Account {
 export const PROFILES_PACKAGE_NAME = "profiles";
 
 export interface ProfilesServiceClient {
+  createProfile(request: CreateProfileDTO): Observable<Profile>;
+
   getProfile(request: GetProfileDTO): Observable<Profile>;
 
   updateProfile(request: UpdateProfileDTO): Observable<Profile>;
@@ -53,6 +59,8 @@ export interface ProfilesServiceClient {
 }
 
 export interface ProfilesServiceController {
+  createProfile(request: CreateProfileDTO): Observable<Profile>;
+
   getProfile(request: GetProfileDTO): Observable<Profile>;
 
   updateProfile(request: UpdateProfileDTO): Observable<Profile>;
@@ -64,7 +72,13 @@ export interface ProfilesServiceController {
 
 export function ProfilesServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getProfile", "updateProfile", "addUserAccount", "removeUserAccount"];
+    const grpcMethods: string[] = [
+      "createProfile",
+      "getProfile",
+      "updateProfile",
+      "addUserAccount",
+      "removeUserAccount",
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("ProfilesService", method)(constructor.prototype[method], method, descriptor);

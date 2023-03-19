@@ -1,7 +1,7 @@
 import { GrpcMethod } from '@nestjs/microservices';
 import { Controller } from "@nestjs/common";
 import { ProfilesService } from "./profiles.service";
-import { Accounts, Profiles, PROFILES_SERVICE_METHODS, PROFILES_SERVICE_NAME } from './common';
+import { Accounts, NotFoundProfileError, Profiles, PROFILES_SERVICE_METHODS, PROFILES_SERVICE_NAME } from './common';
 import { ProfilesDTOs } from './dtos';
 
 @Controller()
@@ -12,7 +12,16 @@ export class ProfilesController {
 
     @GrpcMethod(PROFILES_SERVICE_NAME, PROFILES_SERVICE_METHODS.GET_PROFILE)
     async getProfile(data: ProfilesDTOs.GetProfileDTO): Promise<Profiles> {
-        return await this.profilesService.findOne({where: data, relations: {accounts: true}})
+        const profile = await this.profilesService.findOne({where: data, relations: {accounts: true}})
+
+        if(!profile) throw NotFoundProfileError
+
+        return profile
+    }
+
+    @GrpcMethod(PROFILES_SERVICE_NAME, PROFILES_SERVICE_METHODS.CREATE_PROFILE)
+    async createProfile(data: ProfilesDTOs.CreateProfileDTO): Promise<Profiles> {
+        return await this.profilesService.create({user_id: data.user_id})
     }
 
     @GrpcMethod(PROFILES_SERVICE_NAME, PROFILES_SERVICE_METHODS.UPDATE_PROFILE)

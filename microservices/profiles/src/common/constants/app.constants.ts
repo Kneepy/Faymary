@@ -14,9 +14,10 @@ export const MYSQL_PORT = 3306;
 export const MYSQL_HOST = "localhost";
 
 export const PROFILES_SERVICE_NAME = "ProfilesService";
-export enum PROFILES_SERVICE_METHODS {
-   GET_PROFILE = "GetProfile",
-   UPDATE_PROFILE = "UpdateProfile",
-   ADD_USER_ACCOUNT = "AddUserAccount",
-   REMOVE_USER_ACCOUNT = "RemoveUserAccount"
+export enum PROFILES_SERVICE_METHODS { 
+    CREATE_PROFILE = "CreateProfile",
+    GET_PROFILE = "GetProfile",
+    UPDATE_PROFILE = "UpdateProfile",
+    ADD_USER_ACCOUNT = "AddUserAccount",
+    REMOVE_USER_ACCOUNT = "RemoveUserAccount"
 }

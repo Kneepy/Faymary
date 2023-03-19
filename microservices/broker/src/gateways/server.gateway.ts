@@ -1,12 +1,12 @@
 import { UseFilters } from '@nestjs/common';
-import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
+import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, PROFILES_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
-import { NotificationCreate, NotificationsServiceClient, Notification, NotificationAdditionsEnumType } from 'src/proto/notification';
+import { NotificationCreate, NotificationsServiceClient, Notification, NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
 import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { CommentsServiceClient } from 'src/proto/comments';
 import { PostServiceClient } from 'src/proto/post';
@@ -14,6 +14,7 @@ import { StoriesServiceClient } from 'src/proto/stories';
 import { UserServiceClient } from 'src/proto/user';
 import { MessagesSerivceClient } from 'src/proto/messages';
 import { WEVENTS } from './enums/events.enum';
+import { ProfilesServiceClient } from 'src/proto/profiles';
 
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
 @UseFilters(WsExceptionFilter)
@@ -25,7 +26,8 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
         @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
-        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient
+        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient,
+        @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profileService: ProfilesServiceClient
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
@@ -37,6 +39,8 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         /**
          * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
          * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
+         * 
+         * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
         */
         if(data.parent_type && data.parent_id && !data.to_id) {
             switch (data.parent_type) {
@@ -97,8 +101,11 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if(!this.users.has(verifedTokens.user_id)) this.users.set(verifedTokens.user_id, new Map())
 
+        const userSettings = await this.profileService.getProfile({user_id: verifedTokens.user_id}).toPromise()
+
         client.session_id = tokens.refresh_token
         client.user_id = verifedTokens.user_id
+        client.settings = userSettings
 
         this.users.get(verifedTokens.user_id).set(tokens.refresh_token, client)
     }
