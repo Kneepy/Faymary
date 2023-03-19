@@ -12,18 +12,18 @@ export class AuthService {
         private sessionService: SessionService
     ) {}
 
-    verifyAccessToken(token: string): UserAccessTokenPayload | boolean {
+    verifyAccessToken(token: string): UserAccessTokenPayload | null {
         try {
             return this.jwtService.verify<UserAccessTokenPayload>(token)
         } catch (e) {
-            return false
+            return null
         }
     }
 
-    async verifyRefreshToken(tokenId: string): Promise<Sessions | boolean> {
+    async verifyRefreshToken(tokenId: string): Promise<Sessions | null> {
         const token = await this.sessionService.findOne({id: tokenId})
 
-        return token.createdAt + EXPIRES_IN_REFRESH_TOKEN > Date.now() ? token : false
+        return token.createdAt + EXPIRES_IN_REFRESH_TOKEN > Date.now() ? token : null 
     }
 
     getAccessToken(user_id: string): string {

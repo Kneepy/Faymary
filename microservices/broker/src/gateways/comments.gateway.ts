@@ -33,7 +33,7 @@ export class CommentsGateway {
             parent_type: comment.type as any, 
             parent_id: comment.item_id,
             notification_type: NotificationEnumType.ADD_COMMENT
-        }, WEVENTS.NOTIFICATIONS_TYPE.CREATE_COMMENT)
+        })
         this.serverGateway.broadcastUser<Comment>(user_id, {
             event: WEVENTS.COMMENTS.CREATE, 
             data: comment

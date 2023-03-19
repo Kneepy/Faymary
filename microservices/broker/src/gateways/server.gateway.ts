@@ -13,6 +13,7 @@ import { PostServiceClient } from 'src/proto/post';
 import { StoriesServiceClient } from 'src/proto/stories';
 import { UserServiceClient } from 'src/proto/user';
 import { MessagesSerivceClient } from 'src/proto/messages';
+import { WEVENTS } from './enums/events.enum';
 
 @WebSocketGateway({cors: {origin: "*"}, cookie: true})
 @UseFilters(WsExceptionFilter)
@@ -32,7 +33,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     /**
      * Эта функция сама создаёт уведомления в микросервисе
      */
-    async sendNotification(data: NotificationCreate, event: string): Promise<boolean> {
+    async sendNotification(data: NotificationCreate): Promise<boolean> {
         /**
          * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
          * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
@@ -58,7 +59,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         if(data.to_id !== data.from_id) {
-            return this.broadcastUser<Notification>(data.to_id, {event, data: await this.notificationsService.createNotification(data).toPromise()})
+            return this.broadcastUser<Notification>(data.to_id, {event: WEVENTS.NOTIFICATION, data: await this.notificationsService.createNotification(data).toPromise()})
         }
     }
 

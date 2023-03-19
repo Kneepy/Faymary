@@ -27,6 +27,6 @@ export class LikesGateway {
             parent_id: item_id,
             parent_type: type as any,
             to_id: null
-        }, WEVENTS.NOTIFICATIONS_TYPE.ADD_LIKE)
+        })
     }
 }

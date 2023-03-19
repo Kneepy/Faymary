@@ -20,7 +20,9 @@ export class AuthController {
         const verifyAccess = this.authService.verifyAccessToken(data.access_token)
         const verifyRefresh = await this.authService.verifyRefreshToken(data.refresh_token)
 
-        return (!!verifyAccess && !!verifyRefresh) ? verifyAccess as UserAccessTokenPayload : {user_id: null}
+        if(!!verifyRefresh && !!verifyAccess && (verifyRefresh.user_id === verifyAccess.user_id)) {
+            return verifyAccess
+        } else return {user_id: null}
     }
 
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS)
@@ -46,20 +48,23 @@ export class AuthController {
 
         if(!session) throw Unauthorized
 
-        if(accessCodeIsVerify) {
-            if((accessCodeIsVerify as UserAccessTokenPayload).user_id === session.user_id && data.session.fingerprint === session.fingerprint) {
-                return {
-                    access_token: data.access_token,
-                    refresh_token: data.refresh_token
-                }
-            } else {
-                throw Unauthorized
+        /**
+         * Знаю что дубляж кода и всё такое, заморачивться не хочется
+         * Логика такая что если access_token ещё существет то мы отдаём пользователю ту же сессию что он и отправил
+         * С проверкой fingerprint'а, т.к если он не будет верен то мы удаляем сессию
+         * Если access_token'а нет то удаляем старую сессию и создаём новую, с проверкой fingerprint'а
+         */
+        if(data.session.fingerprint !== session.fingerprint || Date.now() > session.createdAt + EXPIRES_IN_REFRESH_TOKEN) {
+            await this.sessionService.delete(session.id)
+            throw Unauthorized
+        }
+        if(!!accessCodeIsVerify.user_id) {
+            return {
+                access_token: data.access_token,
+                refresh_token: data.refresh_token
             }
         }
         else {
-            if(session.fingerprint !== data.session.fingerprint || session.createdAt + EXPIRES_IN_REFRESH_TOKEN < Date.now()) {
-                throw Unauthorized
-            } 
             await this.sessionService.delete(session.id)
             return {
                 access_token: this.authService.getAccessToken(session.user_id),

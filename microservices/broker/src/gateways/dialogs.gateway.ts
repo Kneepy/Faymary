@@ -65,7 +65,6 @@ export class DialogsGateway {
 
         await this.serverGateway.sendNotification(
             {to_id: delete_id, from_id: user_id, type: NotificationAdditionsEnumType.USER, item_id: delete_id, parent_type: NotificationAdditionsEnumType.DIALOG, parent_id: dialog_id, notification_type: NotificationEnumType.DELETE_USER_FROM_DIALOG},
-            WEVENTS.NOTIFICATIONS_TYPE.REMOVE_USER_FROM_DIALOG
         )
         dialog.participants.forEach(async participant => 
             await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
@@ -131,7 +130,7 @@ export class DialogsGateway {
                 parent_id: dialog.id,
                 parent_type: NotificationAdditionsEnumType.DIALOG,
                 notification_type: NotificationEnumType.DELETE_DIALOG
-            }, WEVENTS.NOTIFICATIONS_TYPE.DELETE_DIALOG)
+            })
         })
     }
 }
