@@ -16,6 +16,7 @@ import { MessagesSerivceClient } from 'src/proto/messages';
 import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
 import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
+import { catchError } from 'rxjs/internal/operators/catchError';
 
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
 @UseFilters(WsExceptionFilter)
@@ -63,15 +64,14 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
         }
 
-        if (data.to_id !== data.from_id) {            
-
+        if (data.to_id !== data.from_id) {          
             /**
              * Тут делаем проверку на то хочет ли пользователь получать те или иные уведомления указанные в настройках
              */
             if(data.notification_type in NotificationEnumType) {
                 const [to_id_socket] = this.users.get(data.to_id).values()
 
-                if(!GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
+                if(to_id_socket && !GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
             }
 
             return this.broadcastUser<Notification>(data.to_id, { event: WEVENTS.NOTIFICATION, data: await this.notificationsService.createNotification(data).toPromise() })

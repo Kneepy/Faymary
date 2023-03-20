@@ -6,7 +6,7 @@ import {CreateUserDTO, FindFollowersDTO, FindUserDTO, FindUsersDTO, FollowUserDT
 import { Users } from "./entities";
 import { USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
-import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound, UserEmailNotFound } from "./constants";
+import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound, UserEmailNotFound, IncorrectDataError } from "./constants";
 import { UserIsFollowInterface, UsersIsFollowsInterface, UserIsLoginedInterface, FollowUserInterface } from "./interfaces";
 import { LoginUserDTO } from "./dtos/login-user.dto";
 
@@ -100,6 +100,8 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
     async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<FollowUserInterface>  {
+        if(data.author_id === data.user_id) throw IncorrectDataError
+
         const isFollow = await this.userService.findOne({id: data.author_id, followers: {id: data.user_id}})
 
         if(isFollow) {

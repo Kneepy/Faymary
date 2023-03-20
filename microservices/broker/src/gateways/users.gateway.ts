@@ -2,7 +2,7 @@ import { Inject } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
 import { USER_MODULE_CONFIG } from "src/constants/app.constants";
 import { NotificationAdditionsEnumType, NotificationEnumType } from "src/proto/notification";
-import { FollowUserDTO, UserFollowResult, UserIsFollowResult, UserServiceClient } from "src/proto/user";
+import { FollowUserDTO, UserFollowResult, UserServiceClient } from "src/proto/user";
 import { WEVENTS } from "./enums/events.enum";
 import { ServerGateway } from "./server.gateway";
 import { ICustomSocket } from "./types/socket.type";
@@ -27,7 +27,6 @@ export class UsersGateway {
             data: subUser,
             event: WEVENTS.USER.SUBSCRIBE
         })
-        
         if(subUser.isFollow) {
             this.serverGateway.sendNotification({
                 to_id: data.author_id,

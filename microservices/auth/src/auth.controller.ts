@@ -55,7 +55,7 @@ export class AuthController {
          * Если access_token'а нет то удаляем старую сессию и создаём новую, с проверкой fingerprint'а
          */
         if(data.session.fingerprint !== session.fingerprint || Date.now() > session.createdAt + EXPIRES_IN_REFRESH_TOKEN) {
-            await this.sessionService.delete(session.id)
+            //await this.sessionService.delete(session.id)
             throw Unauthorized
         }
         if(!!accessCodeIsVerify.user_id) {

@@ -5,3 +5,4 @@ export const IncorrectEmailError = new RpcException("Введён некорек
 export const UserAlredyExist = new RpcException("Пользователь с таким email уже существует!")
 export const UserIdNotFound = new RpcException("Идентификатор пользователя не найден")
 export const UserEmailNotFound = new RpcException("Пользователя с таким email не найдено")
+export const IncorrectDataError = new RpcException("Введены некорректные данные!")
