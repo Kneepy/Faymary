@@ -90,19 +90,14 @@ export class UserController {
         return await this.userService.updateUser({...data, id: req.user_id}).toPromise()
     }
 
-    @Patch("follow")
-    async followUser(@Req() req: ICustomRequest, @Query() data: Omit<FollowUserDTO, "follower_id">): Promise<UserIsFollowResult> {
-        return await this.userService.followUser({follower_id: req.user_id, user_id: data.user_id}).toPromise()
-    }
-
     @Get("/user_is_follow")
     async userIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UserIsFollowDTO, "user_id">) : Promise<boolean> {
-        return (await this.userService.userIsFollow({owner_id: req.user_id, user_id: data.user_id}).toPromise()).isFollow
+        return (await this.userService.userIsFollow({author_id: data.user_id, user_id: req.user_id}).toPromise()).isFollow
     }
 
     @Get("/users_is_follow")
     async usersIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UsersIsFollowDTO, "users_ids">): Promise<Map<string, boolean>> {
-        return new Map(Object.entries((await this.userService.usersIsFollow({owner_id: req.user_id, users_ids: data.users_ids}).toPromise()).follows))
+        return new Map(Object.entries((await this.userService.usersIsFollow({author_id: req.user_id, users_ids: data.users_ids}).toPromise()).follows))
     }
 
     @Get()

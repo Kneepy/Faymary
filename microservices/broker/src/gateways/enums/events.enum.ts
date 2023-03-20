@@ -18,6 +18,9 @@ export const WEVENTS = {
             DELETE: "dialog.delete.message"
         }
     },
+    USER: {
+        SUBSCRIBE: "user.subscribe"
+    },
     NOTIFICATION: "notification",
     ERROR: "error"
 }

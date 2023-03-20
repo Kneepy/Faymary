@@ -15,8 +15,9 @@ import { UserServiceClient } from 'src/proto/user';
 import { MessagesSerivceClient } from 'src/proto/messages';
 import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
+import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
 
-@WebSocketGateway({cors: {origin: "*"}, cookie: true})
+@WebSocketGateway({ cors: { origin: "*" }, cookie: true })
 @UseFilters(WsExceptionFilter)
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
@@ -28,7 +29,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient,
         @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profileService: ProfilesServiceClient
-    ) {}
+    ) { }
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
 
@@ -42,28 +43,38 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
          * 
          * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
         */
-        if(data.parent_type && data.parent_id && !data.to_id) {
+        if (data.parent_type && data.parent_id && !data.to_id) {
             switch (data.parent_type) {
-                case NotificationAdditionsEnumType.USER as NotificationAdditionsEnumType: 
-                    data.to_id = (await this.userService.findUser({id: data.parent_id}).toPromise()).id
+                case NotificationAdditionsEnumType.USER as NotificationAdditionsEnumType:
+                    data.to_id = (await this.userService.findUser({ id: data.parent_id }).toPromise()).id
                     break
-                case NotificationAdditionsEnumType.COMMENT: 
-                    data.to_id = (await this.commentsService.getComment({id: data.parent_id}).toPromise()).user_id
+                case NotificationAdditionsEnumType.COMMENT:
+                    data.to_id = (await this.commentsService.getComment({ id: data.parent_id }).toPromise()).user_id
                     break
-                case NotificationAdditionsEnumType.POST: 
-                    data.to_id = (await this.postsService.getPost({id: data.parent_id}).toPromise()).user_id
+                case NotificationAdditionsEnumType.POST:
+                    data.to_id = (await this.postsService.getPost({ id: data.parent_id }).toPromise()).user_id
                     break
-                case NotificationAdditionsEnumType.STORY: 
-                    data.to_id = (await this.storiesService.getStory({id: data.parent_id}).toPromise()).user_id
+                case NotificationAdditionsEnumType.STORY:
+                    data.to_id = (await this.storiesService.getStory({ id: data.parent_id }).toPromise()).user_id
                     break
-                case NotificationAdditionsEnumType.MESSAGE: 
-                    data.to_id = (await this.messagesService.getMessage({id: data.parent_id}).toPromise()).user_id
+                case NotificationAdditionsEnumType.MESSAGE:
+                    data.to_id = (await this.messagesService.getMessage({ id: data.parent_id }).toPromise()).user_id
                     break
             }
         }
 
-        if(data.to_id !== data.from_id) {
-            return this.broadcastUser<Notification>(data.to_id, {event: WEVENTS.NOTIFICATION, data: await this.notificationsService.createNotification(data).toPromise()})
+        if (data.to_id !== data.from_id) {            
+
+            /**
+             * Тут делаем проверку на то хочет ли пользователь получать те или иные уведомления указанные в настройках
+             */
+            if(data.notification_type in NotificationEnumType) {
+                const [to_id_socket] = this.users.get(data.to_id).values()
+
+                if(!GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
+            }
+
+            return this.broadcastUser<Notification>(data.to_id, { event: WEVENTS.NOTIFICATION, data: await this.notificationsService.createNotification(data).toPromise() })
         }
     }
 
@@ -73,35 +84,35 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     async broadcastUser<T>(user_id: string, data: WsResponse<T>): Promise<boolean> {
         const wsSessions = this.users.get(user_id)
 
-        if(!wsSessions) return false
+        if (!wsSessions) return false
         wsSessions.forEach(socket => socket.send(JSON.stringify(data)))
 
         return true
     }
 
     async handleConnection(@ConnectedSocket() client: ICustomSocket, ...[args]: [IncomingMessage]) {
-        const {session_id, authorization, fingerprint} = args.headers
+        const { session_id, authorization, fingerprint } = args.headers
 
         // если токены не переданы то закрываем соединение
-        if(!authorization || !session_id || !fingerprint) {
+        if (!authorization || !session_id || !fingerprint) {
             client.close()
             return false
         }
 
-        const access_token = authorization.trim().split(" ")[1] ?? authorization  
+        const access_token = authorization.trim().split(" ")[1] ?? authorization
         const tokens = await this.sessionService.generateTokensBySession({
             access_token, refresh_token: session_id as string,
             session: {
-                fingerprint: fingerprint as string, 
+                fingerprint: fingerprint as string,
                 ua: args.headers["user-agent"],
                 ip: (args.socket.remoteAddress || args.headers["x-forwarded-for"]) as string
             }
         }).toPromise()
-        const verifedTokens = await this.sessionService.verifyTokens({access_token: tokens.access_token, refresh_token: tokens.refresh_token}).toPromise()
+        const verifedTokens = await this.sessionService.verifyTokens({ access_token: tokens.access_token, refresh_token: tokens.refresh_token }).toPromise()
 
-        if(!this.users.has(verifedTokens.user_id)) this.users.set(verifedTokens.user_id, new Map())
+        if (!this.users.has(verifedTokens.user_id)) this.users.set(verifedTokens.user_id, new Map())
 
-        const userSettings = await this.profileService.getProfile({user_id: verifedTokens.user_id}).toPromise()
+        const userSettings = await this.profileService.getProfile({ user_id: verifedTokens.user_id }).toPromise()
 
         client.session_id = tokens.refresh_token
         client.user_id = verifedTokens.user_id

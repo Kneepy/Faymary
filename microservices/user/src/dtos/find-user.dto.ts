@@ -6,7 +6,6 @@ export interface FindUserDTO {
     email: string
     lastName: string
     id: string
-    addSubs: boolean
 }
 
 export class FindUsersDTO implements Partial<Omit<Users, "email" | "id">>, Pick<FindManyOptions, "take" | "skip"> {

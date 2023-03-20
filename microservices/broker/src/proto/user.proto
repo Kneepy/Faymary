@@ -4,7 +4,7 @@ package user;
 
 service UserService {
     rpc FindUser (FindUserDTO) returns (stream User);
-    rpc FollowUser (FollowUserDTO) returns (stream UserIsFollowResult);
+    rpc FollowUser (FollowUserDTO) returns (stream UserFollowResult);
     rpc UserIsFollow (UserIsFollowDTO) returns (stream UserIsFollowResult);
     rpc UsersIsFollow (UsersIsFollowDTO) returns (stream UsersIsFollowResult);
     rpc CreateUser (CreateUserDTO) returns (stream User);
@@ -19,6 +19,11 @@ message FindFollowersDTO {
     int64 take = 1;
     int64 skip = 2;
     string user_id = 3;
+}
+
+message UserFollowResult {
+    bool isFollow = 1;
+    User author = 2;
 }
 
 message CreateUserDTO {
@@ -41,7 +46,7 @@ message UserIsLogined {
 
 message FollowUserDTO {
     string user_id = 1;
-    string follower_id = 2;
+    string author_id = 2;
 }
 
 message FindUsersDTO {
@@ -69,7 +74,6 @@ message FindUserDTO {
     optional string email = 1;
     optional string id = 2;
     optional string lastName = 3;
-    optional bool addSubs = 4;
 }
 
 message User {
@@ -77,11 +81,10 @@ message User {
     string email = 2;
     string username = 3;
     string lastName = 4;
-    string password = 5;
-    User followers = 6;
-    User subscriptions = 7;
-    UserState state = 8;
-    string file_id = 9;
+    User followers = 5;
+    User subscriptions = 6;
+    UserState state = 7;
+    string file_id = 8;
 }
 
 message UpdateUserDTO {
@@ -102,11 +105,11 @@ message Users {
 
 message UserIsFollowDTO {
     string user_id = 1;
-    string owner_id = 2;
+    string author_id = 2;
 }
 
 message UsersIsFollowDTO {
-    string owner_id = 1;
+    string author_id = 1;
     repeated string users_ids = 2;
 }
 

@@ -7,7 +7,7 @@ import { Users } from "./entities";
 import { USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
 import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound, UserEmailNotFound } from "./constants";
-import { UserIsFollowInterface, UsersIsFollowsInterface, UserIsLoginedInterface } from "./interfaces";
+import { UserIsFollowInterface, UsersIsFollowsInterface, UserIsLoginedInterface, FollowUserInterface } from "./interfaces";
 import { LoginUserDTO } from "./dtos/login-user.dto";
 
 type RepeatedUsers = {users: Users[]}
@@ -71,19 +71,13 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
     async findOne(data: FindUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Users> {
-        const relations = data.addSubs ? {subscriptions: true, followers: true} : [];
-
-        delete data.addSubs
-
-        Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
-
-        return await this.userService.findOne(data, {relations})
+        return await this.userService.findOne(data)
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USER_IS_FOLLOW)
     async userIsFollow(data: UserIsFollowDTO): Promise<UserIsFollowInterface> {
-        if(data.owner_id) {
-            const user = await this.userService.findOne({id: data.owner_id}, {relations: {subscriptions: true}})
+        if(data.author_id) {
+            const user = await this.userService.findOne({id: data.author_id}, {relations: {subscriptions: true}})
 
             return {isFollow: !!user.subscriptions.find(subs => subs.id === data.user_id)}
 
@@ -92,8 +86,8 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USERS_IS_FOLLOW)
     async usersIsFollow(data: UsersIsFollowDTO): Promise<UsersIsFollowsInterface> {
-        if(data.owner_id) {
-            const user = await this.userService.findOne({id: data.owner_id}, {relations: {followers: true}})
+        if(data.author_id) {
+            const user = await this.userService.findOne({id: data.author_id}, {relations: {followers: true}})
 
             if(data.users_ids.length) {
                 const respond = new Map<string, boolean>()
@@ -105,14 +99,16 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
-    async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<UserIsFollowInterface>  {
-        const isFollow = await this.userService.findOne({id: data.follower_id, subscriptions: {id: data.user_id}}, {relations: {subscriptions: true}})
+    async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<FollowUserInterface>  {
+        const isFollow = await this.userService.findOne({id: data.author_id, followers: {id: data.user_id}})
 
         if(isFollow) {
-            await this.userService.removeSubscription(data.user_id, data.follower_id)
-        } else {
-            await this.userService.addSubscription(data.user_id, data.follower_id)
+            await this.userService.removeSubscription(data.author_id, data.user_id)
+            
+            return {isFollow: !isFollow, author: isFollow}
         }
-        return {isFollow: !isFollow}
+
+        await this.userService.addSubscription(data.author_id, data.user_id)
+        return {isFollow: !isFollow, author: await this.userService.findOne({id: data.author_id})}
     }
 }

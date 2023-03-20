@@ -1,4 +1,4 @@
 export class FollowUserDTO {
-    follower_id: string
+    author_id: string
     user_id: string
 }

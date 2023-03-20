@@ -16,6 +16,11 @@ export interface FindFollowersDTO {
   user_id: string;
 }
 
+export interface UserFollowResult {
+  isFollow: boolean;
+  author: User | undefined;
+}
+
 export interface CreateUserDTO {
   email: string;
   lastName: string;
@@ -36,7 +41,7 @@ export interface UserIsLogined {
 
 export interface FollowUserDTO {
   user_id: string;
-  follower_id: string;
+  author_id: string;
 }
 
 export interface FindUsersDTO {
@@ -69,7 +74,6 @@ export interface FindUserDTO {
   email?: string | undefined;
   id?: string | undefined;
   lastName?: string | undefined;
-  addSubs?: boolean | undefined;
 }
 
 export interface User {
@@ -77,7 +81,6 @@ export interface User {
   email: string;
   username: string;
   lastName: string;
-  password: string;
   followers: User | undefined;
   subscriptions: User | undefined;
   state: UserState;
@@ -102,11 +105,11 @@ export interface Users {
 
 export interface UserIsFollowDTO {
   user_id: string;
-  owner_id: string;
+  author_id: string;
 }
 
 export interface UsersIsFollowDTO {
-  owner_id: string;
+  author_id: string;
   users_ids: string[];
 }
 
@@ -118,7 +121,7 @@ export const USER_PACKAGE_NAME = "user";
 export interface UserServiceClient {
   findUser(request: FindUserDTO): Observable<User>;
 
-  followUser(request: FollowUserDTO): Observable<UserIsFollowResult>;
+  followUser(request: FollowUserDTO): Observable<UserFollowResult>;
 
   userIsFollow(request: UserIsFollowDTO): Observable<UserIsFollowResult>;
 
@@ -140,7 +143,7 @@ export interface UserServiceClient {
 export interface UserServiceController {
   findUser(request: FindUserDTO): Observable<User>;
 
-  followUser(request: FollowUserDTO): Observable<UserIsFollowResult>;
+  followUser(request: FollowUserDTO): Observable<UserFollowResult>;
 
   userIsFollow(request: UserIsFollowDTO): Observable<UserIsFollowResult>;
 
