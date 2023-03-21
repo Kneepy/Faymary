@@ -15,18 +15,21 @@ export class LikesGateway {
     ) {}
 
     @SubscribeMessage(WEVENTS.ADD_LIKE)
-    async addLike(@MessageBody() {item_id, type}: Omit<AddLikeDTO, "user_id">, @ConnectedSocket() {user_id}: ICustomSocket): Promise<void> {
-        const like = await this.likesService.addLike({type, item_id, user_id}).toPromise()
-    
-        await this.serverGateway.broadcastUser(user_id, {event: WEVENTS.ADD_LIKE, data: like})
-        await this.serverGateway.sendNotification({
-            from_id: user_id,
-            notification_type: NotificationEnumType.ADD_LIKE,
-            type: NotificationAdditionsEnumType.USER,
-            item_id: user_id,
-            parent_id: item_id,
-            parent_type: type as any,
-            to_id: null
+    async addLike(@MessageBody() {item_id, type}: Omit<AddLikeDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
+        this.likesService.addLike({type, item_id, user_id: client.user_id}).subscribe({
+            next: async like => {
+                await this.serverGateway.broadcastUser(client.user_id, {event: WEVENTS.ADD_LIKE, data: like})
+                await this.serverGateway.sendNotification({
+                    from_id: client.user_id,
+                    notification_type: NotificationEnumType.ADD_LIKE,
+                    type: NotificationAdditionsEnumType.USER,
+                    item_id: client.user_id,
+                    parent_id: item_id,
+                    parent_type: type as any,
+                    to_id: null
+                })
+            },
+            error: e => this.serverGateway.sendError(client, e)
         })
     }
 }

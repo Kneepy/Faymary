@@ -30,4 +30,9 @@ import fastifyCookie from '@fastify/cookie';
 
     await app.listen(APP_PORT);
     Logger.log("Broker service successfully started")
+
+    /**
+     * Устанавливает кол-во Gateways событий
+     */
+    require('events').EventEmitter.defaultMaxListeners = 15;
 })()

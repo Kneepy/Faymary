@@ -1,7 +1,7 @@
 import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, PROFILES_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
@@ -16,7 +16,7 @@ import { MessagesSerivceClient } from 'src/proto/messages';
 import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
 import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { mergeMap, tap } from 'rxjs/operators';
 
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
 @UseFilters(WsExceptionFilter)
@@ -90,9 +90,8 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true
     }
 
-    async closeConnection(client: ICustomSocket, error: any) {
-        error && client.send(JSON.stringify(error))
-        client.close()
+    async sendError(client: ICustomSocket, error: any) {
+        client.send(JSON.stringify({data: error, event: WEVENTS.ERROR}))
     }
 
     async handleConnection(@ConnectedSocket() client: ICustomSocket, ...[args]: [IncomingMessage]) {
@@ -132,7 +131,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 client.settings = profile
                 this.users.get(client.user_id).set(client.session_id, client)
             },
-            error: e => this.closeConnection(client, e)
+            error: e => this.sendError(client, e) && client.close()
         })
     }
 
