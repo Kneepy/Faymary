@@ -125,12 +125,15 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 client.user_id = verifiedToken.user_id
                 return this.profileService.getProfile({ user_id: client.user_id })
             })
-        ).subscribe(profile => {
-            if (!this.users.has(client.user_id)) this.users.set(client.user_id, new Map())
-
-            client.settings = profile
-            this.users.get(client.user_id).set(client.session_id, client)
-        }, err => this.closeConnection(client, err))
+        ).subscribe({
+            next: profile => {
+                if (!this.users.has(client.user_id)) this.users.set(client.user_id, new Map())
+        
+                client.settings = profile
+                this.users.get(client.user_id).set(client.session_id, client)
+            },
+            error: e => this.closeConnection(client, e)
+        })
     }
 
     handleDisconnect(@ConnectedSocket() client: ICustomSocket) {
