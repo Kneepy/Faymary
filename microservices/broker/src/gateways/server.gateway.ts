@@ -1,7 +1,7 @@
 import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, PROFILES_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsException, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
@@ -16,7 +16,7 @@ import { MessagesSerivceClient } from 'src/proto/messages';
 import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
 import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
-import { catchError } from 'rxjs/internal/operators/catchError';
+import { map, mergeMap, tap } from 'rxjs/operators';
 
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
 @UseFilters(WsExceptionFilter)
@@ -90,6 +90,11 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true
     }
 
+    async closeConnection(client: ICustomSocket, error: any) {
+        error && client.send(JSON.stringify(error))
+        client.close()
+    }
+
     async handleConnection(@ConnectedSocket() client: ICustomSocket, ...[args]: [IncomingMessage]) {
         const { session_id, authorization, fingerprint } = args.headers
 
@@ -100,25 +105,32 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         const access_token = authorization.trim().split(" ")[1] ?? authorization
-        const tokens = await this.sessionService.generateTokensBySession({
+
+        /**
+         * Для меня не работавшего с RxJS выглядит очень страшно
+         * И возможно придётся всё переписывать так как это "первый полёт" в этом направлении
+         */
+        this.sessionService.generateTokensBySession({
             access_token, refresh_token: session_id as string,
             session: {
                 fingerprint: fingerprint as string,
                 ua: args.headers["user-agent"],
                 ip: (args.socket.remoteAddress || args.headers["x-forwarded-for"]) as string
             }
-        }).toPromise()
-        const verifedTokens = await this.sessionService.verifyTokens({ access_token: tokens.access_token, refresh_token: tokens.refresh_token }).toPromise()
+        }).pipe(
+            tap(tokens => client.session_id = tokens.refresh_token),
+            mergeMap(tokens => this.sessionService.verifyTokens({ access_token: tokens.access_token, refresh_token: tokens.refresh_token })),
+            tap(verifiedToken => client.user_id = verifiedToken.user_id),
+            mergeMap(verifiedToken => {
+                client.user_id = verifiedToken.user_id
+                return this.profileService.getProfile({ user_id: client.user_id })
+            })
+        ).subscribe(profile => {
+            if (!this.users.has(client.user_id)) this.users.set(client.user_id, new Map())
 
-        if (!this.users.has(verifedTokens.user_id)) this.users.set(verifedTokens.user_id, new Map())
-
-        const userSettings = await this.profileService.getProfile({ user_id: verifedTokens.user_id }).toPromise()
-
-        client.session_id = tokens.refresh_token
-        client.user_id = verifedTokens.user_id
-        client.settings = userSettings
-
-        this.users.get(verifedTokens.user_id).set(tokens.refresh_token, client)
+            client.settings = profile
+            this.users.get(client.user_id).set(client.session_id, client)
+        }, err => this.closeConnection(client, err))
     }
 
     handleDisconnect(@ConnectedSocket() client: ICustomSocket) {

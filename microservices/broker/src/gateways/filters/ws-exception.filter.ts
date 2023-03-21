@@ -8,7 +8,7 @@ import { ICustomSocket } from "../types/socket.type";
 export class WsExceptionFilter extends BaseWsExceptionFilter {
     catch(exception: WsException, host: ArgumentsHost) {
         const client: ICustomSocket = host.switchToWs().getClient();
-        console.log(exception)
+        console.log(exception, "egweg")
         client.send(JSON.stringify({event: WEVENTS.ERROR, data: exception} as WsResponse<WsException>));
     }
 }
