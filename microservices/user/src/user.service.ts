@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DEFAULT_ENCODING } from "crypto";
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 import { DEFAULT_SKIP_USERS, DEFAULT_TAKE_USERS } from "./constants";
 import { Users } from "./entities";
@@ -12,7 +11,7 @@ export class UserService {
         @InjectRepository(Users) private repository: Repository<Users> 
     ) {}
 
-    async addSubscription(user: Partial<Users> | any, subscriber: Partial<Users> | any) {
+    async addSubscription(user: Partial<Users> | string, subscriber: Partial<Users> | any) {
         await this.repository.createQueryBuilder().relation(Users, "followers").of(user).add(subscriber)
     }
 
@@ -24,8 +23,8 @@ export class UserService {
         return await this.repository.findOne({where, ...otherOptions})
     }
 
-    async find(where: FindOptionsWhere<FindUsers>, otherOption: Omit<FindManyOptions<Users>, "where"> = {take: DEFAULT_TAKE_USERS, skip: DEFAULT_SKIP_USERS}): Promise<Users[]> {
-        return await this.repository.find({where, ...otherOption})
+    async find(where: FindOptionsWhere<FindUsers>, {take = DEFAULT_TAKE_USERS, skip = DEFAULT_SKIP_USERS, ...otherOption}: Omit<FindManyOptions<Users>, "where"> = {}): Promise<Users[]> {
+        return await this.repository.find({where, take, skip, ...otherOption})
     }
 
     async create(user: CreateUser): Promise<Users> {

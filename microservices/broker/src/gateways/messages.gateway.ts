@@ -5,12 +5,10 @@ import { DIALOGS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG } from "src/constants/app
 import { DialogsServiceClient } from "src/proto/dialogs";
 import { CreateMessageDTO, DeleteMessageDTO, Message, MessagesSerivceClient, UpdateMessageDTO } from "src/proto/messages";
 import { WEVENTS } from "./enums/events.enum";
-import { WsExceptionFilter } from "./filters/ws-exception.filter";
 import { ServerGateway } from "./server.gateway";
 import { ICustomSocket } from "./types/socket.type";
 
 @WebSocketGateway()
-@UseFilters(WsExceptionFilter)
 export class MessagesGateway {
     constructor(
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient,

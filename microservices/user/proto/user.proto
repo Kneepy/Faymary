@@ -52,7 +52,7 @@ message FollowUserDTO {
 message FindUsersDTO {
     optional bool addSubs = 1;
     optional string email = 2;
-    optional string username = 3;
+    optional string userName = 3;
     optional string lastName = 4;
     optional string password = 5;
     optional User followers = 6;
@@ -74,12 +74,13 @@ message FindUserDTO {
     optional string email = 1;
     optional string id = 2;
     optional string lastName = 3;
+    optional string userName = 4;
 }
 
 message User {
     string id = 1;
     string email = 2;
-    string username = 3;
+    string userName = 3;
     string lastName = 4;
     User followers = 5;
     User subscriptions = 6;
@@ -90,7 +91,7 @@ message User {
 message UpdateUserDTO {
     string id = 1;
     optional string email = 2;
-    optional string username = 3;
+    optional string userName = 3;
     optional string lastName = 4;
     optional string password = 5;
     optional User followers = 6;

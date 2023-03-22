@@ -22,28 +22,27 @@ export class AuthGuard implements CanActivate {
         delete request.user_id
 
         if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
-        else {
-            const accessToken = request.headers.authorization
-            const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
+        
+        const accessToken = request.headers.authorization
+        const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
-            if(!refreshToken) throw UnautorizedError
-            else {
-                const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
-                const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
-                const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
-                const verifedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
+        if(!refreshToken) throw UnautorizedError
+        
+        const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
+        const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
+        const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
+        const verifedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
 
-                request.headers.refresh_token = tokens.refresh_token
-                request.headers.authorization = tokens.access_token
+        request.headers.refresh_token = tokens.refresh_token
+        request.headers.authorization = tokens.access_token
 
-                response.setCookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token)
+        response.setCookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token)
 
-                if(verifedTokens.user_id !== null) {
-                    request.user_id = verifedTokens.user_id
-                }
+        if(verifedTokens.user_id !== null) {
+            request.user_id = verifedTokens.user_id
+        }
 
-                return true
-            }
-        }        
+        return true
+
     }
 }

@@ -14,7 +14,7 @@ import {
 import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
 import {Response} from "express"
-import {CreateUserDTO, FindFollowersDTO, FindUserDTO, FollowUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowDTO, UserIsFollowResult, Users, UserServiceClient, UsersIsFollowDTO, UserState} from "src/proto/user";
+import {CreateUserDTO, FindFollowersDTO, FindUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowDTO, UsersIsFollowResult, Users, UserServiceClient, UsersIsFollowDTO, UserState} from "src/proto/user";
 import { ICustomRequest } from "src/types/request.type";
 import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
@@ -96,14 +96,14 @@ export class UserController {
     }
 
     @Get("/users_is_follow")
-    async usersIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UsersIsFollowDTO, "users_ids">): Promise<Map<string, boolean>> {
-        return new Map(Object.entries((await this.userService.usersIsFollow({author_id: req.user_id, users_ids: data.users_ids}).toPromise()).follows))
+    async usersIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UsersIsFollowDTO, "users_ids">): Promise<UsersIsFollowResult> {
+        return await this.userService.usersIsFollow({author_id: req.user_id, users_ids: data.users_ids}).toPromise()
     }
 
     @Get()
     @DisableAuth()
     async getUser(@Query() query: FindUserDTO): Promise<User> {
-        return await this.userService.findUser({id: query.id}).toPromise()
+        return await this.userService.findUser(query).toPromise()
     }
 
     @Get("/followers")

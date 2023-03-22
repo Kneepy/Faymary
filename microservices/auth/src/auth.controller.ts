@@ -43,7 +43,7 @@ export class AuthController {
     async generateTokensBySession(data: GenerateTokensBySessionDTO): Promise<TokensPayload> {
         if(!data.refresh_token) throw Unauthorized
 
-        const session = await this.sessionService.findOne({id: data.refresh_token})
+        const session = await this.authService.verifyRefreshToken(data.refresh_token)
         const accessCodeIsVerify = this.authService.verifyAccessToken(data.access_token)
 
         if(!session) throw Unauthorized

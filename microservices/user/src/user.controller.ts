@@ -56,7 +56,7 @@ export class UserController {
     async find(data: FindUsersDTO): Promise<RepeatedUsers> {
         Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
 
-        return {users: await this.userService.find(data)}
+        return {users: await this.userService.find(data, {})}
     }
     
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_FOLLOWERS)
@@ -71,7 +71,9 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
     async findOne(data: FindUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Users> {
-        return await this.userService.findOne(data)
+        if(!Object.keys(data).length) throw IncorrectDataError
+
+        return await this.userService.findOne(data) ?? {} as Users
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.USER_IS_FOLLOW)

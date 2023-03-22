@@ -47,7 +47,7 @@ export interface FollowUserDTO {
 export interface FindUsersDTO {
   addSubs?: boolean | undefined;
   email?: string | undefined;
-  username?: string | undefined;
+  userName?: string | undefined;
   lastName?: string | undefined;
   password?: string | undefined;
   followers?: User | undefined;
@@ -74,12 +74,13 @@ export interface FindUserDTO {
   email?: string | undefined;
   id?: string | undefined;
   lastName?: string | undefined;
+  userName?: string | undefined;
 }
 
 export interface User {
   id: string;
   email: string;
-  username: string;
+  userName: string;
   lastName: string;
   followers: User | undefined;
   subscriptions: User | undefined;
@@ -90,7 +91,7 @@ export interface User {
 export interface UpdateUserDTO {
   id: string;
   email?: string | undefined;
-  username?: string | undefined;
+  userName?: string | undefined;
   lastName?: string | undefined;
   password?: string | undefined;
   followers?: User | undefined;

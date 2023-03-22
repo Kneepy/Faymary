@@ -1,13 +1,12 @@
 import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, PROFILES_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer, WsException, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
 import { NotificationCreate, NotificationsServiceClient, Notification, NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
-import { WsExceptionFilter } from './filters/ws-exception.filter';
 import { CommentsServiceClient } from 'src/proto/comments';
 import { PostServiceClient } from 'src/proto/post';
 import { StoriesServiceClient } from 'src/proto/stories';
@@ -17,9 +16,9 @@ import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
 import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
 import { mergeMap, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
-@UseFilters(WsExceptionFilter)
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
@@ -29,7 +28,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient,
-        @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profileService: ProfilesServiceClient
+        @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profileService: ProfilesServiceClient,
     ) { }
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
@@ -38,43 +37,79 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
      * Эта функция сама создаёт уведомления в микросервисе
      */
     async sendNotification(data: NotificationCreate): Promise<boolean> {
-        /**
-         * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
-         * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
-         * 
-         * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
-        */
-        if (data.parent_type && data.parent_id && !data.to_id) {
-            switch (data.parent_type) {
-                case NotificationAdditionsEnumType.USER as NotificationAdditionsEnumType:
-                    data.to_id = (await this.userService.findUser({ id: data.parent_id }).toPromise()).id
-                    break
-                case NotificationAdditionsEnumType.COMMENT:
-                    data.to_id = (await this.commentsService.getComment({ id: data.parent_id }).toPromise()).user_id
-                    break
-                case NotificationAdditionsEnumType.POST:
-                    data.to_id = (await this.postsService.getPost({ id: data.parent_id }).toPromise()).user_id
-                    break
-                case NotificationAdditionsEnumType.STORY:
-                    data.to_id = (await this.storiesService.getStory({ id: data.parent_id }).toPromise()).user_id
-                    break
-                case NotificationAdditionsEnumType.MESSAGE:
-                    data.to_id = (await this.messagesService.getMessage({ id: data.parent_id }).toPromise()).user_id
-                    break
-            }
-        }
+        if (data.to_id !== data.from_id) {
 
-        if (data.to_id !== data.from_id) {          
             /**
-             * Тут делаем проверку на то хочет ли пользователь получать те или иные уведомления указанные в настройках
+             * Должен принимать строку как id пользователя которому нужно отправить уведомление
+             * Впервые работаю на такой конструкции
+             * И вообще не знаю норм ли это
              */
-            if(data.notification_type in NotificationEnumType) {
-                const [to_id_socket] = this.users.get(data.to_id).values()
+            const subjectNotification = new Subject<string>()
 
-                if(to_id_socket && !GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
-            }
+            subjectNotification.subscribe({
+                next: to_id => {
+                    /**
+                     * Тут делаем проверку на то хочет ли пользователь получать те или иные уведомления указанные в настройках
+                     */
+                    if(data.notification_type in NotificationEnumType) {
+                        const [to_id_socket] = this.users.get(to_id)?.values() ?? []
 
-            return this.broadcastUser<Notification>(data.to_id, { event: WEVENTS.NOTIFICATION, data: await this.notificationsService.createNotification(data).toPromise() })
+                        if(to_id_socket && !GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
+                    }
+                    this.notificationsService.createNotification({...data, to_id: null}).subscribe({
+                        next: notification => this.broadcastUser<Notification>(to_id, { event: WEVENTS.NOTIFICATION, data: notification}),
+                        /**
+                         * Я хз как обработать эту ошибку, клиент о ней знать вообще не должен по идее
+                         */
+                        error: e => e
+                    })
+                }
+            })
+
+            /**
+             * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
+             * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
+             * 
+             * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
+            */
+            if (data.parent_type in NotificationAdditionsEnumType && data.parent_id && !data.to_id) {
+                switch (data.parent_type) {
+                    case NotificationAdditionsEnumType.USER:
+                        this.userService.findUser({ id: data.parent_id }).subscribe({
+                            next: user => subjectNotification.next(user.id),
+                            error: e => e
+                        })
+                        break
+                    case NotificationAdditionsEnumType.COMMENT:
+                        this.commentsService.getComment({ id: data.parent_id }).subscribe({
+                            next: comment => subjectNotification.next(comment.user_id),
+                            error: e => e
+                        })
+                        break
+                    case NotificationAdditionsEnumType.POST:
+                        this.postsService.getPost({ id: data.parent_id }).subscribe({
+                            next: post => subjectNotification.next(post.user_id),
+                            error: e => e
+                        })
+                        break
+                    case NotificationAdditionsEnumType.STORY:
+                        this.storiesService.getStory({ id: data.parent_id }).subscribe({
+                            next: story => subjectNotification.next(story.user_id),
+                            error: e => e
+                        })
+                        break
+                    case NotificationAdditionsEnumType.MESSAGE:
+                        this.messagesService.getMessage({ id: data.parent_id }).subscribe({
+                            next: message => subjectNotification.next(message.user_id),
+                            error: e => e
+                        })
+                        break
+                }
+            } else subjectNotification.next(data.to_id)
+
+            subjectNotification.complete()
+
+            return true
         }
     }
 
