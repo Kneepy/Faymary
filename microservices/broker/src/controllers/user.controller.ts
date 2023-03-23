@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, ForbiddenException,
+    Controller, Delete, ForbiddenException,
     Get,
     Inject,
     Patch,
@@ -18,7 +18,7 @@ import { ICustomRequest } from "src/types/request.type";
 import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
 import { NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
-import { ProfilesServiceClient } from "src/proto/profiles";
+import { Account, ProfilesServiceClient } from "src/proto/profiles";
 import { ICustomResponse } from "src/types/response.type";
 
 @Controller("/user")
@@ -53,9 +53,11 @@ export class UserController {
         
         await this.userService.updateUser({id: data.user_id, state: UserState.ACTIVE}).toPromise()
         const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: data.user_id, ip}).toPromise()
+        const userProfile = await this.profilesService.getProfile({user_id: data.user_id}).toPromise()
 
         /**
          * Если у пользователя в cookie файлах будут лежать данные о старом аккаунте при его смене то мы будем добавлять 
+         * Старый аккаунт в список аккаунтов обоих профилей (откуда вышли и куда вошли)
          * Хз как сократить этот дубляж кода
          */
         if(req.headers.authorization && req.cookies.refresh_token) {
@@ -63,25 +65,39 @@ export class UserController {
 
             if(oldUserId.user_id) {
                 const oldUserProfile = await this.profilesService.getProfile({user_id: oldUserId.user_id}).toPromise()
-                const newUserProfile = await this.profilesService.getProfile({user_id: data.user_id}).toPromise()
-
+                
+                // откуда вышли
                 await this.profilesService.addUserAccount({user_id: data.user_id, profile_id: oldUserProfile.id}).toPromise()
-                await this.profilesService.addUserAccount({user_id: oldUserId.user_id, profile_id: newUserProfile.id}).toPromise()
+                // куда вошли
+                await this.profilesService.addUserAccount({user_id: oldUserId.user_id, profile_id: userProfile.id}).toPromise()
             }
         }
         
+        await this.profilesService.addUserAccount({user_id: data.user_id, profile_id: userProfile.id}).toPromise()
         res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, {httpOnly: true})
 
         return tokens
+    }
+
+    @Delete("delete-account")
+    async deleteAccounts(@Query() data: {account_id: string}, @Req() req: ICustomRequest): Promise<Account> {
+        const userProfile = await this.profilesService.getProfile({user_id: req.user_id}).toPromise()
+        /**
+         * Только если пользователь находится в аккаунтах пользователя, то он сможет удалить аккаунт
+         */
+        const account = userProfile.accounts.find(acc => acc.user_id === req.user_id) && userProfile.accounts.find(acc => acc.id === data.account_id)
+
+        if(!account) throw NotFoundAccount
+
+        return await this.profilesService.removeUserAccount({user_id: account.user_id, profile_id: userProfile.id}).toPromise()
     }
 
     @Patch("change-account")
     async changeAccount(@Query() data: {account_id: string}, @Req() req: ICustomRequest, @Res({passthrough: true}) res: ICustomResponse): Promise<VerifyTokensDTO> {
         const userProfile = await this.profilesService.getProfile({user_id: req.user_id}).toPromise()
         /**
-         * Только если пользователь находится состоит в аккаунтах пользователя, то он может получить токены авторизации
+         * Только если пользователь находится в аккаунтах пользователя, то он может получить токены авторизации
          */
-        console.log(userProfile)
         const account = userProfile.accounts.find(acc => acc.user_id === req.user_id) && userProfile.accounts.find(acc => acc.id === data.account_id)
 
         if(!account) throw NotFoundAccount
