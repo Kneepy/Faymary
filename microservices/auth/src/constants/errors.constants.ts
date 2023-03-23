@@ -6,6 +6,11 @@ export const TokenNotFound = new RpcException({
     message: "Token not found!"
 })
 
+export const PoorDataToCreateTokens = new RpcException({
+    status: Status.DATA_LOSS,
+    message: "Недостаточно данных для создания токенов!"
+})
+
 export const Unauthorized = new RpcException({
     status: Status.DATA_LOSS,
     message: "Ошибка авторизации!"

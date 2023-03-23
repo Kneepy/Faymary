@@ -31,7 +31,7 @@ export class ProfilesController {
 
     @GrpcMethod(PROFILES_SERVICE_NAME, PROFILES_SERVICE_METHODS.ADD_USER_ACCOUNT)
     async addUserAccount(data: ProfilesDTOs.AddUserAccountDTO): Promise<Accounts> {
-        return await this.profilesService.addAccountToProfile({user_id: data.user_id}, {id: data.profile_id})
+        return await this.profilesService.addAccountToProfile({user_id: data.user_id}, {id: data.profile_id}) ?? {} as Accounts
     }
     @GrpcMethod(PROFILES_SERVICE_NAME, PROFILES_SERVICE_METHODS.REMOVE_USER_ACCOUNT)
     async removeUserAccount(data: ProfilesDTOs.RemoveUserAccountDTO): Promise<Accounts> {

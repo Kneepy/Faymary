@@ -23,7 +23,7 @@ export class AuthService {
     async verifyRefreshToken(tokenId: string): Promise<Sessions | null> {
         const token = await this.sessionService.findOne({id: tokenId})
 
-        return token.createdAt + EXPIRES_IN_REFRESH_TOKEN > Date.now() ? token : null 
+        return token?.createdAt + EXPIRES_IN_REFRESH_TOKEN > Date.now() ? token : null 
     }
 
     getAccessToken(user_id: string): string {

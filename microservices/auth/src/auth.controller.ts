@@ -1,4 +1,4 @@
-import { Unauthorized } from './constants/errors.constants';
+import { PoorDataToCreateTokens, Unauthorized } from './constants/errors.constants';
 import { Controller } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import { EXPIRES_IN_REFRESH_TOKEN, SESSION_SERVICE, SESSION_SERVICE_METHODS } from "./constants/session.constants";
@@ -27,6 +27,8 @@ export class AuthController {
 
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS)
     async generateTokens(data: GenerateTokensDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<TokensPayload> {
+        if(!data.fingerprint || !data.ua || !data.ip || !data.user_id) throw PoorDataToCreateTokens
+
         const oldRefreshToken = await this.sessionService.findOne([{ua: data.ua, user_id: data.user_id}, {ip: data.ip, user_id: data.user_id}, {fingerprint: data.fingerprint, user_id: data.user_id}])
 
         if(!!oldRefreshToken) {

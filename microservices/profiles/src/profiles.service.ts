@@ -14,7 +14,9 @@ export class ProfilesService {
     async addAccountToProfile(account: Pick<Accounts, "user_id">, profile: Pick<Profiles, "id">): Promise<Accounts | null> {
         if(!profile.id || !account.user_id) return null
 
-        return await this.accountsRepository.save({user_id: account.user_id, profile: profile})
+        const existAccount = await this.accountsRepository.findOne({where: {user_id: account.user_id, profile: {id: profile.id}}})
+
+        return existAccount ?? await this.accountsRepository.save({user_id: account.user_id, profile: profile})
     }
     async removeAccountProfile(account: Pick<Accounts, "user_id">, profile: Pick<Profiles, "id">): Promise<Accounts | null> {
         if(!profile.id || !account.user_id) return null

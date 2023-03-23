@@ -19,7 +19,7 @@ export class UserService {
         await this.repository.createQueryBuilder().relation(Users, "followers").of(user).remove(subscriber)
     }
 
-    async findOne(where: FindOptionsWhere<FindUser>, otherOptions?: Omit<FindOneOptions<Users>, "where">): Promise<Users> {
+    async findOne(where: FindOptionsWhere<FindUser> | FindOptionsWhere<FindUser>[], otherOptions?: Omit<FindOneOptions<Users>, "where">): Promise<Users> {
         return await this.repository.findOne({where, ...otherOptions})
     }
 

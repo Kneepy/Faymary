@@ -23,15 +23,14 @@ export class UserController {
         if(data.password.length < 6) throw ShortPasswordError
         if(!data.email.split("@")[1] || !data.email.split(".")[1]) throw IncorrectEmailError
 
-        const existUser = await this.userService.findOne({email: data.email})
+        const existUser = await this.userService.findOne([{email: data.email}, {lastName: data.lastName}])
 
         if(!!existUser) throw UserAlredyExist
-        else {
-            const passSalt = await bcrypt.genSalt(10);
-            data.password = bcrypt.hashSync(data.password, passSalt)
+        
+        const passSalt = await bcrypt.genSalt(10);
+        data.password = bcrypt.hashSync(data.password, passSalt)
 
-            return await this.userService.create(data)
-        }
+        return await this.userService.create(data)
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.LOGIN_USER)

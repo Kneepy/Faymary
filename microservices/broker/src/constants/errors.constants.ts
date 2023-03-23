@@ -1,11 +1,5 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
+import { UnauthorizedException, NotFoundException } from '@nestjs/common';
 
-export const ERRORS = {
-    UNAUTHORIZED: "Токены авторизации не найдены!",
-    NOT_ENOUGHT_DATA_TO_CREATE_SESSION: "Недостаточно данных для создания сессии!"
-}
-
-export const WsUnautorizedError = new WsException(ERRORS.UNAUTHORIZED)
-export const UnautorizedError = new UnauthorizedException(ERRORS.UNAUTHORIZED)
-export const PoorDataError = new UnauthorizedException(ERRORS.NOT_ENOUGHT_DATA_TO_CREATE_SESSION)
+export const UnautorizedError = new UnauthorizedException("Токены авторизации не найдены!")
+export const PoorDataError = new UnauthorizedException("Недостаточно данных для создания сессии!")
+export const NotFoundAccount = new NotFoundException("Аккаунт не найден!")
