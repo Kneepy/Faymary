@@ -1,3 +1,4 @@
+import { PoorDataError } from './../constants/errors.constants';
 import { UseFilters } from '@nestjs/common';
 import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, PROFILES_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
@@ -134,6 +135,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         // если токены не переданы то закрываем соединение
         if (!authorization || !session_id || !fingerprint) {
+            this.sendError(client, PoorDataError) 
             client.close()
             return false
         }
@@ -166,7 +168,9 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 client.settings = profile
                 this.users.get(client.user_id).set(client.session_id, client)
             },
-            error: e => this.sendError(client, e) && client.close()
+            error: e => {
+                this.sendError(client, e) && client.close()
+            }
         })
     }
 
