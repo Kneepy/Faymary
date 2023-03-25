@@ -1,11 +1,17 @@
 <template>
     <div class="wef">
-        <div class="wr" @click="f"></div>
-        efwefef
+        <NuxtLink :to="{name: ROUTES.HOME}" class="wr">home</NuxtLink>
+        <NuxtLink :to="{name: ROUTES.LOGIN}" class="wr">login</NuxtLink>
     </div>
 </template>
 <script setup>
 import {useUserStore} from "~/store/user"
+import { ROUTES } from "~/assets/constants/routes.constants";
+
+definePageMeta({
+    requredAuth: true,
+    name: ROUTES.HOME
+})
 
 const store = useUserStore()
 
