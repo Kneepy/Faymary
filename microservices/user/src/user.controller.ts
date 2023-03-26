@@ -23,32 +23,33 @@ export class UserController {
         if(data.password.length < 6) throw ShortPasswordError
         if(!data.email.split("@")[1] || !data.email.split(".")[1]) throw IncorrectEmailError
 
-        const existUser = await this.userService.findOne([{email: data.email}, {lastName: data.lastName}])
+        const lastName = `id${Date.now()}`
+        const existUser = await this.userService.findOne({email: data.email})
 
         if(!!existUser) throw UserAlredyExist
         
         const passSalt = await bcrypt.genSalt(10);
         data.password = bcrypt.hashSync(data.password, passSalt)
 
-        return await this.userService.create(data)
+        return await this.userService.create({...data, lastName})
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.LOGIN_USER)
     async loginUser(data: LoginUserDTO): Promise<UserIsLoginedInterface> {
         const user = await this.userService.findOne({email: data.email})
 
-        if(user) {
-            return {isLogined: bcrypt.compareSync(data.password, user.password), user}
-        } else throw UserEmailNotFound
+        if(!user) throw UserEmailNotFound
+            
+        return {isLogined: await bcrypt.compare(data.password, user.password), user}
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.UPDATE_USER)
     async updateUser(data: UpdateUserDTO): Promise<Users> {
         const user = await this.userService.findOne({id: data.id})
 
-        if(user) {
-            return await this.userService.update(Object.assign(user, data));
-        } else throw UserIdNotFound
+        if(!user) throw UserIdNotFound
+
+        return await this.userService.update(Object.assign(user, data));
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USERS)

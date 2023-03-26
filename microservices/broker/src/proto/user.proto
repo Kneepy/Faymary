@@ -28,10 +28,9 @@ message UserFollowResult {
 
 message CreateUserDTO {
     string email = 1;
-    string lastName = 2;
-    string userName = 3;
-    string password = 4;
-    UserState state = 5;
+    string userName = 2;
+    string password = 3;
+    UserState state = 4;
 }
 
 message LoginUserDTO {

@@ -23,7 +23,6 @@ export interface UserFollowResult {
 
 export interface CreateUserDTO {
   email: string;
-  lastName: string;
   userName: string;
   password: string;
   state: UserState;
