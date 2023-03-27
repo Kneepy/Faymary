@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ROUTES } from "~/assets/constants/routes.constants";
 
 const userData = reactive({
@@ -10,7 +10,7 @@ const ui = reactive({
 
 const isValidData = computed(() => !(!!userData.email?.trim().length))
 const sendData = () => {
-    
+
 }
 
 
@@ -56,34 +56,34 @@ definePageMeta({
             <div class="login__container__rigth">
                 <div class="login__container__rigth__top_box">
                     <Logo :size=50 />
-                    <div class="info_box">
+                    <div class="info_box" v-if="false">
+                        Это ваш аккаунт?
+                        <span>Если это так то войдите в него</span>
+                    </div>
+                    <div class="info_box" v-if="false">
                         Введи свою почту
                         <span>Ваша почта будет использоватся для входа в аккаунт</span>
                     </div>
+                    <div class="info_box" v-if="false">
+                        Ещё немного...
+                        <span>Придумайте пароль для защиты вашего аккаунта</span>
+                    </div>
+                    <div class="info_box" v-if="true" style="font-size: 17px; text-align: center;">
+                        Код подтверждения отправлен на почту il***4@gmail.com
+                    </div>
                 </div>
                 <div class="login__container__rigth__center_box">
-                    <input type="text" v-model="userData.email" placeholder="Введите email"> 
-                    <!--
-                        <input type="text" v-model="userData.userName" placeholder="Как тебя зовут?">
-                        <div class="password_input">
-                            <input :type="ui.isVisiblePass ? `text` : `password`" v-model="userData.pass" placeholder="Придумайте пароль">
-                            <button @click="() => ui.isVisiblePass = !ui.isVisiblePass">
-                                <span class="material-symbols-rounded">
-                                    {{ ui.isVisiblePass ? `visibility_off` : `visibility` }}
-                                </span>
-                            </button>
-                        </div>
-                    -->
-                </div>
-                <div class="login__container__rigth__footer_box">
-                    <button :disabled="isValidData" @click="sendData">Продолжить</button>
+                    <InputEmail v-if="false" />
+                    <ChoseUser v-if="false" />
+                    <InputData v-if="false" />
+                    <ConfirmEmail />
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .login {
     display: flex;
     justify-content: center;
@@ -159,76 +159,6 @@ definePageMeta({
                         text-align: center;
                         color: $gray;
                         font-size: 15px;
-                    }
-                }
-            }
-            &__center_box {
-                display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
-                margin-bottom: 20px;
-                span {
-                    color: red;
-                }
-                input {
-                    background: $primary_content_background;
-                    border: 1px solid $primary_border;
-                    color: $white;
-                    padding: 9px 15px;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    margin: 4px 0;
-                    transition: 100ms;
-                    width: 100%;
-                    &:hover, &:focus {
-                        border-color: $border_1;
-                        transition: 100ms;
-                    }
-                }
-                .password_input {
-                    position: relative;
-                    display: flex;
-                    justify-content: end;
-                    align-items: center;
-                    width: 100%;
-                    input {
-                        padding-right: 40px;
-                    }
-                    button {
-                        right: 10px;
-                        position: absolute;
-                        background-color: transparent;
-                        border: 0px;
-                        display: flex;
-                        align-items: center;
-                        cursor: pointer;
-                        span {
-                            color: $gray;
-                            font-size: 20px;
-                            font-weight: 300;
-                        }
-                    }
-                }
-            }
-            &__footer_box {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                button {
-                    background-color: $white;
-                    width: 100%;
-                    border-radius: 8px;
-                    padding: 7px 0;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    border: none;
-                    transition: 100ms;
-                    &:disabled {
-                        transition: 200ms;
-                        color: $black;
-                        cursor: default;
-                        opacity: .6;
                     }
                 }
             }

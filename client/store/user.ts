@@ -5,8 +5,6 @@ export const useUserStore = defineStore("user", {
         h: 2
     }),
     actions: {
-        isAuth(): boolean {
-            return !!useCookie("refresh").value
-        }
+        
     }
 })
