@@ -2,6 +2,7 @@ import {
     Body,
     Controller, Delete, ForbiddenException,
     Get,
+    Headers,
     Inject,
     Patch,
     Post,
@@ -152,7 +153,7 @@ export class UserController {
 
 
     /**
-     * Все эндпоинты не требующие аутентификации + создание пользователя
+     * Все эндпоинты не требующие аутентификации или создания пользователя
      */
     @Get()
     @DisableAuth()

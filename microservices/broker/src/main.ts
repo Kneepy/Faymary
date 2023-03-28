@@ -27,6 +27,7 @@ import fastifyCookie from '@fastify/cookie';
         next();
     });
     await app.register(fastifyCookie)
+    app.enableCors()
 
     await app.listen(APP_PORT);
     Logger.log("Broker service successfully started")

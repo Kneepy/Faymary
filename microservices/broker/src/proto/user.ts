@@ -23,7 +23,7 @@ export interface UserFollowResult {
 
 export interface CreateUserDTO {
   email: string;
-  userName: string;
+  fullName: string;
   password: string;
   state: UserState;
 }
@@ -46,8 +46,8 @@ export interface FollowUserDTO {
 export interface FindUsersDTO {
   addSubs?: boolean | undefined;
   email?: string | undefined;
+  fullName?: string | undefined;
   userName?: string | undefined;
-  lastName?: string | undefined;
   password?: string | undefined;
   followers?: User | undefined;
   subscriptions?: User | undefined;
@@ -72,15 +72,15 @@ export interface UsersIsFollowResult_FollowsEntry {
 export interface FindUserDTO {
   email?: string | undefined;
   id?: string | undefined;
-  lastName?: string | undefined;
   userName?: string | undefined;
+  fullName?: string | undefined;
 }
 
 export interface User {
   id: string;
   email: string;
+  fullName: string;
   userName: string;
-  lastName: string;
   followers: User | undefined;
   subscriptions: User | undefined;
   state: UserState;
@@ -90,8 +90,8 @@ export interface User {
 export interface UpdateUserDTO {
   id: string;
   email?: string | undefined;
+  fullName?: string | undefined;
   userName?: string | undefined;
-  lastName?: string | undefined;
   password?: string | undefined;
   followers?: User | undefined;
   subscriptions?: User | undefined;

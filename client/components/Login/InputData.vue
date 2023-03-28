@@ -68,7 +68,7 @@ const checkExistUser = () => {
         .password_input {
             position: relative;
             display: flex;
-            justify-content: end;
+            justify-content: flex-end;
             align-items: center;
             width: 100%;
             input {

@@ -4,13 +4,13 @@ import { FindManyOptions } from "typeorm"
 
 export interface FindUserDTO {
     email: string
-    lastName: string
+    userName: string
     id: string
 }
 
 export class FindUsersDTO implements Partial<Omit<Users, "email" | "id">>, Pick<FindManyOptions, "take" | "skip"> {
+    fullName?: string
     userName?: string
-    lastName?: string
     password?: string
     file_id?: string
     followers?: Users[]

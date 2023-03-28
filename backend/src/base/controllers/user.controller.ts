@@ -74,8 +74,8 @@ export class UserController {
 
         body.password = bcrypt.hashSync(body.password, bcrypt.genSaltSync(2));
 
-        const lastName = body.email.split("@")[0];
-        const user = await this.userService.create({ ...body, lastName });
+        const userName = body.email.split("@")[0];
+        const user = await this.userService.create({ ...body, userName });
 
         return await this.setConfirmation(user);
     }

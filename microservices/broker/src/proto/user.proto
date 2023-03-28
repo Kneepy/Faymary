@@ -28,7 +28,7 @@ message UserFollowResult {
 
 message CreateUserDTO {
     string email = 1;
-    string userName = 2;
+    string fullName = 2;
     string password = 3;
     UserState state = 4;
 }
@@ -51,8 +51,8 @@ message FollowUserDTO {
 message FindUsersDTO {
     optional bool addSubs = 1;
     optional string email = 2;
-    optional string userName = 3;
-    optional string lastName = 4;
+    optional string fullName = 3;
+    optional string userName = 4;
     optional string password = 5;
     optional User followers = 6;
     optional User subscriptions = 7;
@@ -72,15 +72,15 @@ message UsersIsFollowResult {
 message FindUserDTO {
     optional string email = 1;
     optional string id = 2;
-    optional string lastName = 3;
-    optional string userName = 4;
+    optional string userName = 3;
+    optional string fullName = 4;
 }
 
 message User {
     string id = 1;
     string email = 2;
-    string userName = 3;
-    string lastName = 4;
+    string fullName = 3;
+    string userName = 4;
     User followers = 5;
     User subscriptions = 6;
     UserState state = 7;
@@ -90,8 +90,8 @@ message User {
 message UpdateUserDTO {
     string id = 1;
     optional string email = 2;
-    optional string userName = 3;
-    optional string lastName = 4;
+    optional string fullName = 3;
+    optional string userName = 4;
     optional string password = 5;
     optional User followers = 6;
     optional User subscriptions = 7;

@@ -12,9 +12,9 @@ export class UsersInput {
 
     @IsString()
     @IsNotEmpty()
-    lastName: string;
+    userName: string;
 
     @IsString()
     @IsNotEmpty()
-    userName: string;
+    fullName: string;
 }

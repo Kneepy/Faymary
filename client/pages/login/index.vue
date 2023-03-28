@@ -13,6 +13,10 @@ definePageMeta({
     name: ROUTES.LOGIN,
     layout: false
 })
+
+const choseUser = (res: boolean) => {
+    console.log(res)
+}
 </script>
 
 <template>
@@ -68,7 +72,7 @@ definePageMeta({
                     </div>
                 </div>
                 <div class="login__container__rigth__center_box">
-                    <InputEmail v-if="page.inputEmail" />
+                    <InputEmail v-if="page.inputEmail" @userExist="choseUser" />
                     <ChoseUser v-if="page.choseUser" />
                     <InputData v-if="page.inputData" />
                     <ConfirmEmail v-if="page.confirmEmail" />

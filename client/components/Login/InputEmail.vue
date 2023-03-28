@@ -1,10 +1,17 @@
 <script setup lang="ts">
+const emit = defineEmits<{
+    (e: "userExist", exist: boolean): void
+}>()
 const userData = reactive({
     email: ""
 })
+const userStore = useUserStore()
 const isValidData = computed(() => !(!!userData.email.length))
-const checkExistUser = () => {
+const checkExistUser = async () => {
+    userStore.tempUser = await userStore.getUserByEmail({email: userData.email})
+    userStore.tempUser.email = userData.email
 
+    emit("userExist", !!userStore.tempUser.id)
 }
 </script>
 <template>
@@ -13,7 +20,7 @@ const checkExistUser = () => {
             <input type="text" v-model="userData.email" placeholder="Введите email"> 
         </div>
         <div class="input__email__footer_box">
-            <button :disabled="isValidData" @click="checkExistUser">Продолжить</button>
+            <Button :disabled="isValidData" @click="checkExistUser">Продолжить</Button>
         </div>
     </div>
 </template>
@@ -53,7 +60,7 @@ const checkExistUser = () => {
         .password_input {
             position: relative;
             display: flex;
-            justify-content: end;
+            justify-content: flex-end;
             align-items: center;
             width: 100%;
             input {
@@ -79,23 +86,6 @@ const checkExistUser = () => {
         display: flex;
         align-items: center;
         justify-content: center;
-        button {
-            background-color: $white;
-            width: 100%;
-            border-radius: 8px;
-            padding: 7px 0;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: 100ms;
-            &:disabled {
-                transition: 200ms;
-                color: $black;
-                cursor: default;
-                opacity: .6;
-            }
-        }
     }
 }
 </style>

@@ -62,7 +62,7 @@ export class DialogsGateway {
         const dialog = await this.dialogsService.create({
             users: usersDialog,
             creator: socket.user,
-            title: `${usersDialog.map(user => user.userName)}`
+            title: `${usersDialog.map(user => user.fullName)}`
         });
         const notficationType = NotificationEnumType.ADD_DIALOG;
 

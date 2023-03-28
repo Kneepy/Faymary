@@ -1,9 +1,9 @@
 import { Users } from "src/entities";
 import { UserState } from "src/user-state.enum";
 
-export class CreateUserDTO implements Omit<Users, "id" | "followers" | "subscriptions" | "file_id" | "lastName"> {
+export class CreateUserDTO implements Omit<Users, "id" | "followers" | "subscriptions" | "file_id" | "userName"> {
     email: string;
-    userName: string;
+    fullName: string;
     password: string;
     state: UserState;
 }

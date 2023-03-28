@@ -1,4 +1,9 @@
 export default defineNuxtConfig({
+    runtimeConfig: {
+        public: {
+            baseURL: "http://localhost:5000/"
+        }
+    },
     modules: [
         "@pinia/nuxt",
     ],

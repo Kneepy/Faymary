@@ -13,7 +13,7 @@ defineEmits<{
             </div>
         </button>
         <div class="answer">
-            <Button class="answer__no" @click="$emit(`done`, true)" :disabled="false">Нет</button>
+            <Button class="answer__no" @click="$emit(`done`, false)" :disabled="false">Нет</button>
             <Button class="answer__yes" @click="$emit(`done`, true)" :disabled="false">Да</button>
         </div>
     </div>
