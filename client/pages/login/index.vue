@@ -1,18 +1,12 @@
 <script setup lang="tsx">
 import { ROUTES } from "~/assets/constants/routes.constants";
 
-const userData = reactive({
-    pass: "", email: "", userName: ""
+const page = reactive({
+    inputEmail: true,
+    choseUser: false,
+    inputData: false,
+    confirmEmail: false
 })
-const ui = reactive({
-    isVisiblePass: false,
-})
-
-const isValidData = computed(() => !(!!userData.email?.trim().length))
-const sendData = () => {
-
-}
-
 
 definePageMeta({
     requredAuth: false,
@@ -56,27 +50,28 @@ definePageMeta({
             <div class="login__container__rigth">
                 <div class="login__container__rigth__top_box">
                     <Logo :size=50 />
-                    <div class="info_box" v-if="false">
-                        Это ваш аккаунт?
-                        <span>Если это так то войдите в него</span>
-                    </div>
-                    <div class="info_box" v-if="false">
+                    <div class="info_box" v-if="page.inputEmail">
                         Введи свою почту
                         <span>Ваша почта будет использоватся для входа в аккаунт</span>
                     </div>
-                    <div class="info_box" v-if="false">
+                    <div class="info_box" v-if="page.choseUser">
+                        Это ваш аккаунт?
+                        <span>Если это так то войдите в него</span>
+                    </div>
+                    <div class="info_box" v-if="page.inputData">
                         Ещё немного...
                         <span>Придумайте пароль для защиты вашего аккаунта</span>
                     </div>
-                    <div class="info_box" v-if="true" style="font-size: 17px; text-align: center;">
-                        Код подтверждения отправлен на почту il***4@gmail.com
+                    <div class="info_box" v-if="page.confirmEmail">
+                        Подтвердите вход
+                        <span>Код подтверждения отправлен на почту il***4@gmail.com</span>
                     </div>
                 </div>
                 <div class="login__container__rigth__center_box">
-                    <InputEmail v-if="false" />
-                    <ChoseUser v-if="false" />
-                    <InputData v-if="false" />
-                    <ConfirmEmail />
+                    <InputEmail v-if="page.inputEmail" />
+                    <ChoseUser v-if="page.choseUser" />
+                    <InputData v-if="page.inputData" />
+                    <ConfirmEmail v-if="page.confirmEmail" />
                 </div>
             </div>
         </div>
@@ -144,7 +139,7 @@ definePageMeta({
                 display: flex;
                 justify-content: center;
                 width: 100%;
-                margin-bottom: 20px;
+                margin-bottom: 30px;
                 flex-wrap: wrap;
                 .info_box {
                     display: flex;

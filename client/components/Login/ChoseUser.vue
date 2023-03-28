@@ -1,5 +1,8 @@
-
-
+<script setup lang="ts">
+defineEmits<{
+    (e: "done", done: boolean): void
+}>()
+</script>
 <template>
     <div class="chose__user">
         <button class="user">
@@ -10,8 +13,8 @@
             </div>
         </button>
         <div class="answer">
-            <button class="answer__no">Нет</button>
-            <button class="answer__yes">Да</button>
+            <Button class="answer__no" @click="$emit(`done`, true)" :disabled="false">Нет</button>
+            <Button class="answer__yes" @click="$emit(`done`, true)" :disabled="false">Да</button>
         </div>
     </div>
 </template>
