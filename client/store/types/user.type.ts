@@ -9,4 +9,5 @@ export interface User {
     userName: string
     state: UserState
     file_id: string
+    password: string
 }

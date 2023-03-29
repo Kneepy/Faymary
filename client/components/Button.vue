@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const { disabled } = defineProps<{
-    disabled: boolean,
+    disabled?: boolean,
 }>()
 </script>
 

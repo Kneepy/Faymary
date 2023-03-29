@@ -1,46 +1,58 @@
 <script setup lang="ts">
-const { userName } = defineProps<{
-    userName?: string
-}>()
-const userData = reactive({
-    userName: "",
-    password: ""
-})
-const ui = reactive({
-    isVisiblePass: false
-})
-const isValidData = computed(() => !(!!userData.password.length) && (userName ? true : !(!!userData.userName.length) ))
-const checkExistUser = () => {
+import { ROUTES } from '~~/assets/constants/routes.constants';
 
+definePageMeta({
+    name: ROUTES.LOGIN_INPUT_DATA,
+    middleware: ["presence-email"]
+})
+const { tempUser, ...userStore } = useUserStore()
+const { exists } = useRoute().query
+const isVisiblePass = ref(false)
+const isValidData = computed(() => !!tempUser.password?.length && !!tempUser.fullName?.length)
+const loginUser = async () => {
+    const {user_id} = await userStore.createUser({password: tempUser.password, fullName: tempUser.fullName, email: tempUser.email})
 }
 </script>
 <template>
     <div class="input__password">
+        <div class="info_box">
+            Ещё немного...
+            <span>Придумайте пароль для защиты вашего аккаунта</span>
+        </div>
         <div class="input__password__center_box">
-            <input type="text" v-if="userName" v-model="userData.userName" placeholder="Как тебя зовут?"> 
+            <input type="text" v-if="exists" v-model="tempUser.fullName" placeholder="Как тебя зовут?"> 
             <div class="password_input">
-                <input :type="ui.isVisiblePass ? `text` : `password`" v-model="userData.password" placeholder="Придумайте пароль">
-                <button @click="() => ui.isVisiblePass = !ui.isVisiblePass">
+                <input :type="isVisiblePass ? `text` : `password`" v-model="tempUser.password" placeholder="Придумайте пароль">
+                <Button @click="() => isVisiblePass = !isVisiblePass">
                     <span class="material-symbols-rounded">
-                        {{ ui.isVisiblePass ? `visibility_off` : `visibility` }}
+                        {{ isVisiblePass ? `visibility_off` : `visibility` }}
                     </span>
-                </button>
+                </Button>
             </div>
         </div>
         <div class="input__password__footer_box">
-            <button :disabled="isValidData" @click="checkExistUser">Продолжить</button>
+            <button :disabled="!isValidData" @click="loginUser">Продолжить</button>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .input__password {
-    &__top_box {
+    .info_box {
         display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-bottom: 20px;
         flex-wrap: wrap;
+        justify-content: center;
+        color: $white;
+        font-size: 20px;
+        font-weight: 500;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        span {
+            margin-top: 5px;
+            text-align: center;
+            color: $gray;
+            font-size: 15px;
+        }
     }
     &__center_box {
         display: flex;
@@ -77,14 +89,15 @@ const checkExistUser = () => {
             button {
                 right: 10px;
                 position: absolute;
+                width: auto;
                 background-color: transparent;
-                border: 0px;
                 display: flex;
+                top: 8px;
                 align-items: center;
                 cursor: pointer;
                 span {
                     color: $gray;
-                    font-size: 20px;
+                    font-size: 22px;
                     font-weight: 300;
                 }
             }

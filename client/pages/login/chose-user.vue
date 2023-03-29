@@ -1,25 +1,49 @@
 <script setup lang="ts">
-defineEmits<{
-    (e: "done", done: boolean): void
-}>()
+import { ROUTES } from '~~/assets/constants/routes.constants';
+
+definePageMeta({
+    name: ROUTES.LOGIN_CHOSE_USER,
+    middleware: ["presence-email"]
+})
+const { tempUser } = useUserStore()
 </script>
 <template>
     <div class="chose__user">
-        <button class="user">
-            <Avatar :size=50 href="https://source.unsplash.com/random" />
+        <div class="info_box">
+            Это ваш аккаунт?
+            <span>Если это так то войдите в него</span>
+        </div>
+        <Button :disabled="false" class="user">
+            <Avatar :size=50 :href="tempUser.file_id" />
             <div class="user__info">
-                <div class="user__info__name">Ilya Famin</div>
-                <div class="user__info__id">@Fama</div>
+                <div class="user__info__name">{{ tempUser.fullName }}</div>
+                <div class="user__info__id">@{{ tempUser.userName }}</div>
             </div>
-        </button>
+        </Button>
         <div class="answer">
-            <Button class="answer__no" @click="$emit(`done`, false)" :disabled="false">Нет</button>
-            <Button class="answer__yes" @click="$emit(`done`, true)" :disabled="false">Да</button>
+            <Button class="answer__no">Нет</button>
+            <Button class="answer__yes">Да</button>
         </div>
     </div>
 </template>
 <style scoped lang="scss">
 .chose__user {
+    .info_box {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        color: $white;
+        font-size: 20px;
+        font-weight: 500;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        span {
+            margin-top: 5px;
+            text-align: center;
+            color: $gray;
+            font-size: 15px;
+        }
+    }
     .user {
         display: flex;
         align-items: center;

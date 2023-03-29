@@ -3,10 +3,12 @@ const { size, href } = defineProps<{
     size: number,
     href: string
 }>()
+const config = useRuntimeConfig()
+const img = config.public.imgesURL + href
 </script>
 
 <template>
-    <div class="logo" :style="{width: size + `px`, height: size + `px`, backgroundImage: `url(${href})`}"></div>
+    <div class="logo" :style="{width: size + `px`, height: size + `px`, backgroundImage: `url(${img})`}"></div>
 </template>
 
 <style lang="scss">

@@ -53,10 +53,8 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USERS)
-    async find(data: FindUsersDTO): Promise<RepeatedUsers> {
-        Object.keys(data).forEach(key => data[key] === undefined && delete data[key])
-
-        return {users: await this.userService.find(data, {})}
+    async find({take, skip, ...data}: FindUsersDTO): Promise<RepeatedUsers> {
+        return {users: await this.userService.find(data, {take, skip})}
     }
     
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_FOLLOWERS)
