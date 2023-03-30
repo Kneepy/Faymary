@@ -1,0 +1,21 @@
+version: '0.0'
+services:
+  mysql: 
+    container_name: mysql
+    command: --init-file /data/application/user.sql
+    volumes:
+      - ./user/user.sql:/data/application/user.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: root
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+  user: 
+    container_name: user
+    build: ./user
+    ports:
+      - 5002:5002
+    command: npm run start:prod
+    depends_on:
+      - mysql

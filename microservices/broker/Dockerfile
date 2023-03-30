@@ -1,13 +1,15 @@
-FROM node:12.13-alpine
+FROM node:lts
 
-WORKDIR /app
+WORKDIR /broker
 
 COPY package*.json ./
 
 RUN npm i
 
-COPY . . 
+COPY . .
+
+RUN npm run build
 
 COPY ./dist ./dist
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod"]

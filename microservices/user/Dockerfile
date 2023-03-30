@@ -1,13 +1,16 @@
-FROM node:12.13-alpine
+# init db
+FROM mysql 
 
-WORKDIR /app
+ENV MYSQL_DATABASE user
+ENV MYSQL_ROOT_PASSWORD root
 
+# init project
+FROM node:lts
+
+WORKDIR /user
 COPY package*.json ./
-
 RUN npm i
-
-COPY . . 
-
+COPY . .
+RUN npm run build
 COPY ./dist ./dist
-
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod"]
