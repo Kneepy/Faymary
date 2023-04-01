@@ -1,9 +1,3 @@
-# init db
-FROM mysql 
-
-ENV MYSQL_DATABASE user
-ENV MYSQL_ROOT_PASSWORD root
-
 # init project
 FROM node:lts
 

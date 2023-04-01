@@ -3,17 +3,17 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 
 definePageMeta({
     name: ROUTES.LOGIN_CONFIRM,
+    middleware: ["presence-email"]
 })
+const userStore = useUserStore()
+const appState = useAppStateStore()
+const { user_id } = useRoute().query
 const inputs = ref()
+const ui = reactive({ incorrectCode: false, confirmedCode: false })
 const countInputs = 6
 const code: string[] = []
 const countdownDuration = ref(299) // 5 минут
 const countdown = computed(() => `${Math.floor(countdownDuration.value / 60)}:${countdownDuration.value % 60}`)
-
-onMounted(() => {
-    resetCountdown()
-})
-
 const resetCountdown = () => {
     if(countdownDuration.value <= 0) countdownDuration.value = 299
 
@@ -25,12 +25,18 @@ const resetCountdown = () => {
         countdownDuration.value -= 1;
     }, 1000)
 }
-const sendCode = () => {
-    console.log(code.join(""))
+const sendCode = async () => {
+    appState.load = true
+    try {
+        await userStore.confirmUser({user_id: user_id?.toString() as string, code: code.join("")})
+        appState.load = false
+        ui.confirmedCode = true
+    } catch (e) {
+        ui.incorrectCode = true
+    }
+    appState.load = false
 }
-const resendCode = () => {
-    resetCountdown()
-}
+const resendCode = () => userStore.sendConfirmCode({email: userStore.tempUser.email, user_id: userStore.tempUser.id})
 const nextInput = (event: KeyboardEvent) => {
     const keyDeleteCode = "Backspace"
     if(!event.key.trim().length || (event.key.trim().length > 1 && event.key !== keyDeleteCode)) return
@@ -39,9 +45,9 @@ const nextInput = (event: KeyboardEvent) => {
 
     if(event.key === keyDeleteCode) {
         if(currentInput === 0) return 
-
         delete code[currentInput]
-        inputs.value[currentInput - 1].value = ""
+        inputs.value[currentInput].value = ""
+        
         inputs.value[currentInput - 1].focus()
     } else {
         code[currentInput] = event.key
@@ -55,15 +61,29 @@ const nextInput = (event: KeyboardEvent) => {
         inputs.value[currentInput + 1].focus()
     }
 }
+const inputCode = (event: any) => {
+    event.target.value = event.target.value.trim()
+    if(ui.incorrectCode) ui.incorrectCode = false
+    if(ui.confirmedCode) ui.confirmedCode = false
+}
+
+onMounted(() => {
+    resetCountdown()
+})
 </script> 
 <template>
     <div class="confirm__email">
         <div class="info_box">
             Подтвердите вход
-            <span>Код подтверждения отправлен на почту il***4@gmail.com</span>
+            <span>Код подтверждения отправлен на почту {{ userStore.tempUser.email }}</span>
         </div>
         <div class="confirm__email__inputs">
-            <input v-for="i in countInputs" :key="i" type="text" ref="inputs" @keyup="nextInput" @input="(event: any) => event.target.value = event.target.value.trim()" :maxlength=1>
+            <input 
+                v-for="i in countInputs" :key="i" type="text" ref="inputs" 
+                @keyup="nextInput" @input="inputCode" 
+                :maxlength=1
+                :class="[ui.incorrectCode ? `incorrect` : ``, ui.confirmedCode ? `confirmed` : ``]"
+            >
         </div>
         <div class="confirm__email__countdown">
             <span v-if="countdownDuration > 0">Сообщение придёт в течение {{ countdown }}</span>
@@ -110,6 +130,14 @@ const nextInput = (event: KeyboardEvent) => {
             &:hover, &:focus {
                 border-color: $border_1;
                 transition: 100ms;
+            }
+            &.incorrect {
+                border-color: $red;
+                background-color: $error_red_background;
+            }
+            &.confirmed {
+                border-color: $green;
+                background-color: $confirm_green_background;
             }
         }
     }

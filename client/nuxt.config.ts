@@ -2,7 +2,8 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             baseURL: "http://localhost:5000/",
-            imgesURL: "http://localhost:5013/"
+            imgesURL: "http://localhost:5013/",
+            sessionCookie: "refresh_token"
         }
     },
     modules: [

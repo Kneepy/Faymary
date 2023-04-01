@@ -11,3 +11,7 @@ export interface User {
     file_id: string
     password: string
 }
+
+export interface UserId {
+    user_id: string
+}

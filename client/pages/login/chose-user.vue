@@ -21,8 +21,10 @@ const { tempUser } = useUserStore()
             </div>
         </Button>
         <div class="answer">
-            <Button class="answer__no">Нет</button>
-            <Button class="answer__yes">Да</button>
+            <Button class="answer__no">Нет</Button>
+            <NuxtLink :to="{name: ROUTES.LOGIN_INPUT_DATA, query: {exists: true as any}}">
+                <Button class="answer__yes">Да</Button>
+            </NuxtLink>
         </div>
     </div>
 </template>

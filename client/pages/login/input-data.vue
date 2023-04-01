@@ -1,34 +1,57 @@
 <script setup lang="ts">
+import { use } from 'h3';
 import { ROUTES } from '~~/assets/constants/routes.constants';
+import { ServerError } from '~~/store/types/error';
 
 definePageMeta({
     name: ROUTES.LOGIN_INPUT_DATA,
     middleware: ["presence-email"]
 })
-const { tempUser, ...userStore } = useUserStore()
 const { exists } = useRoute().query
+
+const userStore = useUserStore()
+const appStateStore = useAppStateStore()
 const isVisiblePass = ref(false)
-const isValidData = computed(() => !!tempUser.password?.length && !!tempUser.fullName?.length)
+const errors = ref<ServerError>()
+const isValidData = computed(() => (userStore.tempUser.password?.length > 1) && !!userStore.tempUser.fullName?.length)
+const clearErrorOnInputPass = () => errors.value = {} as ServerError
 const loginUser = async () => {
-    const {user_id} = await userStore.createUser({password: tempUser.password, fullName: tempUser.fullName, email: tempUser.email})
+    appStateStore.load = true
+    try {
+        const { user_id } = await (
+            exists ? 
+            userStore.loginUser({password: userStore.tempUser.password, email: userStore.tempUser.email}) : 
+            userStore.createUser({password: userStore.tempUser.password, fullName: userStore.tempUser.fullName, email: userStore.tempUser.email})
+        )
+    
+        if(user_id) {
+            navigateTo({name: ROUTES.LOGIN_CONFIRM, query: {user_id}})
+        }
+    } catch (e: any) {
+        errors.value = e
+    }  
+    appStateStore.load = false
 }
 </script>
 <template>
     <div class="input__password">
         <div class="info_box">
             Ещё немного...
-            <span>Придумайте пароль для защиты вашего аккаунта</span>
+            <span>{{ exists ? `Введите пароль от вашего аккаунта` : `Придумайте пароль для защиты вашего аккаунта` }}</span>
         </div>
         <div class="input__password__center_box">
-            <input type="text" v-if="exists" v-model="tempUser.fullName" placeholder="Как тебя зовут?"> 
+            <span class="hint" v-if="!exists" :style="{marginTop: `0px`}">Как вас будут назвать другие пользователи?</span>
+            <input type="text" v-if="!exists" v-model="userStore.tempUser.fullName" placeholder="Как тебя зовут?"> 
+            <span class="hint" :style="{marginTop: exists ? `0px` : ``}">Пароль должен содержать не менее 6 символов.</span>
             <div class="password_input">
-                <input :type="isVisiblePass ? `text` : `password`" v-model="tempUser.password" placeholder="Придумайте пароль">
+                <input :class="errors?.message ? `input__error` : ``" :type="isVisiblePass ? `text` : `password`" v-model="userStore.tempUser.password" @input="clearErrorOnInputPass" placeholder="Придумайте пароль">
                 <Button @click="() => isVisiblePass = !isVisiblePass">
                     <span class="material-symbols-rounded">
                         {{ isVisiblePass ? `visibility_off` : `visibility` }}
                     </span>
                 </Button>
             </div>
+            <span class="error" v-if="errors?.message">{{ errors?.message }}</span>
         </div>
         <div class="input__password__footer_box">
             <button :disabled="!isValidData" @click="loginUser">Продолжить</button>
@@ -56,11 +79,18 @@ const loginUser = async () => {
     }
     &__center_box {
         display: flex;
-        justify-content: center;
         flex-wrap: wrap;
         margin-bottom: 20px;
-        span {
-            color: red;
+        .hint {
+            font-size: 12px;
+            color: $gray;
+            margin-top: 10px;
+            margin-bottom: 2px;
+        }
+        .error {
+            font-size: 12px;
+            color: $red;
+            margin-bottom: 2px;
         }
         input {
             background: $primary_content_background;
@@ -75,6 +105,10 @@ const loginUser = async () => {
             &:hover, &:focus {
                 border-color: $border_1;
                 transition: 100ms;
+            }
+            &.input__error {
+                border-color: $red;
+                background-color: $error_red_background;
             }
         }
         .password_input {

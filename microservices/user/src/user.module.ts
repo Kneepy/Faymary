@@ -8,13 +8,13 @@ import { UserService } from "./user.service";
     imports: [
         TypeOrmModule.forRoot({
             type: "mysql",
-            host: "localhost",
+            host: "localhost", // для контейнера docker нужно менять на соответсвующий хотст (mysql)
             port: 3306,
             username: "root",
             password: "root",
             database: "user",
             entities: [Users],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Users])
     ],

@@ -35,11 +35,10 @@ export class MailController {
 
     @GrpcMethod(MAIL_SERVICE_NAME, MAIL_SERVICE_METHODS.CONFIRM_ACCESS_CODE)
     async confirmAccessCode(data: ConfirmAccessCodeDTO): Promise<IsConfirmedAccessCodeInterface> {
-        const accessCode = await this.accessCodesService.findOne({user_id: data.user_id})
-        const isConfirmed = !!accessCode ? accessCode.code === data.code : false
+        const accessCode = await this.accessCodesService.findOne({user_id: data.user_id, code: data.code})
 
-        if(isConfirmed) await this.accessCodesService.delete(accessCode.id)
+        if(!!accessCode) await this.accessCodesService.delete(accessCode.id)
 
-        return {isConfirmed}
+        return {isConfirmed: !!accessCode}
     }
 }

@@ -8,8 +8,10 @@ const userData = reactive({
     email: ""
 })
 const userStore = useUserStore()
-const isValidData = computed(() => !(!!userData.email.length))
+const appStateStore = useAppStateStore()
+const isValidData = computed(() => !(!!userData.email?.split("@")[1]))
 const checkExistUser = async () => {
+    appStateStore.load = true
     userStore.tempUser = await userStore.getUserBy({email: userData.email})
    
     if(!userStore.tempUser.id) {
@@ -19,6 +21,8 @@ const checkExistUser = async () => {
     else {
         navigateTo({name: ROUTES.LOGIN_CHOSE_USER, query: {exists: true as any}})
     }
+
+    appStateStore.load = false
 }
 </script>
 <template>

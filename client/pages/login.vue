@@ -6,6 +6,7 @@ definePageMeta({
     name: ROUTES.LOGIN,
     layout: false
 })
+const appState = useAppStateStore()
 const getBackPage = () => useRouter().go(-1)
 </script>
 
@@ -42,6 +43,7 @@ const getBackPage = () => useRouter().go(-1)
                 </div>
             </div>
             <div class="login__container__rigth">
+                <Loader v-if="appState.load" />
                 <div class="login__container__rigth__top_box">
                     <Button @click="getBackPage" v-if="$route.name !== ROUTES.LOGIN_INPUT_EMAIL">
                         <span class="material-symbols-rounded">keyboard_backspace</span>

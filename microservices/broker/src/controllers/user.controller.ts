@@ -2,7 +2,6 @@ import {
     Body,
     Controller, Delete, ForbiddenException,
     Get,
-    Headers,
     Inject,
     Patch,
     Post,
@@ -21,6 +20,7 @@ import { DisableAuth } from "src/disable-auth.decorator";
 import { NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
 import { Account, ProfilesServiceClient } from "src/proto/profiles";
 import { ICustomResponse } from "src/types/response.type";
+import { SendAccessCodeDTO } from '../proto/mail';
 
 @Controller("/user")
 export class UserController {
@@ -42,6 +42,12 @@ export class UserController {
         return {user_id: isLogined.user.id}
     }
 
+    @Post("send-confirm-code")
+    @DisableAuth()
+    async resendConfirmCode(@Body() data: SendAccessCodeDTO): Promise<{user_id: string}> {
+        return await this.mailService.sendAccessCode({user_id: data.user_id, email: data.email}).toPromise()
+    }
+
     @Put("confirm")
     @DisableAuth()
     async confirmUser(@Query() data: ConfirmAccessCodeDTO, @Req() req: ICustomRequest, @Res({ passthrough: true }) res: ICustomResponse): Promise<VerifyTokensDTO> {
@@ -50,7 +56,7 @@ export class UserController {
         const { isConfirmed } = await this.mailService.confirmAccessCode({user_id: data.user_id, code: data.code}).toPromise()
         const ip = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for']
 
-        if(isConfirmed) throw new ForbiddenException()
+        if(!isConfirmed) throw new ForbiddenException()
         
         await this.userService.updateUser({id: data.user_id, state: UserState.ACTIVE}).toPromise()
         const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: data.user_id, ip}).toPromise()
