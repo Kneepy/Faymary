@@ -3,7 +3,6 @@ import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({
     requredAuth: false,
-    name: ROUTES.LOGIN,
     layout: false
 })
 const appState = useAppStateStore()

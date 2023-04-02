@@ -6,6 +6,10 @@ definePageMeta({
     middleware: ["presence-email"]
 })
 const { tempUser } = useUserStore()
+
+const untieEmail = () => {
+    // тут нужно что-нибудь придумать если пользователь ответил что это не его аккаунт
+}
 </script>
 <template>
     <div class="chose__user">
@@ -21,7 +25,7 @@ const { tempUser } = useUserStore()
             </div>
         </Button>
         <div class="answer">
-            <Button class="answer__no">Нет</Button>
+            <Button class="answer__no" @click="untieEmail">Нет</Button>
             <NuxtLink :to="{name: ROUTES.LOGIN_INPUT_DATA, query: {exists: true as any}}">
                 <Button class="answer__yes">Да</Button>
             </NuxtLink>

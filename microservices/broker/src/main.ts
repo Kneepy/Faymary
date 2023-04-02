@@ -31,7 +31,7 @@ import fastifyCookie from '@fastify/cookie';
     /**
      * Нужно будет поменять origin на конкретный хост FE
      */
-    app.enableCors({origin: "http://localhost:3000", credentials: true, exposedHeaders: ["authorization"]})
+    app.enableCors({origin: "http://localhost:3000", credentials: true, exposedHeaders: ["authorization", "set-cookie"]})
 
     await app.listen(APP_PORT);
     Logger.log("Broker service successfully started")

@@ -8,7 +8,6 @@ definePageMeta({
     requredAuth: true,
     name: ROUTES.HOME
 })
-
 </script>
 <style lang="scss">
 .home {

@@ -28,9 +28,13 @@ const resetCountdown = () => {
 const sendCode = async () => {
     appState.load = true
     try {
-        await userStore.confirmUser({user_id: userStore.tempUser.id, code: code.join("")})
+        const tokens = await userStore.confirmUser({user_id: userStore.tempUser.id, code: code.join("")})
+        
         appState.load = false
+        appState.refresh_token = tokens.refresh_token
         ui.confirmedCode = true
+
+        navigateTo({name: ROUTES.HOME})
     } catch (e) {
         ui.incorrectCode = true
     }

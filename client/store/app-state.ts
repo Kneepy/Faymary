@@ -6,6 +6,12 @@ export const useAppStateStore = defineStore("app-state", {
         /**
          * Bearer токен отправляемый серверу (указывается без приставки Bearer)
          */
-        authorization: ""                      
-    })
+        authorization: "",
+        refresh_token: useCookie(useRuntimeConfig().public.sessionCookie).value          
+    }),
+    actions: {
+        isAuth(): boolean {
+            return !!this.refresh_token
+        }
+    }
 })

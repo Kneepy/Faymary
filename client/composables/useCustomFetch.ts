@@ -16,10 +16,12 @@ export const useCustomFetch = async (href: string, data: UseFetchOptions<any>) =
     },
     async onResponse({ response }) {
         /**
-         * Мы при каждом ответе изменяем этот заголовок т.к он может меняться взависимости от времени 
+         * Мы при каждом ответе изменяем эти заголовоки т.к они могут меняться взависимости от времени 
          */
         const appStateStore = useAppStateStore()
+        const config = useRuntimeConfig()
         appStateStore.authorization = response.headers.get("authorization") as string
+        appStateStore.refresh_token = useCookie(config.public.sessionCookie).value
     },
     ...data
 })
