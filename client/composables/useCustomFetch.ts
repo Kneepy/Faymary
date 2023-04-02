@@ -1,21 +1,25 @@
 import { UseFetchOptions } from "nuxt/app"
 
 export const useCustomFetch = async (href: string, data: UseFetchOptions<any>) => await useFetch(href, {
-    async onRequest({options}) {
+    async onRequest({ options }) {
         const config = useRuntimeConfig()
         const appStateStore = useAppStateStore()
 
-        options.baseURL = config.public.baseURL
+        options.baseURL = config.public.baseApiURL
         options.headers = {
             ...data.headers,
             authorization: `Bearer ${appStateStore.authorization}`,
             fingerprint: await useNuxtApp().$fingerprint,
         } as HeadersInit
         this.credentials = "include"
+        this.mode = "cors"
     },
-    async onResponse(ctx) {
-        // я не знаю что делать это чудо заголовки отправленные с сервера не видит
-        ctx.response.headers.forEach((v, i) => console.log(i, v))
+    async onResponse({ response }) {
+        /**
+         * Мы при каждом ответе изменяем этот заголовок т.к он может меняться взависимости от времени 
+         */
+        const appStateStore = useAppStateStore()
+        appStateStore.authorization = response.headers.get("authorization") as string
     },
     ...data
 })

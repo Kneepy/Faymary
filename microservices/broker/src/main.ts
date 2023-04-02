@@ -28,8 +28,10 @@ import fastifyCookie from '@fastify/cookie';
     });
     await app.register(fastifyCookie)
     
-    // нужно будет поменять origin на конкретный хост FA
-    app.enableCors({origin: "http://localhost:3000", credentials: true})
+    /**
+     * Нужно будет поменять origin на конкретный хост FE
+     */
+    app.enableCors({origin: "http://localhost:3000", credentials: true, exposedHeaders: ["authorization"]})
 
     await app.listen(APP_PORT);
     Logger.log("Broker service successfully started")

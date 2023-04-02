@@ -164,7 +164,6 @@ export class UserController {
     @Get()
     @DisableAuth()
     async getUser(@Query() query: FindUserDTO, @Res({passthrough: true}) h: ICustomResponse): Promise<User> {
-        h.header("wefwe", "efwef")
         return await this.userService.findUser(query).toPromise()
     }
 

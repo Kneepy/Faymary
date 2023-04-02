@@ -29,7 +29,10 @@ export class AuthController {
     async generateTokens(data: GenerateTokensDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<TokensPayload> {
         if(!data.fingerprint || !data.ua || !data.ip || !data.user_id) throw PoorDataToCreateTokens
 
-        const oldRefreshToken = await this.sessionService.findOne([{ua: data.ua, user_id: data.user_id}, {ip: data.ip, user_id: data.user_id}, {fingerprint: data.fingerprint, user_id: data.user_id}])
+        /**
+         * Я тут даже хз, нужно по идее вообще убрать проверку по ua и ip, скорее всего так и сделаю (если что то она тут была)
+         */
+        const oldRefreshToken = await this.sessionService.findOne([{ua: data.ua, user_id: data.user_id}, {fingerprint: data.fingerprint, user_id: data.user_id}])
 
         if(!!oldRefreshToken) {
             await this.sessionService.delete(oldRefreshToken.id)
@@ -57,7 +60,7 @@ export class AuthController {
          * Если access_token'а нет то удаляем старую сессию и создаём новую, с проверкой fingerprint'а
          */
         if(data.session.fingerprint !== session.fingerprint || Date.now() > session.createdAt + EXPIRES_IN_REFRESH_TOKEN) {
-            //await this.sessionService.delete(session.id)
+            await this.sessionService.delete(session.id)
             throw Unauthorized
         }
         if(!!accessCodeIsVerify.user_id) {

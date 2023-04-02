@@ -4,7 +4,7 @@ const { size, href } = defineProps<{
     href: string
 }>()
 const config = useRuntimeConfig()
-const img = config.public.imgesURL + href
+const img = config.public.imgesApiURL + href
 </script>
 
 <template>
