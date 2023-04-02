@@ -35,6 +35,7 @@ export class AuthGuard implements CanActivate {
 
         request.headers.refresh_token = tokens.refresh_token
         request.headers.authorization = tokens.access_token
+        response.header("authorization", tokens.access_token)
 
         response.setCookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token)
 
@@ -43,6 +44,5 @@ export class AuthGuard implements CanActivate {
         }
 
         return true
-
     }
 }

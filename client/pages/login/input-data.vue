@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { use } from 'h3';
 import { ROUTES } from '~~/assets/constants/routes.constants';
 import { ServerError } from '~~/store/types/error';
 
@@ -7,7 +6,7 @@ definePageMeta({
     name: ROUTES.LOGIN_INPUT_DATA,
     middleware: ["presence-email"]
 })
-const { exists } = useRoute().query
+const exists = useRoute().query.exists === "true" // т.к query это всегда строка
 
 const userStore = useUserStore()
 const appStateStore = useAppStateStore()
@@ -25,6 +24,7 @@ const loginUser = async () => {
         )
     
         if(user_id) {
+            userStore.tempUser.id = user_id
             navigateTo({name: ROUTES.LOGIN_CONFIRM, query: {user_id}})
         }
     } catch (e: any) {
@@ -44,7 +44,13 @@ const loginUser = async () => {
             <input type="text" v-if="!exists" v-model="userStore.tempUser.fullName" placeholder="Как тебя зовут?"> 
             <span class="hint" :style="{marginTop: exists ? `0px` : ``}">Пароль должен содержать не менее 6 символов.</span>
             <div class="password_input">
-                <input :class="errors?.message ? `input__error` : ``" :type="isVisiblePass ? `text` : `password`" v-model="userStore.tempUser.password" @input="clearErrorOnInputPass" placeholder="Придумайте пароль">
+                <input 
+                    :class="errors?.message ? `input__error` : ``" 
+                    :type="isVisiblePass ? `text` : `password`" 
+                    v-model="userStore.tempUser.password" 
+                    @input="clearErrorOnInputPass"
+                    :placeholder="exists ? `Введите пароль` : `Придумайте пароль`"
+                >
                 <Button @click="() => isVisiblePass = !isVisiblePass">
                     <span class="material-symbols-rounded">
                         {{ isVisiblePass ? `visibility_off` : `visibility` }}

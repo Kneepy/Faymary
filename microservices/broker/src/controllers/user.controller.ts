@@ -2,6 +2,8 @@ import {
     Body,
     Controller, Delete, ForbiddenException,
     Get,
+    Header,
+    Headers,
     Inject,
     Patch,
     Post,
@@ -9,7 +11,6 @@ import {
     Query,
     Req,
     Res,
-    UnauthorizedException,
 } from "@nestjs/common";
 import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
@@ -17,7 +18,7 @@ import {CreateUserDTO, FindFollowersDTO, FindUserDTO, LoginUserDTO, UpdateUserDT
 import { ICustomRequest } from "src/types/request.type";
 import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
-import { NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
+import { IncorrectPasswordError, NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
 import { Account, ProfilesServiceClient } from "src/proto/profiles";
 import { ICustomResponse } from "src/types/response.type";
 import { SendAccessCodeDTO } from '../proto/mail';
@@ -36,7 +37,7 @@ export class UserController {
     async loginUser(@Body() data: LoginUserDTO): Promise<{user_id: string}> {
         const isLogined = await this.userService.loginUser({email: data.email, password: data.password}).toPromise()
 
-        if(!isLogined.isLogined) throw UnauthorizedException
+        if(!isLogined.isLogined) throw IncorrectPasswordError
 
         await this.mailService.sendAccessCode({user_id: isLogined.user.id, email: data.email}).toPromise()
         return {user_id: isLogined.user.id}
@@ -69,7 +70,6 @@ export class UserController {
          */
         if(req.headers.authorization && req.cookies.refresh_token) {
             const oldUserId = await this.sessionService.verifyTokens({access_token: req.headers.authorization, refresh_token: req.cookies.refresh_token}).toPromise()
-
             if(oldUserId.user_id) {
                 const oldUserProfile = await this.profilesService.getProfile({user_id: oldUserId.user_id}).toPromise()
                 
@@ -81,7 +81,7 @@ export class UserController {
         }
         
         await this.profilesService.addUserAccount({user_id: data.user_id, profile_id: userProfile.id}).toPromise()
-        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, {httpOnly: true})
+        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, {httpOnly: true, secure: true, maxAge: 60*60*24*14, path: "/"})
 
         return tokens
     }
@@ -163,7 +163,8 @@ export class UserController {
      */
     @Get()
     @DisableAuth()
-    async getUser(@Query() query: FindUserDTO): Promise<User> {
+    async getUser(@Query() query: FindUserDTO, @Res({passthrough: true}) h: ICustomResponse): Promise<User> {
+        h.header("wefwe", "efwef")
         return await this.userService.findUser(query).toPromise()
     }
 

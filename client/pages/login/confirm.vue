@@ -28,7 +28,7 @@ const resetCountdown = () => {
 const sendCode = async () => {
     appState.load = true
     try {
-        await userStore.confirmUser({user_id: user_id?.toString() as string, code: code.join("")})
+        await userStore.confirmUser({user_id: userStore.tempUser.id, code: code.join("")})
         appState.load = false
         ui.confirmedCode = true
     } catch (e) {

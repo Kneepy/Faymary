@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { User, UserId } from "./types/user.type";
+import { AuthTokens, User, UserId } from "./types/user.type";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
@@ -24,15 +24,13 @@ export const useUserStore = defineStore("user", {
             if(res.error.value?.data) throw res.error.value?.data
             return res.data.value
         },
-        async confirmUser({user_id, code}: {user_id: string, code: string}): Promise<{access_token: string, refresh_token: string}> {
+        async confirmUser({user_id, code}: {user_id: string, code: string}): Promise<AuthTokens> {
             const res = await useCustomFetch("/user/confirm", {method: "PUT", query: {user_id, code}})
 
             if(res.error.value?.data) throw res.error.value.data
 
-            // я хз что делать оно почему-то cookie не устанавливает, как и те что приходят с сервера
-            const config = useRuntimeConfig()
-            const cookie = useCookie<string>(config.public.sessionCookie, {httpOnly: true, secure: true, maxAge: 1209600, path: "/"})
-            cookie.value = res.data.value.refresh_token
+            const appStateStore = useAppStateStore()
+            appStateStore.authorization = res.data.value.access_token
 
             return res.data.value
         }

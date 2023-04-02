@@ -1,4 +1,4 @@
-<script setup lang="tsx">
+<script setup lang="ts">
 import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({

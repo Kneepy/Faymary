@@ -6,6 +6,8 @@ export default defineNuxtConfig({
             sessionCookie: "refresh_token"
         }
     },
+    ssr: true,
+    target: 'server',
     modules: [
         "@pinia/nuxt",
     ],

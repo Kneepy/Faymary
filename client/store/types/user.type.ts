@@ -15,3 +15,8 @@ export interface User {
 export interface UserId {
     user_id: string
 }
+
+export interface AuthTokens {
+    access_token: string
+    refresh_token: string
+}
