@@ -1,7 +1,9 @@
 export default defineNuxtPlugin(() => {
+    const appStateStore = useAppStateStore()
+
     if(process.server) return
 
-    const socket = new WebSocket("ws://localhost:5000")
+    const socket = new WebSocket(useRuntimeConfig().public.baseWsURL)
    
     return {
         provide: {socket}

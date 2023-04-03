@@ -12,7 +12,7 @@ import {
     Req,
     Res,
 } from "@nestjs/common";
-import {COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
+import {AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
 import {CreateUserDTO, FindFollowersDTO, FindUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowDTO, UsersIsFollowResult, Users, UserServiceClient, UsersIsFollowDTO, UserState} from "src/proto/user";
 import { ICustomRequest } from "src/types/request.type";
@@ -81,7 +81,7 @@ export class UserController {
         }
         
         await this.profilesService.addUserAccount({user_id: data.user_id, profile_id: userProfile.id}).toPromise()
-        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, {httpOnly: true, secure: true, maxAge: 60*60*24*14, path: "/"})
+        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, AUTH_COOKIE_OPTIONS)
 
         return tokens
     }

@@ -2,6 +2,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             baseApiURL: "http://localhost:5000/",
+            baseWsURL: "ws://localhost:5000",
             imgesApiURL: "http://localhost:5013/",
             sessionCookie: "refresh_token"
         }

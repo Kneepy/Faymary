@@ -1,9 +1,12 @@
 <template>
-    <div class="home"></div>
+    <div class="home">
+        {{ userStore.me }}
+    </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ROUTES } from "~/assets/constants/routes.constants";
 
+const userStore = useUserStore()
 definePageMeta({
     requredAuth: true,
     name: ROUTES.HOME
@@ -11,6 +14,6 @@ definePageMeta({
 </script>
 <style lang="scss">
 .home {
-    
+    display: flex;
 }
 </style>

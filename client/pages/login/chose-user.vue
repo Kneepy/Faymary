@@ -3,7 +3,7 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 
 definePageMeta({
     name: ROUTES.LOGIN_CHOSE_USER,
-    middleware: ["presence-email"]
+    middleware: ["presence-email"],
 })
 const { tempUser } = useUserStore()
 

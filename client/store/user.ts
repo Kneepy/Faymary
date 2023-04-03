@@ -2,12 +2,19 @@ import { defineStore } from "pinia";
 import { AuthTokens, User, UserId } from "./types/user.type";
 
 export const useUserStore = defineStore("user", {
-    state: () => ({
-        tempUser: {} as User
+    state: (): {tempUser: Partial<User>, me: Partial<User>} => ({
+        tempUser: {},
+        me: {}
     }),
     actions: {
         async getUserBy (data: Partial<Pick<User, "email" | "userName" | "id">>): Promise<User> {
             return (await useCustomFetch("/user", {method: "GET", query: data})).data.value
+        },
+        async getMe(): Promise<User> {
+            const res = await useCustomFetch("/user/me", {method: "GET"})
+
+            if(res.error.value?.data) throw res.error.value?.data
+            return res.data.value
         },
         async sendConfirmCode(data: Pick<User, "email"> & UserId): Promise<UserId> {
             return (await useCustomFetch("/user/send-confirm-code", {method: "POST", body: data})).data.value

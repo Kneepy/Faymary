@@ -7,7 +7,6 @@ definePageMeta({
 })
 const userStore = useUserStore()
 const appState = useAppStateStore()
-const { user_id } = useRoute().query
 const inputs = ref()
 const ui = reactive({ incorrectCode: false, confirmedCode: false })
 const countInputs = 6

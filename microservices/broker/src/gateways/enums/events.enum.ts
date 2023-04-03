@@ -22,5 +22,6 @@ export const WEVENTS = {
         SUBSCRIBE: "user.subscribe"
     },
     NOTIFICATION: "notification",
+    SESSION_TOKEN: "session.token",
     ERROR: "error"
 }

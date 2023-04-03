@@ -1,4 +1,4 @@
-import { COOKIE_REFRESH_TOKEN_NAME } from 'src/constants/app.constants';
+import { AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME } from 'src/constants/app.constants';
 import { Reflector } from '@nestjs/core';
 import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
 import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./constants/app.constants";
@@ -36,8 +36,7 @@ export class AuthGuard implements CanActivate {
         request.headers.refresh_token = tokens.refresh_token
         request.headers.authorization = tokens.access_token
         response.header("authorization", tokens.access_token)
-
-        response.setCookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token)
+        response.cookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token, AUTH_COOKIE_OPTIONS)
 
         if(verifedTokens.user_id !== null) {
             request.user_id = verifedTokens.user_id

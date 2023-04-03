@@ -17,11 +17,12 @@ export const useCustomFetch = async (href: string, data: UseFetchOptions<any>) =
     async onResponse({ response }) {
         /**
          * Мы при каждом ответе изменяем эти заголовоки т.к они могут меняться взависимости от времени 
+         * Следующая строчка кода не нужна т.к BE сам устанавливает cookie файлы + nuxt не видит те куки которые устанавливает сервак
+         * 
+         * appStateStore.refresh_token = useCookie(config.public.sessionCookie).value
          */
         const appStateStore = useAppStateStore()
-        const config = useRuntimeConfig()
         appStateStore.authorization = response.headers.get("authorization") as string
-        appStateStore.refresh_token = useCookie(config.public.sessionCookie).value
     },
     ...data
 })

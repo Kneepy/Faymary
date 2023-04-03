@@ -2,7 +2,7 @@
 import { ROUTES } from '~~/assets/constants/routes.constants';
 
 definePageMeta({
-    name: ROUTES.LOGIN_INPUT_EMAIL
+    name: ROUTES.LOGIN_INPUT_EMAIL,
 })
 const userData = reactive({
     email: ""

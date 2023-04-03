@@ -63,7 +63,7 @@ export class AuthController {
             await this.sessionService.delete(session.id)
             throw Unauthorized
         }
-        if(!!accessCodeIsVerify.user_id) {
+        if(!!accessCodeIsVerify?.user_id) {
             return {
                 access_token: data.access_token,
                 refresh_token: data.refresh_token

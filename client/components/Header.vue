@@ -1,11 +1,11 @@
 <template>
-    <header>
+    <div class="header">
         <div class="header__container">
             <NuxtLink :to="{name: ROUTES.HOME}">
                 <Logo :size=60 />
             </NuxtLink>
         </div>
-    </header>
+    </div>
 </template>
 
 <script setup>
@@ -14,7 +14,7 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 </script>
 
 <style scoped lang="scss">
-header {
+.header {
     height: 70px;
     width: 100%;
     position: fixed;

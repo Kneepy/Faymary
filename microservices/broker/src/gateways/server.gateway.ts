@@ -126,6 +126,10 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true
     }
 
+    async sendUser<T>(client: ICustomSocket, data: WsResponse<T>) {
+        client.send(JSON.stringify(data))
+    }
+
     async sendError(client: ICustomSocket, error: any) {
         client.send(JSON.stringify({data: error, event: WEVENTS.ERROR}))
     }
@@ -154,7 +158,10 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 ip: (args.socket.remoteAddress || args.headers["x-forwarded-for"]) as string
             }
         }).pipe(
-            tap(tokens => client.session_id = tokens.refresh_token),
+            tap(tokens => {
+                client.session_id = tokens.refresh_token
+                this.sendUser<string>(client, {event: WEVENTS.SESSION_TOKEN, data: client.session_id})
+            }),
             mergeMap(tokens => this.sessionService.verifyTokens({ access_token: tokens.access_token, refresh_token: tokens.refresh_token })),
             tap(verifiedToken => client.user_id = verifiedToken.user_id),
             mergeMap(verifiedToken => {
