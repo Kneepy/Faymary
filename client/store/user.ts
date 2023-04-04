@@ -11,7 +11,7 @@ export const useUserStore = defineStore("user", {
             return (await useCustomFetch("/user", {method: "GET", query: data})).data.value
         },
         async getMe(): Promise<User> {
-            const res = await useCustomFetch("/user/me", {method: "GET"})
+            const res = await useCustomFetch("/user/me", {method: "GET", server: false})
 
             if(res.error.value?.data) throw res.error.value?.data
             return res.data.value

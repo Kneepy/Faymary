@@ -1,18 +1,21 @@
 <script setup lang="ts">
 const { size, href } = defineProps<{
     size: number,
-    href: string
+    /**
+     * Может быть как ссылкой так и id файла из api
+     */
+    href?: string
 }>()
 const config = useRuntimeConfig()
-const img = config.public.imgesApiURL + href
+const img = (!!href?.split("http")[1] ? href : config.public.imgesApiURL + (href ?? ""))
 </script>
 
 <template>
-    <div class="logo" :style="{width: size + `px`, height: size + `px`, backgroundImage: `url(${img})`}"></div>
+    <div class="avatar" :style="{width: size + `px`, height: size + `px`, backgroundImage: `url(${img})`}"></div>
 </template>
 
 <style lang="scss">
-.logo {
+.avatar {
     width: 40px;
     height: 40px;
     border-radius: 15%;

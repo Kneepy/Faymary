@@ -1,6 +1,6 @@
 import { UseFetchOptions } from "nuxt/app"
 
-export const useCustomFetch = async (href: string, data: UseFetchOptions<any>) => await useFetch(href, {
+export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useFetch(href, {
     async onRequest({ options }) {
         const config = useRuntimeConfig()
         const appStateStore = useAppStateStore()
@@ -24,5 +24,6 @@ export const useCustomFetch = async (href: string, data: UseFetchOptions<any>) =
         const appStateStore = useAppStateStore()
         appStateStore.authorization = response.headers.get("authorization") as string
     },
-    ...data
+    ...data,
+    server: false
 })
