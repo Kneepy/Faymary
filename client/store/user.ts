@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { AuthTokens, User, UserId } from "./types/user.type";
+import { AuthTokens, Profile, User, UserId } from "./types/user.type";
 
 export const useUserStore = defineStore("user", {
     state: (): {tempUser: Partial<User>, me: Partial<User>} => ({
@@ -15,6 +15,9 @@ export const useUserStore = defineStore("user", {
 
             if(res.error.value?.data) throw res.error.value?.data
             return res.data.value
+        },
+        async getMeProfile(): Promise<Profile> {            
+            return (await useCustomFetch("/user/me/profile", {method: "GET"})).data.value
         },
         async sendConfirmCode(data: Pick<User, "email"> & UserId): Promise<UserId> {
             return (await useCustomFetch("/user/send-confirm-code", {method: "POST", body: data})).data.value

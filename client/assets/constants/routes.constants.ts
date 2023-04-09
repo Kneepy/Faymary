@@ -3,5 +3,7 @@ export const ROUTES = {
     LOGIN_CHOSE_USER: "LoginChoseUser",
     LOGIN_INPUT_DATA: "LoginInputData",
     LOGIN_INPUT_EMAIL: "LoginInputEmail",
+    SETTINGS: "Settings",
+    SUPPORT: "Support",
     HOME: "Home"
 }

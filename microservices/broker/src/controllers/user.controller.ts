@@ -19,7 +19,7 @@ import { ICustomRequest } from "src/types/request.type";
 import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
 import { IncorrectPasswordError, NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
-import { Account, ProfilesServiceClient } from "src/proto/profiles";
+import { Account, Profile, ProfilesServiceClient } from "src/proto/profiles";
 import { ICustomResponse } from "src/types/response.type";
 import { SendAccessCodeDTO } from '../proto/mail';
 
@@ -142,17 +142,22 @@ export class UserController {
         return await this.userService.findUser({id: req.user_id}).toPromise()
     }
 
+    @Get("/me/profile")
+    async getUserAccounts(@Req() req: ICustomRequest): Promise<Profile> {
+        return await this.profilesService.getProfile({user_id: req.user_id}).toPromise()
+    }
+
     @Patch()
     async updateUser(@Req() req: ICustomRequest, @Body() data: Omit<UpdateUserDTO, "id">): Promise<User> {
         return await this.userService.updateUser({...data, id: req.user_id}).toPromise()
     }
 
-    @Get("/user_is_follow")
+    @Get("/user-is-follow")
     async userIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UserIsFollowDTO, "user_id">) : Promise<boolean> {
         return (await this.userService.userIsFollow({author_id: data.user_id, user_id: req.user_id}).toPromise()).isFollow
     }
 
-    @Get("/users_is_follow")
+    @Get("/users-is-follow")
     async usersIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UsersIsFollowDTO, "users_ids">): Promise<UsersIsFollowResult> {
         return await this.userService.usersIsFollow({author_id: req.user_id, users_ids: data.users_ids}).toPromise()
     }

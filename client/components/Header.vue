@@ -1,24 +1,31 @@
+<script setup>
+import { ROUTES } from '~~/assets/constants/routes.constants';
+
+const userStore = useUserStore()
+const visibleUserMenu = ref(false)
+const visibleChangeAccountModal = ref(false)
+const toggleUserMenu = () => visibleUserMenu.value = !visibleUserMenu.value
+const openChangeAccount = () => visibleChangeAccountModal.value = true
+</script>
 <template>
     <div class="header">
         <div class="header__container">
             <NuxtLink :to="{name: ROUTES.HOME}">
                 <Logo :size=60 />
             </NuxtLink>
-            <Button class="user__profile">
-                <div class="user__profile__box">
-                    <Avatar v-if="userStore.me.file_id" :href="userStore.me.file_id" :size=40 />
-                    <span class="material-symbols-rounded">expand_more</span>
-                </div>
-            </Button>
+            <div class="header__container__user" v-click-outside="() => visibleUserMenu = false">
+                <Button @click="toggleUserMenu" class="user__profile">
+                    <div class="user__profile__box">
+                        <Avatar :href="userStore.me.file_id" :size=40 />
+                        <span class="material-symbols-rounded">expand_more</span>
+                    </div>
+                </Button>
+                <UserMenu @change-account="openChangeAccount" @destroy="toggleUserMenu" v-if="visibleUserMenu" />
+                <ChangeAccount @on-close="() => visibleChangeAccountModal = false" v-if="visibleChangeAccountModal" />
+            </div>
         </div>
     </div>
 </template>
-
-<script setup>
-import { ROUTES } from '~~/assets/constants/routes.constants';
-
-const userStore = useUserStore()
-</script>
 
 <style scoped lang="scss">
 .header {
@@ -39,23 +46,30 @@ const userStore = useUserStore()
         height: 100%;
         align-items: center;
         justify-content: space-between;
-        .user__profile {
+        position: relative;
+        &__user {
             height: 100%;
-            width: fit-content;
-            background-color: transparent;
-            border-radius: 0px;
-            padding: 10px;
-            &:hover {
-                background-color: $transperent_hover_content_background;
-            }
-            &__box {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                span {
-                    margin-left: 10px;
-                    font-size: 30px;
-                    color: $gray;
+            .user__profile {
+                height: 100%;
+                width: fit-content;
+                background-color: transparent;
+                border-radius: 0px;
+                padding: 10px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                &:hover {
+                    background-color: $transperent_hover_content_background;
+                }
+                &__box {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    span {
+                        margin-left: 10px;
+                        font-size: 20px;
+                        color: $gray;
+                    }
                 }
             }
         }

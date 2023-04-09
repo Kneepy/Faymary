@@ -5,6 +5,9 @@ definePageMeta({
     requredAuth: false,
     layout: false
 })
+useHead({
+    title: "Регистрация | FY Cloud",
+})
 const appState = useAppStateStore()
 const getBackPage = () => useRouter().go(-1)
 </script>
