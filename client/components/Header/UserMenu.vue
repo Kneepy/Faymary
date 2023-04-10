@@ -1,18 +1,14 @@
 <script setup lang="ts">
 import { ROUTES } from '~~/assets/constants/routes.constants';
-import { Account } from '~~/store/types/user.type';
 
 const emit = defineEmits(["destroy", "change-account"])
 const userStore = useUserStore()
+const config = useRuntimeConfig()
+const appStore = useAppStateStore()
 // кароче делаем кнопку сменить аккаунт и показываем модалку с аккаунтами 
 if(!userStore.me.profile?.accounts) {
     userStore.me.profile = await userStore.getMeProfile()
-    userStore.me.profile.accounts = await Promise.all(
-        userStore.me.profile.accounts.map(async (account: Account) => ({
-            ...account,
-            ...await userStore.getUserBy({id: account.user_id})
-        }))
-    )
+    userStore.me.profile.accounts = await userStore.getMeAccounts()
 }
 const closeMenu = () => emit(`destroy`)
 const changeAccount = () => {
@@ -49,7 +45,7 @@ const changeAccount = () => {
                     Помощь
                 </Button>
             </NuxtLink>
-            <NuxtLink :to="{name: ROUTES.LOGIN_INPUT_EMAIL}" @click="closeMenu">
+            <NuxtLink :to="{name: ROUTES.LOGIN_INPUT_EMAIL, query: {authorization: appStore.authorization}}" @click="closeMenu">
                 <Button class="option logout">
                     <span class="material-symbols-rounded">logout</span>
                     Выход
@@ -83,6 +79,9 @@ const changeAccount = () => {
                 flex-direction: column;
                 margin-left: 12px;
                 flex: 1;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
                 .name {
                     color: $white;
                     font-weight: bold;

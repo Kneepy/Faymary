@@ -22,7 +22,7 @@ export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useF
          * appStateStore.refresh_token = useCookie(config.public.sessionCookie).value
          */
         const appStateStore = useAppStateStore()
-        appStateStore.authorization = response.headers.get("authorization") as string
+        appStateStore.authorization = response.headers.get("authorization") as string ?? appStateStore.authorization
     },
     ...data,
     server: false

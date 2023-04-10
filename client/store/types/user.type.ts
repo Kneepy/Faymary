@@ -24,9 +24,10 @@ export interface Profile {
     accounts: Account[]
 }
 
-export interface Account extends User {
+export interface Account {
     id: string
     user_id: string
+    user: User
 }
 
 export interface UserId {

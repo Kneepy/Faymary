@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { AuthTokens, Profile, User, UserId } from "./types/user.type";
+import { Account, AuthTokens, Profile, User, UserId } from "./types/user.type";
 
 export const useUserStore = defineStore("user", {
     state: (): {tempUser: Partial<User>, me: Partial<User>} => ({
@@ -16,8 +16,20 @@ export const useUserStore = defineStore("user", {
             if(res.error.value?.data) throw res.error.value?.data
             return res.data.value
         },
-        async getMeProfile(): Promise<Profile> {            
+        async getMeProfile(): Promise<Profile> {    
             return (await useCustomFetch("/user/me/profile", {method: "GET"})).data.value
+        },
+        async getMeAccounts(): Promise<Account[]> {
+            return !!this.me.profile.accounts?.length && Promise.all(this.me.profile.accounts.map(async (account: Account) => ({
+                ...account,
+                user: await this.getUserBy({id: account.user_id})
+            })))
+        },
+        async changeAccount(account_id: string): Promise<AuthTokens> {
+            const res = await useCustomFetch("/user/change-account", {method: "PATCH", query: {account_id}})
+
+            if(res.error.value?.data) throw res.error.value?.data
+            return res.data.value
         },
         async sendConfirmCode(data: Pick<User, "email"> & UserId): Promise<UserId> {
             return (await useCustomFetch("/user/send-confirm-code", {method: "POST", body: data})).data.value

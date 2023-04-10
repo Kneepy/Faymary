@@ -9,6 +9,7 @@ useHead({
     title: "Регистрация | FY Cloud",
 })
 const appState = useAppStateStore()
+appState.authorization = useRoute().query.authorization as string
 const getBackPage = () => useRouter().go(-1)
 </script>
 

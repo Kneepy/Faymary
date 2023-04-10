@@ -70,6 +70,7 @@ export class UserController {
          */
         if(req.headers.authorization && req.cookies.refresh_token) {
             const oldUserId = await this.sessionService.verifyTokens({access_token: req.headers.authorization, refresh_token: req.cookies.refresh_token}).toPromise()
+            
             if(oldUserId.user_id) {
                 const oldUserProfile = await this.profilesService.getProfile({user_id: oldUserId.user_id}).toPromise()
                 
@@ -110,9 +111,9 @@ export class UserController {
         if(!account) throw NotFoundAccount
 
         const ip = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for']
-        const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: req.user_id, ip}).toPromise()
+        const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: account.user_id, ip}).toPromise()
 
-        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, {httpOnly: true})
+        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, AUTH_COOKIE_OPTIONS)
 
         return tokens
     }
