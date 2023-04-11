@@ -19,7 +19,7 @@ export class NotificationController {
     constructor(private notificationService: NotificationService) {}
 
     @GrpcMethod(NOTIFICATIONS_SERVICE_NAME, NOTIFICATION_SERVICE_METHODS.GET_ALL_USER_NOTIFICATIONS)
-    async getAllUserNotifications({ user_id, skip, take }: NotificationGetDTO): Promise<Notifications[]> {
+    async getAllUserNotifications({ user_id, skip, take }: NotificationGetDTO): Promise<{notifications: Notifications[]}> {
         if(!user_id) throw NotFoundNotification;
 
         const notifications = await this.notificationService.find(
@@ -27,7 +27,7 @@ export class NotificationController {
             { skip, take }
         );
 
-        return notifications;
+        return {notifications};
     }
 
     @GrpcMethod(NOTIFICATIONS_SERVICE_NAME, NOTIFICATION_SERVICE_METHODS.CREATE_NOTIFICATION)

@@ -14,14 +14,14 @@ import {
     StoreClientDependency, StoriesClient, StoriesClientDependency, UsersClient,
     UsersClientDependency
 } from './app-clients.providers';
-import {CommentsController, DialogsControllerer, PostController, StoriesController, UserController} from "./controllers";
+import {CommentsController, DialogsControllerer, NotificationController, PostController, StoriesController, UserController} from "./controllers";
 import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
 
 const Gateways = [CommentsGateway, ServerGateway, DialogsGateway, MessagesGateway, LikesGateway, UsersGateway]
 const Clients = [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient, ProfilesClient]
-const Controllers = [UserController, PostController, StoriesController, CommentsController, DialogsControllerer]
+const Controllers = [UserController, PostController, StoriesController, CommentsController, DialogsControllerer, NotificationController]
 
 @Module({
     imports: [

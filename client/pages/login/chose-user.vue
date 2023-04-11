@@ -70,7 +70,7 @@ const untieEmail = () => {
             font-size: 16px;
             color: $white;
             &__name {
-                font-weight: bold;
+                font-weight: 500;
             }
             &__id {
                 color: $gray;

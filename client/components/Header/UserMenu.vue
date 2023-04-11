@@ -84,12 +84,12 @@ const changeAccount = () => {
                 text-overflow: ellipsis;
                 .name {
                     color: $white;
-                    font-weight: bold;
+                    font-weight: 500;
                 }
                 .id {
                     color: $gray;
                     font-size: 14px;
-                    font-weight: bold;
+                    font-weight: 700;
                 }
                 
             }

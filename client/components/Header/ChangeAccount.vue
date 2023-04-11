@@ -77,8 +77,14 @@ const changeAccount = async (account: Account) => {
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 color: $white;
-                font-weight: bold;
-                font-size: 15px;
+                .name {
+                    font-size: 17px;
+                    font-weight: 400;
+                }
+                .email {
+                    font-size: 14px;
+                    font-weight: 600;
+                }
             }
             .current_account {
                 flex: 1;

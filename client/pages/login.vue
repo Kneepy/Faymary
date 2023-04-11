@@ -88,7 +88,7 @@ const getBackPage = () => useRouter().go(-1)
                 align-items: center;
                 width: 90px;
                 justify-content: space-between;
-                font-weight: bold;
+                font-weight: 600;
                 color: $white;
                 font-size: 19px;
                 margin-bottom: 10px;
@@ -98,7 +98,7 @@ const getBackPage = () => useRouter().go(-1)
                 font-size: 17px;
                 width: 190px;
                 margin-bottom: 10px;
-                font-weight: lighter;
+                font-weight: 300;
             }
             &__footer__box {
                 span {

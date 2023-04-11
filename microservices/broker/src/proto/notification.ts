@@ -24,6 +24,10 @@ export enum NotificationEnumType {
   UNRECOGNIZED = -1,
 }
 
+export interface Notifications {
+  notifications: Notification[];
+}
+
 export interface Notification {
   id: string;
   type: NotificationAdditionsEnumType;
@@ -55,13 +59,13 @@ export interface NotificationCreate {
 export const NOTIFICATIONS_PACKAGE_NAME = "notifications";
 
 export interface NotificationsServiceClient {
-  getAllUserNotifications(request: NotificationGetDTO): Observable<Notification>;
+  getAllUserNotifications(request: NotificationGetDTO): Observable<Notifications>;
 
   createNotification(request: NotificationCreate): Observable<Notification>;
 }
 
 export interface NotificationsServiceController {
-  getAllUserNotifications(request: NotificationGetDTO): Observable<Notification>;
+  getAllUserNotifications(request: NotificationGetDTO): Observable<Notifications>;
 
   createNotification(request: NotificationCreate): Observable<Notification>;
 }
