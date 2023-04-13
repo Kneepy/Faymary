@@ -3,25 +3,31 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 
 const userStore = useUserStore()
 const visibleUserMenu = ref(false)
+const visibleNotificationsMenu = ref(false)
+const searchValue = ref("")
 const visibleChangeAccountModal = ref(false)
 const toggleUserMenu = () => visibleUserMenu.value = !visibleUserMenu.value
+const toggleNotificationsMenu = () => visibleNotificationsMenu.value = !visibleNotificationsMenu.value
 const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChangeAccountModal.value
 </script>
 <template>
     <div class="header">
         <div class="header__container">
             <div class="header__container__left">
-                <NuxtLink class="header__container__left__logo" :to="{name: ROUTES.HOME}">
+                <NuxtLink class="header__container__left__logo noselect" :to="{name: ROUTES.HOME}">
                     <Logo :size=45 />
                     <span>FAYMARY</span>
                 </NuxtLink>
                 <div class="search">
                     <Button class="search__bth"><span class="material-symbols-rounded">search</span></Button>
-                    <input placeholder="Введите что-нибудь" type="text">
+                    <input v-model="searchValue" placeholder="Введите что-нибудь" type="text">
                 </div>
-                <Button class="notifications">
-                    <span class="material-symbols-rounded">notifications</span>
-                </Button>
+                <div class="notifications" v-click-outside="() => visibleNotificationsMenu = false">
+                    <Button @click="toggleNotificationsMenu" class="notifications__bth">
+                        <span class="material-symbols-rounded">notifications</span>
+                    </Button>
+                    <NotificationsMenu v-if="visibleNotificationsMenu" />
+                </div>
             </div>
             <div class="header__container__right">
                 <div class="header__container__right__user" v-click-outside="() => visibleUserMenu = false">
@@ -100,23 +106,28 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                 }
             }
             .notifications {
-                width: 55px;
                 height: 100%;
-                background-color: transparent;
-                border-radius: 0px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-left: 30px;
-                &:hover {
-                    background-color: $transparent_button_hover;
-                }
-                span {
-                    color: $gray;
+                position: relative;
+                &__bth {
+                    width: 55px;
+                    height: 100%;
+                    background-color: transparent;
+                    border-radius: 0px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-left: 20px;
+                    &:hover {
+                        background-color: $transperent_hover_content_background;
+                    }
+                    span {
+                        color: $gray;
+                    }
                 }
             }
         }
         &__right {
+            height: 100%;
             &__user {
                 height: 100%;
                 .user__profile {

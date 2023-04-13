@@ -3,13 +3,7 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 
 const emit = defineEmits(["destroy", "change-account"])
 const userStore = useUserStore()
-const config = useRuntimeConfig()
 const appStore = useAppStateStore()
-// кароче делаем кнопку сменить аккаунт и показываем модалку с аккаунтами 
-if(!userStore.me.profile?.accounts) {
-    userStore.me.profile = await userStore.getMeProfile()
-    userStore.me.profile.accounts = await userStore.getMeAccounts()
-}
 const closeMenu = () => emit(`destroy`)
 const changeAccount = () => {
     emit(`change-account`)

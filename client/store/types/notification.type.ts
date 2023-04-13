@@ -1,4 +1,4 @@
-import { AdditionsEnum } from "./additions.enum";
+import { Addition, AdditionsType } from "./additions.type";
 
 export enum NotificationEnumType {
     ADD_COMMENT = 0,
@@ -10,12 +10,14 @@ export enum NotificationEnumType {
 
 export interface Notification {
     id: string;
-    type: AdditionsEnum;
+    type: AdditionsType;
     item_id: string;
-    to_id: string;
+    item: Addition
     parent_id: string;
-    parent_type: AdditionsEnum;
+    parent_type: AdditionsType;
+    parent: Addition
     from_id: string;
+    to_id: string;
     createdAt: string;
     notification_type: NotificationEnumType;
 }

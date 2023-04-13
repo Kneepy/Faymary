@@ -2,8 +2,6 @@ import {
     Body,
     Controller, Delete, ForbiddenException,
     Get,
-    Header,
-    Headers,
     Inject,
     Patch,
     Post,
@@ -20,7 +18,7 @@ import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
 import { IncorrectPasswordError, NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
 import { Account, Profile, ProfilesServiceClient } from "src/proto/profiles";
-import { ICustomResponse } from "src/types/response.type";
+import { ICustomResponse, BrokerResponse } from "src/types";
 import { SendAccessCodeDTO } from '../proto/mail';
 
 @Controller("/user")
@@ -139,13 +137,16 @@ export class UserController {
     }
 
     @Get("/me")
-    async getUserBySessionTokens(@Req() req: ICustomRequest) {
+    async getUserBySessionTokens(@Req() req: ICustomRequest): Promise<User> {
         return await this.userService.findUser({id: req.user_id}).toPromise()
     }
 
     @Get("/me/profile")
     async getUserAccounts(@Req() req: ICustomRequest): Promise<Profile> {
-        return await this.profilesService.getProfile({user_id: req.user_id}).toPromise()
+        const profile = await this.profilesService.getProfile({user_id: req.user_id}).toPromise()
+        profile.accounts = await Promise.all(profile.accounts.map(async account => ({...account, user: await this.userService.findUser({id: account.user_id}).toPromise()})))
+        
+        return profile
     }
 
     @Patch()
@@ -169,7 +170,7 @@ export class UserController {
      */
     @Get()
     @DisableAuth()
-    async getUser(@Query() query: FindUserDTO, @Res({passthrough: true}) h: ICustomResponse): Promise<User> {
+    async getUser(@Query() query: FindUserDTO): Promise<User> {
         return await this.userService.findUser(query).toPromise()
     }
 

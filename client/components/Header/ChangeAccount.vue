@@ -4,7 +4,6 @@ import { Account } from '~~/store/types/user.type';
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 const userStore = useUserStore()
-const appStore = useAppStateStore()
 const changeAccount = async (account: Account) => {
     if(account.user.id !== userStore.me.id) {
         try {
@@ -18,13 +17,17 @@ const changeAccount = async (account: Account) => {
         }
     }
 }
+
+if(!userStore.me.profile?.accounts) {
+    userStore.me.profile = await userStore.getMeProfile()
+}
 </script>
 <template>
     <ModalBox @onClose="close">
         <div class="change_account">
             <div class="title">Сменить учётную запись</div>
-            <div class="accounts">
-                <Button v-for="account in userStore.me.profile.accounts" @click="changeAccount(account)" :key="account.id" class="account">
+            <div v-if="!!userStore.me.profile?.accounts" class="accounts">
+                <Button v-for="account in userStore.me.profile?.accounts" @click="changeAccount(account)" :key="account.id" class="account">
                     <Avatar :href="account.user.file_id" :size=50 />
                     <div class="user_info">
                         <div class="name">{{ account.user.fullName }}</div>
@@ -35,6 +38,7 @@ const changeAccount = async (account: Account) => {
                     </div>
                 </Button>
             </div>
+            <Loader v-else />
         </div>
     </ModalBox>
 </template>
@@ -50,6 +54,7 @@ const changeAccount = async (account: Account) => {
     padding: 20px;
     flex-direction: column;
     max-width: 700px;
+    min-width: 400px;
     .title {
         font-size: 21px;
         font-weight: bold;
@@ -57,6 +62,8 @@ const changeAccount = async (account: Account) => {
     }
     .accounts {
         width: 100%;
+        position: relative;
+        min-height: 100px;
         .account {
             min-width: 400px;
             display: flex;

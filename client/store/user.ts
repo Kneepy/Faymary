@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { Account, AuthTokens, Profile, User, UserId } from "./types/user.type";
+import { AuthTokens, Profile, User, UserId } from "./types/user.type";
 
 export const useUserStore = defineStore("user", {
     state: (): {tempUser: Partial<User>, me: Partial<User>} => ({
@@ -18,12 +18,6 @@ export const useUserStore = defineStore("user", {
         },
         async getMeProfile(): Promise<Profile> {    
             return (await useCustomFetch("/user/me/profile", {method: "GET"})).data.value
-        },
-        async getMeAccounts(): Promise<Account[]> {
-            return !!this.me.profile.accounts?.length && Promise.all(this.me.profile.accounts.map(async (account: Account) => ({
-                ...account,
-                user: await this.getUserBy({id: account.user_id})
-            })))
         },
         async changeAccount(account_id: string): Promise<AuthTokens> {
             const res = await useCustomFetch("/user/change-account", {method: "PATCH", query: {account_id}})

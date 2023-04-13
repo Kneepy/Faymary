@@ -18,6 +18,7 @@ import {CommentsController, DialogsControllerer, NotificationController, PostCon
 import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {RpcExceptionFilter} from "./rpc-exception.filter";
 import { AuthGuard } from './auth.guard';
+import { UtilsService } from './utils/get-item.util';
 
 const Gateways = [CommentsGateway, ServerGateway, DialogsGateway, MessagesGateway, LikesGateway, UsersGateway]
 const Clients = [LikesClient, UsersClient, StoreClient, SessionClient, PostClient, NotificationsClient, MessagesClient, DialogsClient, StoriesClient, CommentsClient, MailClient, ProfilesClient]
@@ -29,6 +30,7 @@ const Controllers = [UserController, PostController, StoriesController, Comments
     ],
     controllers: Controllers,
     providers: [
+        UtilsService,
         {
             provide: APP_FILTER,
             useClass: RpcExceptionFilter
