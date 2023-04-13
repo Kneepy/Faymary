@@ -1,41 +1,35 @@
 import { PoorDataError } from './../constants/errors.constants';
-import { UseFilters } from '@nestjs/common';
-import { COMMENTS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG, POST_MODULE_CONFIG, PROFILES_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
+import { NOTIFICATIONS_MODULE_CONFIG, PROFILES_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { Inject } from '@nestjs/common';
-import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer, WsException, WsResponse } from "@nestjs/websockets";
+import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WsResponse } from "@nestjs/websockets";
 import { IncomingMessage } from 'http';
 import { SESSION_MODULE_CONFIG } from 'src/constants/app.constants';
 import { SessionServiceClient } from 'src/proto/session';
 import { ICustomSocket } from './types/socket.type';
-import { NotificationCreate, NotificationsServiceClient, Notification, NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
-import { CommentsServiceClient } from 'src/proto/comments';
-import { PostServiceClient } from 'src/proto/post';
-import { StoriesServiceClient } from 'src/proto/stories';
+import { NotificationCreate, NotificationsServiceClient, NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
 import { UserServiceClient } from 'src/proto/user';
-import { MessagesSerivceClient } from 'src/proto/messages';
 import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
 import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
 import { mergeMap, tap } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
+import { UtilsService } from 'src/utils/get-item.util';
+import { BrokerResponse, Fields } from 'src/types';
 
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
 export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
         @Inject(NOTIFICATIONS_MODULE_CONFIG.PROVIDER) private notificationsService: NotificationsServiceClient,
-        @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,
-        @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
-        @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
-        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesSerivceClient,
         @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profileService: ProfilesServiceClient,
-    ) { }
+        private utilsService: UtilsService
+    ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
 
     /**
-     * Эта функция сама создаёт уведомления в микросервисе
+     * Эта функция сама создаёт уведомления и получает все необходимы данные по id и type и отправляет их клиенту
      */
     async sendNotification(data: NotificationCreate): Promise<boolean> {
         if (data.to_id !== data.from_id) {
@@ -58,7 +52,18 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                         if(to_id_socket && !GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
                     }
                     this.notificationsService.createNotification({...data, to_id: null}).subscribe({
-                        next: notification => this.broadcastUser<Notification>(to_id, { event: WEVENTS.NOTIFICATION, data: notification}),
+                        next: notification => {
+                            forkJoin({
+                                parent: this.utilsService.getItem<any>(notification.parent_type, notification.parent_id).data,
+                                item: this.utilsService.getItem<any>(notification.type, notification.item_id).data,
+                                to: this.userService.findUser({id: notification.to_id}),
+                                from: this.userService.findUser({id: notification.from_id})
+                            }).subscribe({
+                                next: ({parent, item, to, from}) => {
+                                    this.broadcastUser<BrokerResponse.Notification>(to_id, { event: WEVENTS.NOTIFICATION, data: {...notification, parent, item, to, from}})
+                                }
+                            })
+                        },
                         /**
                          * Я хз как обработать эту ошибку, клиент о ней знать вообще не должен по идее
                          */
@@ -74,38 +79,12 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
              * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
             */
             if (data.parent_type in NotificationAdditionsEnumType && data.parent_id && !data.to_id) {
-                switch (data.parent_type) {
-                    case NotificationAdditionsEnumType.USER:
-                        this.userService.findUser({ id: data.parent_id }).subscribe({
-                            next: user => subjectNotification.next(user.id),
-                            error: e => e
-                        })
-                        break
-                    case NotificationAdditionsEnumType.COMMENT:
-                        this.commentsService.getComment({ id: data.parent_id }).subscribe({
-                            next: comment => subjectNotification.next(comment.user_id),
-                            error: e => e
-                        })
-                        break
-                    case NotificationAdditionsEnumType.POST:
-                        this.postsService.getPost({ id: data.parent_id }).subscribe({
-                            next: post => subjectNotification.next(post.user_id),
-                            error: e => e
-                        })
-                        break
-                    case NotificationAdditionsEnumType.STORY:
-                        this.storiesService.getStory({ id: data.parent_id }).subscribe({
-                            next: story => subjectNotification.next(story.user_id),
-                            error: e => e
-                        })
-                        break
-                    case NotificationAdditionsEnumType.MESSAGE:
-                        this.messagesService.getMessage({ id: data.parent_id }).subscribe({
-                            next: message => subjectNotification.next(message.user_id),
-                            error: e => e
-                        })
-                        break
-                }
+                const parent = this.utilsService.getItem(data.parent_type, data.parent_id)
+
+                parent.data.subscribe({
+                    next: item => subjectNotification.next(parent.key === Fields.USER ? item.id : item.user_id),
+                    error: e => e
+                })
             } else subjectNotification.next(data.to_id)
 
             subjectNotification.complete()

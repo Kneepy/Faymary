@@ -4,6 +4,7 @@ import { Notification as BaseNotification } from "src/proto/notification";
 import { Message as BaseMessage } from "src/proto/messages";
 import { Post as BasePost } from "src/proto/post"
 import { Account, Profile as BaseProfile } from "src/proto/profiles";
+import { Like as BaseLike } from "src/proto/likes"
 import { Addition } from "./additions.type";
 import { User } from "src/proto/user";
 
@@ -30,5 +31,8 @@ export namespace BrokerResponse {
     }
     export interface Profile extends BaseProfile {
         accounts: (Account & {user: User})[]
+    }
+    export interface Like extends BaseLike {
+        attachments: Addition
     }
 }

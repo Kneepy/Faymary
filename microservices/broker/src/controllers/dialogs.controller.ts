@@ -40,7 +40,7 @@ export class DialogsControllerer {
         return Promise.all(historyNotes.notes.map(async note => {
             if(note.action === DialogActionEnum.ADD_USER || note.action === DialogActionEnum.REMOVE_USER) {
                 const attachments = this.utilsService.getItem(AdditionsType.USER, note.item_id)
-                return {...note, attachments: {[attachments.key]: await attachments.data}}
+                return {...note, attachments: {[attachments.key]: await attachments.data.toPromise()}}
             }
             
             return note
@@ -62,7 +62,7 @@ export class DialogsControllerer {
             const item = this.utilsService.getItem(message.attachment, message.item_id)
             const user = await this.userService.findUser({id: message.user_id}).toPromise()
 
-            return {...message, attachments: {[item.key]: await item.data}, user}
+            return {...message, attachments: {[item.key]: await item.data.toPromise()}, user}
         }))
     }
 
@@ -72,6 +72,6 @@ export class DialogsControllerer {
         const item = this.utilsService.getItem(message.attachment, message.item_id)
         const user = await this.userService.findUser({id: message.user_id}).toPromise()
 
-        return {...message, attachments: {[item.key]: await item.data}, user}
+        return {...message, attachments: {[item.key]: await item.data.toPromise()}, user}
     }
 }

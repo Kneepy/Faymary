@@ -1,5 +1,4 @@
 import { Controller, Get, Inject, Query, Req } from "@nestjs/common";
-import { map, mergeMap, tap } from "rxjs/operators";
 import { NOTIFICATIONS_MODULE_CONFIG, USER_MODULE_CONFIG } from "src/constants/app.constants";
 import { NotificationsServiceClient } from "src/proto/notification";
 import { NotificationGetDTO } from "src/proto/notification";
@@ -24,8 +23,8 @@ export class NotificationController {
             const parent = this.utilsService.getItem<any>(notification.parent_type, notification.parent_id)
             const item = this.utilsService.getItem<any>(notification.type, notification.item_id)
             const from = await this.userService.findUser({id: notification.from_id}).toPromise()
-            
-            return {...notification, parent: {[parent.key]: await parent.data}, item: {[item.key]: await item.data}, from, to}
+
+            return {...notification, parent: {[parent.key]: await parent.data.toPromise()}, item: {[item.key]: await item.data.toPromise()}, from, to}
         }))
     }
 }

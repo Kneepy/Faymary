@@ -7,6 +7,7 @@ import { DialogsServiceClient } from "src/proto/dialogs"
 import { Inject, Injectable } from "@nestjs/common"
 import { COMMENTS_MODULE_CONFIG, DIALOGS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from "src/constants/app.constants"
 import { AdditionsType, Fields } from "src/types/additions.type"
+import { Observable } from "rxjs"
 
 @Injectable()
 export class UtilsService {
@@ -46,10 +47,10 @@ export class UtilsService {
         }
     }
 
-    getItem<T = any>(type: AdditionsType | any, item_id: string): {key: Fields, data: Promise<T>} {
+    getItem<T = any>(type: AdditionsType | any, item_id: string): {key: Fields, data: Observable<T>} {
         if (!(type in AdditionsType) || !item_id) return 
 
         const { handler, field } = this.handlers[type]
-        return {data: handler(item_id), key: field}
+        return {data: handler({id: item_id}), key: field}
     }
 }

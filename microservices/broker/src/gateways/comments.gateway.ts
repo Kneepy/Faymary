@@ -1,18 +1,24 @@
 import { WebSocketGateway } from '@nestjs/websockets';
-import { COMMENTS_MODULE_CONFIG } from '../constants/app.constants';
+import { COMMENTS_MODULE_CONFIG, USER_MODULE_CONFIG } from '../constants/app.constants';
 import { ConnectedSocket, MessageBody, SubscribeMessage } from '@nestjs/websockets';
 import { Inject } from '@nestjs/common';
-import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO, Comment } from 'src/proto/comments';
+import { CommentsServiceClient, CreateCommentDTO, UpdateCommentDTO } from 'src/proto/comments';
 import { ICustomSocket } from './types/socket.type';
 import { WEVENTS } from './enums/events.enum';
 import { ServerGateway } from './server.gateway';
 import { NotificationAdditionsEnumType, NotificationEnumType } from 'src/proto/notification';
+import { UtilsService } from 'src/utils/get-item.util';
+import { BrokerResponse } from 'src/types';
+import { UserServiceClient } from 'src/proto/user';
+import { forkJoin } from 'rxjs';
 
 @WebSocketGateway() 
 export class CommentsGateway {
     constructor(
         @Inject(COMMENTS_MODULE_CONFIG.PROVIDER) private commentsService: CommentsServiceClient,
-        private serverGateway: ServerGateway
+        @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
+        private serverGateway: ServerGateway,
+        private utilsService: UtilsService
     ) {}
 
     @SubscribeMessage(WEVENTS.COMMENTS.CREATE)
@@ -32,10 +38,16 @@ export class CommentsGateway {
                     parent_id: comment.item_id,
                     notification_type: NotificationEnumType.ADD_COMMENT
                 })
-                this.serverGateway.broadcastUser<Comment>(client.user_id, {
-                    event: WEVENTS.COMMENTS.CREATE, 
-                    data: comment
-                })
+
+                const attachments = this.utilsService.getItem(comment.type, comment.item_id)
+                
+                forkJoin({
+                    attach: attachments.data,
+                    user: this.userService.findUser({id: comment.user_id})
+                }).subscribe(({user, attach}) => this.serverGateway.broadcastUser<BrokerResponse.Comment>(client.user_id, {
+                    event: WEVENTS.COMMENTS.UPDATE, 
+                    data: {...comment, attachments: {[attachments.key]: attach}, user}
+                }))
             },
             error: e => this.serverGateway.sendError(client, e)
         })
@@ -47,10 +59,17 @@ export class CommentsGateway {
             /**
              * Ну тут мне кажется что обновлённый комментарий нужно возвращать только отправителю
              */
-            next: comment =>  this.serverGateway.broadcastUser(client.user_id, {
-                event: WEVENTS.COMMENTS.UPDATE, 
-                data: comment
-            })
+            next: comment => {
+                const attachments = this.utilsService.getItem(comment.type, comment.item_id)
+            
+                forkJoin({
+                    attach: attachments.data,
+                    user: this.userService.findUser({id: comment.user_id})
+                }).subscribe(({user, attach}) => this.serverGateway.broadcastUser<BrokerResponse.Comment>(client.user_id, {
+                    event: WEVENTS.COMMENTS.UPDATE, 
+                    data: {...comment, attachments: {[attachments.key]: attach}, user}
+                }))
+            }
         })
     }
 }

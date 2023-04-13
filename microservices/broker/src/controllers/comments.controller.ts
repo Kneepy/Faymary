@@ -29,7 +29,7 @@ export class CommentsController {
             const item = this.utilsService.getItem(comment.type, comment.id)
             const user = await this.userService.findUser({id: comment.user_id}).toPromise()
 
-            return {...comment, attachments: {[item.key]: await item.data}, user}
+            return {...comment, attachments: {[item.key]: await item.data.toPromise()}, user}
         }))
     }
 
@@ -40,6 +40,6 @@ export class CommentsController {
         const item = this.utilsService.getItem(comment.type, comment.id)
         const user = await this.userService.findUser({id: comment.user_id}).toPromise()
 
-        return {...comment, attachments: {[item.key]: await item.data}, user}
+        return {...comment, attachments: {[item.key]: await item.data.toPromise()}, user}
     }
 }
