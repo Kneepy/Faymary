@@ -1,4 +1,5 @@
 import { Addition, AdditionsType } from "./additions.type";
+import { User } from "./user.type";
 
 export enum NotificationEnumType {
     ADD_COMMENT = 0,
@@ -17,7 +18,9 @@ export interface Notification {
     parent_type: AdditionsType;
     parent: Addition
     from_id: string;
+    from: User
     to_id: string;
+    to: User
     createdAt: string;
     notification_type: NotificationEnumType;
 }

@@ -4,6 +4,7 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 const userStore = useUserStore()
 const visibleUserMenu = ref(false)
 const visibleNotificationsMenu = ref(false)
+const currentRoute = useRoute()
 const searchValue = ref("")
 const visibleChangeAccountModal = ref(false)
 const toggleUserMenu = () => visibleUserMenu.value = !visibleUserMenu.value
@@ -18,20 +19,37 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                     <Logo :size=45 />
                     <span>FAYMARY</span>
                 </NuxtLink>
-                <div class="search">
+                <!--<div class="search">
                     <Button class="search__bth"><span class="material-symbols-rounded">search</span></Button>
                     <input v-model="searchValue" placeholder="Введите что-нибудь" type="text">
-                </div>
-                <div class="notifications" v-click-outside="() => visibleNotificationsMenu = false">
-                    <Button @click="toggleNotificationsMenu" class="notifications__bth">
-                        <span class="material-symbols-rounded">notifications</span>
+                </div>-->
+            </div>
+            <div class="header__container__center">
+                <NuxtLink :to="{name: ROUTES.HOME}">
+                    <Button class="navigation_bth" :class="{active: currentRoute.name === ROUTES.HOME}">
+                        <span class="material-symbols-rounded">home</span>
                     </Button>
-                    <NotificationsMenu v-if="visibleNotificationsMenu" />
-                </div>
+                </NuxtLink>
+                <NuxtLink :to="{name: ROUTES.HOME}">
+                    <Button class="navigation_bth" :class="{active: currentRoute.name === ROUTES.MESSAGES}">
+                        <span class="material-symbols-rounded">forum</span>
+                    </Button>
+                </NuxtLink>
+                <NuxtLink :to="{name: ROUTES.HOME}">
+                    <Button class="navigation_bth" :class="{active: currentRoute.name === ROUTES.STORIES}">
+                        <span class="material-symbols-rounded">import_contacts</span>
+                    </Button>
+                </NuxtLink>
             </div>
             <div class="header__container__right">
+                <div class="notifications" v-click-outside="() => visibleNotificationsMenu = false">
+                    <Button @click="toggleNotificationsMenu" :class="{active: visibleNotificationsMenu}" class="notifications__bth">
+                        <span class="material-symbols-rounded">notifications</span>
+                    </Button>
+                    <NotificationsMenu @close="toggleNotificationsMenu" v-if="visibleNotificationsMenu" />
+                </div>
                 <div class="header__container__right__user" v-click-outside="() => visibleUserMenu = false">
-                    <Button @click="toggleUserMenu" class="user__profile">
+                    <Button @click="toggleUserMenu" class="user__profile" :class="{active: visibleUserMenu}">
                         <div class="user__profile__box">
                             <Avatar :href="userStore.me.file_id" :size=40 />
                             <span class="material-symbols-rounded">expand_more</span>
@@ -105,9 +123,63 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                     color: $white;
                 }
             }
+        }
+        &__center {
+            display: flex;
+            height: 100%;
+            align-items: center;
+            a {
+                height: 100%;
+                display: flex;
+                align-items: center;
+            }
+            .navigation_bth {
+                width: 250px;
+                margin-right: 10px;
+                background-color: transparent;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                height: 55px;
+                position: relative;
+                &:hover {
+                    background-color: $transparent_button_hover;
+                }
+                &.active {
+                    height: 100%;
+                    &::after {
+                        content: "";
+                        width: 100%;
+                        height: 3px;
+                        border-radius: 3px;
+                        background-color: $white;
+                        display: inline-block;
+                        position: absolute;
+                        bottom: 0;
+                    }
+                    &:hover {
+                        background-color: transparent;
+                    }
+                    span {
+                        color: $white;
+                        font-variation-settings: 'FILL' 1;
+                    }
+                }
+                span {
+                    color: $gray;
+                    font-size: 36px;
+                    font-weight: 300;
+                }
+            }
+        }
+        &__right {
+            height: 100%;
+            display: flex;
             .notifications {
                 height: 100%;
                 position: relative;
+                margin-right: 20px;
                 &__bth {
                     width: 55px;
                     height: 100%;
@@ -118,16 +190,19 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                     justify-content: center;
                     margin-left: 20px;
                     &:hover {
-                        background-color: $transperent_hover_content_background;
+                        background-color: $transparent_button_hover;
+                    }
+                    &.active {
+                        background-color: $transparent_button_hover;
+                        span {
+                            font-variation-settings: 'FILL' 1;
+                        }
                     }
                     span {
                         color: $gray;
                     }
                 }
             }
-        }
-        &__right {
-            height: 100%;
             &__user {
                 height: 100%;
                 .user__profile {
@@ -140,7 +215,10 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                     white-space: nowrap;
                     text-overflow: ellipsis;
                     &:hover {
-                        background-color: $transperent_hover_content_background;
+                        background-color: $transparent_button_hover;
+                    }
+                    &.active {
+                        background-color: $transparent_button_hover;
                     }
                     &__box {
                         display: flex;

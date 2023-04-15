@@ -5,5 +5,7 @@ export const ROUTES = {
     LOGIN_INPUT_EMAIL: "LoginInputEmail",
     SETTINGS: "Settings",
     SUPPORT: "Support",
+    STORIES: "Stories",
+    MESSAGES: "messages",
     HOME: "Home"
 }
