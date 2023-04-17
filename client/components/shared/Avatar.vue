@@ -9,7 +9,7 @@ const props = defineProps<{
 const config = useRuntimeConfig()
 
 // тут должна быть замена на фотку отсутсвия аватарки но будет рандомная фотка с unsplash
-const img = computed(() => props.href ? (!!props.href?.split("http")[1] ? props.href : config.public.imgesApiURL + props.href) : "https://source.unsplash.com/random")
+const img = computed(() => props.href ? (!!props.href?.split("http")[1] ? props.href : config.public.imgesApiURL + props.href) : "https://source.unsplash.com/random?people")
 </script>
 
 <template>

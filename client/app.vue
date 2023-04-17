@@ -17,6 +17,7 @@ a {
 }
 body {
     background-color: $primary_background;
+    display: grid;
 }
 input, button {
     outline: none;

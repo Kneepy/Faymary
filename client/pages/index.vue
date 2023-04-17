@@ -1,5 +1,6 @@
 <template>
     <div class="home">
+        <StoriesBar />
     </div>
 </template>
 <script setup lang="ts">
@@ -16,5 +17,8 @@ useHead({
 <style lang="scss">
 .home {
     display: flex;
+    width: 900px;
+    margin: 0 auto;
+    margin-top: 15px;
 }
 </style>

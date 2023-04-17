@@ -1,11 +1,11 @@
 <template>
-    <body>
+    <div class="default">
         <Header />
         <slot />
-    </body>
+    </div>
 </template>
-<style lang="scss">
-body {
-    
+<style lang="scss" scoped>
+.default {
+    padding-top: 70px;
 }
 </style>

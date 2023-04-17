@@ -17,6 +17,7 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.4.0",
     "@pinia/nuxt": "^0.4.7",
+    "gsap": "^3.11.5",
     "pinia": "^2.0.33"
   },
   "overrides": {

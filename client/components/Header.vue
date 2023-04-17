@@ -4,8 +4,6 @@ import { ROUTES } from '~~/assets/constants/routes.constants';
 const userStore = useUserStore()
 const visibleUserMenu = ref(false)
 const visibleNotificationsMenu = ref(false)
-const currentRoute = useRoute()
-const searchValue = ref("")
 const visibleChangeAccountModal = ref(false)
 const toggleUserMenu = () => visibleUserMenu.value = !visibleUserMenu.value
 const toggleNotificationsMenu = () => visibleNotificationsMenu.value = !visibleNotificationsMenu.value
@@ -18,27 +16,6 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                 <NuxtLink class="header__container__left__logo noselect" :to="{name: ROUTES.HOME}">
                     <Logo :size=45 />
                     <span>FAYMARY</span>
-                </NuxtLink>
-                <!--<div class="search">
-                    <Button class="search__bth"><span class="material-symbols-rounded">search</span></Button>
-                    <input v-model="searchValue" placeholder="Введите что-нибудь" type="text">
-                </div>-->
-            </div>
-            <div class="header__container__center">
-                <NuxtLink :to="{name: ROUTES.HOME}">
-                    <Button class="navigation_bth" :class="{active: currentRoute.name === ROUTES.HOME}">
-                        <span class="material-symbols-rounded">home</span>
-                    </Button>
-                </NuxtLink>
-                <NuxtLink :to="{name: ROUTES.HOME}">
-                    <Button class="navigation_bth" :class="{active: currentRoute.name === ROUTES.MESSAGES}">
-                        <span class="material-symbols-rounded">forum</span>
-                    </Button>
-                </NuxtLink>
-                <NuxtLink :to="{name: ROUTES.HOME}">
-                    <Button class="navigation_bth" :class="{active: currentRoute.name === ROUTES.STORIES}">
-                        <span class="material-symbols-rounded">import_contacts</span>
-                    </Button>
                 </NuxtLink>
             </div>
             <div class="header__container__right">
@@ -73,10 +50,9 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
     border-bottom: 1px solid $primary_border;
     display: flex;
     align-items: center;
-    padding: 0 10px;
-
+    z-index: 100;
     .header__container {
-        width: 1400px;
+        width: 1200px;
         margin: 0 auto;
         display: flex;
         height: 100%;
@@ -124,62 +100,13 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                 }
             }
         }
-        &__center {
-            display: flex;
-            height: 100%;
-            align-items: center;
-            a {
-                height: 100%;
-                display: flex;
-                align-items: center;
-            }
-            .navigation_bth {
-                width: 250px;
-                margin-right: 10px;
-                background-color: transparent;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 8px;
-                height: 55px;
-                position: relative;
-                &:hover {
-                    background-color: $transparent_button_hover;
-                }
-                &.active {
-                    height: 100%;
-                    &::after {
-                        content: "";
-                        width: 100%;
-                        height: 3px;
-                        border-radius: 3px;
-                        background-color: $white;
-                        display: inline-block;
-                        position: absolute;
-                        bottom: 0;
-                    }
-                    &:hover {
-                        background-color: transparent;
-                    }
-                    span {
-                        color: $white;
-                        font-variation-settings: 'FILL' 1;
-                    }
-                }
-                span {
-                    color: $gray;
-                    font-size: 36px;
-                    font-weight: 300;
-                }
-            }
-        }
         &__right {
             height: 100%;
             display: flex;
             .notifications {
                 height: 100%;
                 position: relative;
-                margin-right: 20px;
+                margin-right: 10px;
                 &__bth {
                     width: 55px;
                     height: 100%;
