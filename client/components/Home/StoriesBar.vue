@@ -61,7 +61,7 @@ const interestButtonUnscale = (direction: number) => shiftStories.value -= -Math
             <span class="material-symbols-rounded">navigate_next</span>
         </div>
         <div class="stories__box" ref="storiesBox">
-            <Button v-for="s in 15" class="story" ref="stories" :key="s" :style="{transform: `translateX(${shiftStories}px)`, backgroundImage: `url(https://source.unsplash.com/random?landscapes)`}">
+            <Button v-for="s in 25" class="story" ref="stories" :key="s" :style="{transform: `translateX(${shiftStories}px)`, backgroundImage: `url(https://source.unsplash.com/random?landscapes)`}">
                 <div class="author">
                     <div class="border">
                         <Avatar class="user-avatar" :size=35 href="https://source.unsplash.com/random?peoples" />  
@@ -92,7 +92,7 @@ const interestButtonUnscale = (direction: number) => shiftStories.value -= -Math
         display: flex;
         .story {
             min-width: 100px;
-            width: 150px;
+            width: 140px;
             height: 145px;
             margin-right: 5px;
             border-radius: 10px;
