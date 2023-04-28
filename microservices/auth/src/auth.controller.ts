@@ -59,7 +59,7 @@ export class AuthController {
          * С проверкой fingerprint'а, т.к если он не будет верен то мы удаляем сессию
          * Если access_token'а нет то удаляем старую сессию и создаём новую, с проверкой fingerprint'а
          */
-        if(data.session.fingerprint !== session.fingerprint || Date.now() > session.createdAt + EXPIRES_IN_REFRESH_TOKEN) {
+        if(data.session.fingerprint !== session.fingerprint || data.session.ip !== session.ip || Date.now() > session.createdAt + EXPIRES_IN_REFRESH_TOKEN) {
             await this.sessionService.delete(session.id)
             throw Unauthorized
         }
@@ -71,6 +71,7 @@ export class AuthController {
         }
         else {
             await this.sessionService.delete(session.id)
+
             return {
                 access_token: this.authService.getAccessToken(session.user_id),
                 refresh_token: (await this.authService.getRefreshToken({

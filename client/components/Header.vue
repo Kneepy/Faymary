@@ -28,7 +28,7 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                 <div class="header__container__right__user" v-click-outside="() => visibleUserMenu = false">
                     <Button @click="toggleUserMenu" class="user__profile" :class="{active: visibleUserMenu}">
                         <div class="user__profile__box">
-                            <Avatar :href="userStore.me.file_id" :size=40 />
+                            <Avatar :href="userStore.me?.file_id" :size=40 />
                             <span class="material-symbols-rounded">expand_more</span>
                         </div>
                     </Button>

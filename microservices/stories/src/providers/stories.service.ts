@@ -1,4 +1,4 @@
-import { FindOptionsWhere, FindManyOptions, Repository } from "typeorm";
+import { FindOptionsWhere, FindManyOptions, Repository, FindOneOptions } from "typeorm";
 import {
     FindManyStoryInterface,
     FindStoryInterface
@@ -18,9 +18,10 @@ export class StoriesService {
         return await this.repository.save({ ...args, createdAt: Date.now() });
     }
 
-    async findOne(args: FindStoryInterface): Promise<Story> {
+    async findOne(args: FindStoryInterface, otherOpt?: Omit<FindOneOptions<Story>, "where">): Promise<Story> {
         return await this.repository.findOne({
-            where: args
+            where: args,
+            ...otherOpt
         });
     }
 

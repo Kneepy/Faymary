@@ -59,12 +59,12 @@ export class UserController {
     
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_FOLLOWERS)
     async findFollowers(data: FindFollowersDTO): Promise<RepeatedUsers> {
-        return {users: await this.userService.find({subscriptions: {id: data.user_id}}, {take: data.take, skip: data.skip})}
+        return {users: await this.userService.find({subscriptions: {id: data.user_id}}, {take: data.take, skip: data.skip}) ?? []}
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_SUBSCRIPTIONS)
     async findSubscriptions(data: FindFollowersDTO): Promise<RepeatedUsers> {
-        return {users: await this.userService.find({followers: {id: data.user_id}}, {take: data.take, skip: data.skip})}
+        return {users: await this.userService.find({followers: {id: data.user_id}}, {take: data.take, skip: data.skip}) ?? []}
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)

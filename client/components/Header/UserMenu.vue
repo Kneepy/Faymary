@@ -56,6 +56,7 @@ const changeAccount = () => {
     border: 1px solid $primary_border;
     border-radius: 10px;
     width: 280px;
+    overflow: hidden;
     &_container {
         padding: 12px;
         &__box {
@@ -131,7 +132,7 @@ const changeAccount = () => {
             display: flex;
             align-items: center;
             &:hover {
-                background-color: $transperent_hover_content_background;
+                background-color: $transperent_hover_content_background_1;
             }
             &.logout {
                 color: $red;

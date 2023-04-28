@@ -1,7 +1,6 @@
 <template>
     <div class="home">
-        <Test />
-        <!--<StoriesBar />-->
+        <StoriesBar />
     </div>
 </template>
 <script setup lang="ts">

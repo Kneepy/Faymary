@@ -17,7 +17,6 @@ import {
 } from "src/dtos";
 import { Story } from "src/entities";
 import { StoriesService } from "src/providers";
-import { Raw } from 'typeorm';
 
 @Controller()
 export class StoriesController {
@@ -29,10 +28,10 @@ export class StoriesController {
             {
                 user_id: data.user_id,
 
-                // получение только историй выложенных в течении одного дня
+                /* получение только историй выложенных в течении одного дня
                 createdAt: Raw(
                     alias => `${alias} < ${alias} + ${STORY_EXPIRES_AFTER}`
-                )
+                )*/
             },
             { relations: { marks: true } }
         );
@@ -42,7 +41,7 @@ export class StoriesController {
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.GET_STORY)
     async getStory(data: GetStoryDTO): Promise<Story> {
-        return await this.storiesService.findOne({id: data.id})
+        return await this.storiesService.findOne({id: data.id}, {relations: {marks: true}})
     }
 
     @GrpcMethod(STORIES_SERVICE, STORIES_SERVICE_METHODS.CREATE_STORY)
@@ -73,6 +72,5 @@ export class StoriesController {
         if(story.user_id === data.user_id) 
             return await this.storiesService.update(data);
         else throw UserDoesNotMatch
-        
     }
 }

@@ -8,7 +8,9 @@ const itemsBox = ref()
 const visibleItemsBox = ref()
 const shiftItems = ref(0)
 
-const addShiftItems = (direction: number, skipPack: boolean) => {
+const addShiftItems = (direction: number, skipPack: boolean = false) => { 
+    if(itemsBox.value?.offsetWidth < visibleItemsBox.value?.offsetWidth) return
+
     const shift = (itemsBox.value?.offsetWidth / props.count) * Math.sign(direction)
     const countVisibleStories = Math.floor(visibleItemsBox.value.offsetWidth / Math.abs(shift))
     const widthVisibleStories = (props.count - countVisibleStories) * Math.abs(shift)
@@ -30,6 +32,7 @@ const addShiftItems = (direction: number, skipPack: boolean) => {
         return shiftItems.value = changeShiftValue
     }
 }
+
 const scrollItems = (e: WheelEvent) => addShiftItems(-e.deltaY, false)
 const skipItems = (direction: number) => addShiftItems(direction, true)
 
@@ -42,6 +45,7 @@ const interestButtonScale = (direction: number) => shiftItems.value += -Math.sig
  * Эта функция возвращает текущий скролл назад при удалении курсора мыши с кнопок следющей/предыдущей истории
  */
 const interestButtonUnscale = (direction: number) => shiftItems.value -= -Math.sign(direction) * baseInterestShift
+const visibleButtons = computed(() => (itemsBox.value?.offsetWidth > visibleItemsBox.value?.offsetWidth))
 </script>
 <template>
     <div ref="visibleItemsBox" @wheel="scrollItems" class="horizontal-scroll">
@@ -50,17 +54,20 @@ const interestButtonUnscale = (direction: number) => shiftItems.value -= -Math.s
             :prev="() => skipItems(-1)" 
             :shiftIncrease="() => interestButtonScale(-1)" 
             :shiftReduce="() => interestButtonUnscale(-1)"
-            :scrollPosition="position"
+            :visible="!position.start && visibleButtons"
         />
         <slot 
             name="next" 
             :next="() => skipItems(1)"
             :shiftIncrease="() => interestButtonScale(1)" 
             :shiftReduce="() => interestButtonUnscale(1)" 
-            :scrollPosition="position"
+            :visible="!position.end && visibleButtons"
         />
-        <div ref="itemsBox" class="scroll-items"><slot :scrollPosition="position" :shift="shiftItems" /></div>
+        <div ref="itemsBox" class="scroll-items"><slot :scrollPosition="position" :scroll="addShiftItems" :shift="shiftItems" /></div>
     </div>
 </template>
 <style lang="scss" scoped>
+.scroll-items {
+    width: fit-content;
+}
 </style>

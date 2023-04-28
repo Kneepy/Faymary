@@ -1,13 +1,19 @@
 import { ROUTES } from "~~/assets/constants/routes.constants"
 
 export default defineNuxtRouteMiddleware(route => {
-    if(process.server) return
-
     if(route.meta.requredAuth) {
+        const appStateStore = useAppStateStore()
         const userStore = useUserStore()
-        
-        userStore.getMe()
-        .then(me => userStore.$patch({me}))
-        .catch(() => {navigateTo({name: ROUTES.LOGIN_INPUT_EMAIL})})
+
+        const authMe = async () => {
+            try {
+                userStore.me = await userStore.getMe()
+            } catch (e) {
+                navigateTo({name: ROUTES.LOGIN_INPUT_EMAIL})
+            }
+        }
+        if(!appStateStore.authorization || !userStore.me) {
+            authMe().then(() => {})
+        }
     }
 })

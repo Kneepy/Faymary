@@ -1,5 +1,9 @@
+<script setup>
+// сделать loading page
+const appStateStore = useAppStateStore()
+</script>
 <template>
-    <div class="default">
+    <div class="default" v-if="!!appStateStore.authorization">
         <Header />
         <slot />
     </div>

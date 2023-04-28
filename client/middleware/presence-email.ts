@@ -6,5 +6,5 @@ import { ROUTES } from "~~/assets/constants/routes.constants"
 export default defineNuxtRouteMiddleware(() => {
     const { tempUser } = useUserStore()
 
-    if(!tempUser.email) return navigateTo({name: ROUTES.LOGIN})
+    if(!tempUser.email) return navigateTo({name: ROUTES.LOGIN_INPUT_EMAIL})
 })

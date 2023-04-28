@@ -49,6 +49,12 @@ export const useUserStore = defineStore("user", {
             appStateStore.authorization = res.data.value.access_token
 
             return res.data.value
+        },
+        async getTokens(): Promise<AuthTokens> {
+            const res = await useCustomFetch("/user/auth", {method: "POST"})
+
+            if(res.error.value?.data) throw res.error.value?.data
+            return res.data.value
         }
     }
 })

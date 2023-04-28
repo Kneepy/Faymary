@@ -1,6 +1,6 @@
-import { AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME } from 'src/constants/app.constants';
+import { AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME, REQUEST_FIELD_ACCESS_TOKEN } from 'src/constants/app.constants';
 import { Reflector } from '@nestjs/core';
-import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./constants/app.constants";
 import { SessionServiceClient } from "./proto/session";
 import { ICustomRequest } from './types/request.type';
@@ -23,11 +23,11 @@ export class AuthGuard implements CanActivate {
 
         if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
         
-        const accessToken = request.headers.authorization
+        const accessToken = request.headers[REQUEST_FIELD_ACCESS_TOKEN]
         const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
         if(!refreshToken) throw UnautorizedError
-        
+    
         const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
         const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
         const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
@@ -35,10 +35,10 @@ export class AuthGuard implements CanActivate {
 
         request.headers.refresh_token = tokens.refresh_token
         request.headers.authorization = tokens.access_token
-        response.header("authorization", tokens.access_token)
+        response.header(REQUEST_FIELD_ACCESS_TOKEN, tokens.access_token)
         response.cookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token, AUTH_COOKIE_OPTIONS)
 
-        if(verifedTokens.user_id !== null) {
+        if(!!verifedTokens.user_id) {
             request.user_id = verifedTokens.user_id
         }
 

@@ -3,7 +3,7 @@ export default defineNuxtPlugin(() => {
 
     if(process.server) return
 
-    const socket = new WebSocket(useRuntimeConfig().public.baseWsURL)
+    const socket = null //new WebSocket(useRuntimeConfig().public.baseWsURL)
    
     return {
         provide: {socket}
