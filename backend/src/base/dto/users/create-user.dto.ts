@@ -1,9 +1,5 @@
-import {
-    IsEmail,
-    IsNotEmpty,
-    IsString,
-    MinLength,
-} from "class-validator";
+import { Expose } from "class-transformer";
+import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class CreateUserDto {
     @IsEmail()
@@ -18,5 +14,5 @@ export class CreateUserDto {
 
     @IsString()
     @IsNotEmpty()
-    userName: string;
+    fullName: string;
 }

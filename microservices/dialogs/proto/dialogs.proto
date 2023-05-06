@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package dialogs;
+
+service DialogsService {
+    rpc AddUserToDialog (AddUserDialogDTO) returns (stream DialogHistory);
+    rpc CreateDialog (CreateDialogDTO) returns (stream Dialog);
+    rpc GetDialog (GetDialogDTO) returns (stream Dialog);
+    rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialogs);
+    rpc DeleteDialog (DeleteDialogDTO) returns (stream DialogHistory);
+    rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream DialogHistory);
+    rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream DialogHistory);
+    rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream DialogHistory);
+    rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistories);
+    rpc DialogIncludesUser (DialogIncludesUserDTO) returns (stream DialogIsIncludesUser);
+}
+
+message Dialog {
+    string id = 1;
+    repeated DialogParticipants participants = 2;
+    StateDialogEnum state = 3;
+    string name = 4;
+    string file_id = 5;
+}
+message DialogParticipants {
+    string id = 1;
+    ParticipantRights rights = 2;
+    string user_id = 3;
+    Dialog dialog = 4;
+}
+message DialogHistory {
+    string id = 1;
+    string user_id = 2;
+    DialogActionEnum action = 3;
+    optional string item_id = 4;
+    optional string desc = 5;
+    string createdAt = 6;
+    Dialog dialog = 7;
+}
+
+message Dialogs {
+    repeated Dialog dialogs = 1;
+}
+
+message DialogHistories {
+    repeated DialogHistory notes = 1;
+}
+
+message DialogIncludesUserDTO {
+    string user_id = 1;
+    string dialog_id = 2;
+}
+
+message DialogIsIncludesUser {
+    bool isIncluded = 1;
+}
+
+message AddUserDialogDTO {
+    string user_id = 1;
+    string dialog_id = 2;
+    string user_invited_id = 3;
+}
+
+message CreateDialogDTO {
+    repeated DialogParticipants participants = 1;
+    optional string name = 2;
+}
+
+message GetDialogDTO {
+    string id = 1;
+}
+
+message GetUserDialogsDTO {
+    string user_id = 1;
+    int32 skip = 2;
+    int32 take = 3;
+}
+
+message DeleteDialogDTO {
+    string user_id = 1;
+    string dialog_id = 2;
+}
+
+message DeleteUserDialogDTO {
+    string delete_id = 1;
+    string user_id = 2;
+    string dialog_id = 3;
+}
+
+message ChangeNameDialogDTO {
+    string name = 1;
+    string user_id = 2;
+    string dialog_id = 3;
+}
+
+message GetHistoryDialogDTO {
+    string dialog_id = 1;
+    int32 take = 2;
+    int32 skip = 3;
+}
+
+message ChangeFileDialogDTO {
+    string dialog_id = 1;
+    string file_id = 2;
+    string user_id = 3;
+}
+
+enum DialogActionEnum {
+    CREATE_DIALOG = 0;
+    DELETE_DIALOG = 1;
+    ADD_USER = 2;
+    REMOVE_USER = 3;
+    CHANGE_NAME_DIALOG = 4;
+    CHANGE_FILE_DIALOG = 5;
+}
+
+enum StateDialogEnum {
+    DELETED = 0;
+    ACTIVE = 1;
+}
+
+enum ParticipantRights {
+    LISTENER = 0; 
+    USER = 1; ADMIN = 2;
+    CREATOR = 3;
+}
+
+message Empty {}

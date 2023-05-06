@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+    rpc FindUser (FindUserDTO) returns (stream User);
+    rpc FollowUser (FollowUserDTO) returns (stream UserFollowResult);
+    rpc UserIsFollow (UserIsFollowDTO) returns (stream UserIsFollowResult);
+    rpc UsersIsFollow (UsersIsFollowDTO) returns (stream UsersIsFollowResult);
+    rpc CreateUser (CreateUserDTO) returns (stream User);
+    rpc LoginUser (LoginUserDTO) returns (stream UserIsLogined);
+    rpc UpdateUser (UpdateUserDTO) returns (stream User);
+    rpc FindUsers (FindUsersDTO) returns (stream Users);
+    rpc FindSubscriptions (FindFollowersDTO) returns (stream Users);
+    rpc FindFollowers (FindFollowersDTO) returns (stream Users);    
+}
+
+message FindFollowersDTO {
+    int64 take = 1;
+    int64 skip = 2;
+    string user_id = 3;
+}
+
+message UserFollowResult {
+    bool isFollow = 1;
+    User author = 2;
+}
+
+message CreateUserDTO {
+    string email = 1;
+    string fullName = 2;
+    string password = 3;
+    UserState state = 4;
+}
+
+message LoginUserDTO {
+    string email = 1;
+    string password = 2;
+}
+
+message UserIsLogined {
+    bool isLogined = 1;
+    User user = 2;
+}
+
+message FollowUserDTO {
+    string user_id = 1;
+    string author_id = 2;
+}
+
+message FindUsersDTO {
+    optional bool addSubs = 1;
+    optional string email = 2;
+    optional string fullName = 3;
+    optional string userName = 4;
+    optional string password = 5;
+    optional User followers = 6;
+    optional User subscriptions = 7;
+    optional UserState state = 8;
+    optional int32 skip = 9;
+    optional int32 take = 10;
+}
+
+message UserIsFollowResult {
+    bool isFollow = 1;
+}
+
+message UsersIsFollowResult {
+    map<string, bool> follows = 1;
+}
+
+message FindUserDTO {
+    optional string email = 1;
+    optional string id = 2;
+    optional string userName = 3;
+    optional string fullName = 4;
+}
+
+message User {
+    string id = 1;
+    string email = 2;
+    string fullName = 3;
+    string userName = 4;
+    User followers = 5;
+    User subscriptions = 6;
+    UserState state = 7;
+    string file_id = 8;
+}
+
+message UpdateUserDTO {
+    string id = 1;
+    optional string email = 2;
+    optional string fullName = 3;
+    optional string userName = 4;
+    optional string password = 5;
+    optional User followers = 6;
+    optional User subscriptions = 7;
+    optional UserState state = 8;
+    optional string file_id = 9;
+}
+
+message Users {
+    repeated User users = 1;
+}
+
+message UserIsFollowDTO {
+    string user_id = 1;
+    string author_id = 2;
+}
+
+message UsersIsFollowDTO {
+    string author_id = 1;
+    repeated string users_ids = 2;
+}
+
+enum UserState {
+    UNACTIVE = 0;
+    ACTIVE = 1;
+}
+
+message Empty {}

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package posts;
+
+service PostService {
+    rpc CreatePost(PostCreateDTO) returns (stream Post);
+    rpc UpdatePost(PostUpdateDTO) returns (stream Post);
+    rpc DeletePost(PostDeleteDTO) returns (stream Empty);
+    rpc GetPost(GetOnePostDTO) returns (stream Post);
+    rpc GetPosts(GetManyPostsDTO) returns (stream Posts);
+}
+
+message PostCreateDTO {
+    string user_id = 1;
+    optional string msg = 2;
+    repeated string file_ids = 3;
+}
+
+message PostUpdateDTO {
+    string id = 1;
+    string user_id = 2;
+    optional string msg = 3;
+    repeated string file_ids = 4;
+}
+
+message PostDeleteDTO {
+    string id = 1;
+    string user_id = 2;
+}
+
+message GetOnePostDTO {
+    string id = 1;
+}
+
+message GetManyPostsDTO {
+    optional string user_id = 1;
+    optional string ids = 2;
+    optional string msg = 3;
+    int32 take = 4;
+    int32 skip = 5;
+}
+
+message Post {
+    string id = 1;
+    string user_id = 2;
+    string createdAt = 3;
+    string msg = 4;
+    repeated string file_ids = 5;
+}
+
+message Posts {
+    repeated Post posts = 1;
+}
+
+message Empty {}

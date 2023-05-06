@@ -1,2 +1,3 @@
-export { DialogsInput } from "./dialogs.input";
-export { DialogsArgs } from "./dialogs.args";
+export * from "./dialogs.args";
+export * from "./dialogs.input";
+export * from "./relationships";

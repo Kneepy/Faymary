@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package profiles;
+
+service ProfilesService {
+    rpc CreateProfile (CreateProfileDTO) returns (stream Profile);
+    rpc GetProfile (GetProfileDTO) returns (stream Profile);
+    rpc UpdateProfile (UpdateProfileDTO) returns (stream Profile);
+    rpc AddUserAccount (MoveUserAccountDTO) returns (stream Account);
+    rpc RemoveUserAccount (MoveUserAccountDTO) returns (stream Account);
+}
+
+message GetProfileDTO {
+    string user_id = 1;
+}
+message CreateProfileDTO {
+    string user_id = 1;
+}
+message UpdateProfileDTO {
+    string id = 1;
+    string user_id = 2;
+    optional bool commentsNotification = 3;
+    optional bool likesNotification = 4;
+    optional bool subscriptionNotifications = 5;
+    optional bool deleteDialogNotifications = 6;
+    optional bool exceptionsFromDialogsNotifications = 7;
+}
+message MoveUserAccountDTO {
+    string user_id = 1;
+    string profile_id = 2;
+}
+message Profile {
+    string id = 1;
+    string user_id = 2;
+    bool commentsNotification = 3;
+    bool likesNotification = 4;
+    bool subscriptionNotifications = 5;
+    bool deleteDialogNotifications = 6;
+    bool exceptionsFromDialogsNotifications = 7;
+    repeated Account accounts = 8;
+}
+
+message Account {
+    string id = 1;
+    string user_id = 2;
+    Profile profile = 3;
+}

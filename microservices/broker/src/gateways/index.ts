@@ -1,0 +1,6 @@
+export * from "./comments.gateway"
+export * from "./server.gateway"
+export * from "./dialogs.gateway"
+export * from "./messages.gateway"
+export * from "./likes.gateway"
+export * from "./users.gateway"

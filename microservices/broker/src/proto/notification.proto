@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package notifications;
+
+service NotificationsService {
+    rpc GetAllUserNotifications (NotificationGetDTO) returns (stream Notifications);
+    rpc CreateNotification (NotificationCreate) returns (stream Notification);
+}
+
+message Notifications {
+    repeated Notification notifications = 1;
+}
+
+message Notification {
+    string id = 1;
+    NotificationAdditionsEnumType type = 2;
+    string item_id = 3;
+    string to_id = 4;
+    string parent_id = 5;
+    NotificationAdditionsEnumType parent_type = 6;
+    string from_id = 7;
+    string createdAt = 8;
+    NotificationEnumType notification_type = 9;
+}
+
+message NotificationGetDTO {
+    string user_id = 1;
+    optional int32 skip = 2;
+    optional int32 take = 3;
+}
+
+message NotificationCreate {
+    string from_id = 1;
+    string to_id = 2;
+    optional string item_id = 3;
+    NotificationAdditionsEnumType type = 4;
+    string parent_id = 5;
+    NotificationAdditionsEnumType parent_type = 6;
+    NotificationEnumType notification_type = 7;
+}
+
+enum NotificationAdditionsEnumType {
+    USER = 0;
+    STORY = 1;
+    POST = 2;
+    COMMENT = 3;
+    MESSAGE = 4;
+    DIALOG = 5;
+    LIKE = 6;
+}
+
+enum NotificationEnumType {
+    ADD_COMMENT = 0;
+    DELETE_USER_FROM_DIALOG = 1;
+    DELETE_DIALOG = 2;
+    SUB_USER = 3;
+    ADD_LIKE = 4;
+}

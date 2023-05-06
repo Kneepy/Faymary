@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package session;
+
+service SessionService {
+    rpc VerifyTokens (VerifyTokensDTO) returns (stream AccessToken);
+    rpc GenerateTokens (GenerateTokensDTO) returns (stream VerifyTokensDTO);
+    rpc GenerateTokensBySession (GenerateTokensBySessionDTO) returns (stream VerifyTokensDTO);
+}
+
+message AccessToken {
+    string user_id = 1;
+}
+
+message VerifyTokensDTO {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message GenerateTokensDTO {
+    string fingerprint = 1;
+    string ua = 2;
+    string ip = 3;
+    string user_id = 4;
+}
+
+message SessionOptions {
+    string fingerprint = 1;
+    string ua = 2;
+    string ip = 3;
+}
+
+message GenerateTokensBySessionDTO {
+    string access_token = 1;
+    string refresh_token = 2;
+    SessionOptions session = 3;
+}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package store;
+
+service StoreService {
+    rpc RemoveFile (RemoveFileDTO) returns (stream RemoveFileRes);
+}
+
+message RemoveFileDTO {
+    string id = 1;
+}
+
+message RemoveFileRes {}

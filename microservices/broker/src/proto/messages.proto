@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package messages;
+
+service MessagesSerivce {
+    rpc CreateMessage (CreateMessageDTO) returns (stream Message);
+    rpc GetDialogMessages (GetMessagesDTO) returns (stream Messages);
+    rpc GetMessage (GetMessageDTO) returns (stream Message);
+    rpc UpdateMessage (UpdateMessageDTO) returns (stream Message);
+    rpc DeleteMessage (DeleteMessageDTO) returns (stream Message);
+}
+
+message GetMessagesDTO {
+    string dialog_id = 1;
+    optional int32 take = 2;
+    optional int32 skip = 3;
+}
+
+message GetMessageDTO {
+    string id = 1;
+}
+
+message CreateMessageDTO {
+    optional MessagesEnumType attachment = 1;
+    string dialog_id = 2;
+    optional string item_id = 3;
+    string msg = 4;
+    string user_id = 5;
+}
+
+message UpdateMessageDTO {
+    optional MessagesEnumType attachment = 1;
+    string dialog_id = 2;
+    string id = 3;
+    optional string msg = 4;
+    optional string item_id = 5;
+    string user_id = 6;
+}
+
+message DeleteMessageDTO {
+    string id = 1;
+    string user_id = 2;
+}
+
+message Message {
+    string id = 1;
+    optional MessagesEnumType attachment = 2;
+    optional string item_id = 3;
+    string dialog_id = 4;
+    string user_id = 5;
+    string msg = 6;
+    string createdAt = 7;
+}
+
+message Messages {
+    repeated Message messages = 1;
+}
+
+enum MessagesEnumType {
+    USER = 0;
+    STORY = 1;
+    POST = 2;
+    COMMENT = 3;
+    MESSAGE = 4;
+    FILE = 7;
+}

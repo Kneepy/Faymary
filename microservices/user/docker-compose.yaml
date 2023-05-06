@@ -1,0 +1,30 @@
+version: '0.0'
+services:
+  mysql: 
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: user
+    image: mysql:latest
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - 3306:3306
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 502:80
+    environment:
+      PMA_HOST: mysql
+  user: 
+    container_name: user
+    build: .
+    ports:
+      - 5002:5002
+    command: npm run start:prod
+    depends_on:
+      - mysql
+volumes:
+  db:

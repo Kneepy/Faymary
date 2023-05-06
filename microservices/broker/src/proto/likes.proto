@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package likes;
+
+service LikesService {
+    rpc AddLike (AddLikeDTO) returns (stream Like);
+    rpc GetCountLikes (GetCountLikesDTO) returns (stream CountLikes);
+    rpc CheckLike (CheckLikeDTO) returns (stream IsLiked);
+}
+
+message Like {
+    string id = 1;
+    LikeType type = 2;
+    string item_id = 3;
+    string user_id = 4;
+    string createdAt = 5;
+    LikeState state = 6;
+}
+
+message GetCountLikesDTO {
+    LikeType type = 1;
+    string item_id = 2;
+}
+
+message CountLikes {
+    int32 count = 1;
+}
+
+message CheckLikeDTO {
+    string user_id = 1;
+    string item_id = 2;
+    LikeType type = 3;
+}
+
+message IsLiked {
+    bool isLiked = 1;
+}
+
+message AddLikeDTO {
+    string user_id = 1;
+    string item_id = 2;
+    LikeType type = 3;
+}
+
+enum LikeType {
+    USER = 0;
+    STORY = 1;
+    POST = 2;
+    COMMENT = 3;
+    MESSAGE = 4;
+}
+enum LikeState {
+    NOT_ACTIVE = 0;
+    ACTIVE = 1;
+}
