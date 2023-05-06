@@ -97,7 +97,7 @@ if(!userStore.me.profile?.accounts) {
                 flex: 1;
                 min-width: 50px;
                 display: flex;
-                justify-content: end;
+                justify-content: flex-end;
                 span {
                     color: $white;
                     font-size: 24px;

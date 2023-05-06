@@ -15,33 +15,37 @@ export class AuthGuard implements CanActivate {
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request: ICustomRequest = context.switchToHttp().getRequest();
-        const response: ICustomResponse = context.switchToHttp().getResponse()
+        try {
+            const request: ICustomRequest = context.switchToHttp().getRequest();
+            const response: ICustomResponse = context.switchToHttp().getResponse()
 
-        // типо защита от лоха
-        delete request.user_id
+            // типо защита от лоха
+            delete request.user_id
 
-        if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
+            if(this.reflector.get<boolean>(USE_AUTH_METADATA, context.getHandler()) == false) return true
+            
+            const accessToken = request.headers[REQUEST_FIELD_ACCESS_TOKEN]
+            const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
+
+            if(!refreshToken) throw UnautorizedError
         
-        const accessToken = request.headers[REQUEST_FIELD_ACCESS_TOKEN]
-        const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
+            const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
+            const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
+            const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
+            const verifedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
 
-        if(!refreshToken) throw UnautorizedError
-    
-        const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
-        const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
-        const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
-        const verifedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
+            request.headers.refresh_token = tokens.refresh_token
+            request.headers.authorization = tokens.access_token
+            response.header(REQUEST_FIELD_ACCESS_TOKEN, tokens.access_token)
+            response.cookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token, AUTH_COOKIE_OPTIONS)
 
-        request.headers.refresh_token = tokens.refresh_token
-        request.headers.authorization = tokens.access_token
-        response.header(REQUEST_FIELD_ACCESS_TOKEN, tokens.access_token)
-        response.cookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token, AUTH_COOKIE_OPTIONS)
+            if(!!verifedTokens.user_id) {
+                request.user_id = verifedTokens.user_id
+            }
 
-        if(!!verifedTokens.user_id) {
-            request.user_id = verifedTokens.user_id
+            return true
+        } catch (e) {
+            throw new UnauthorizedException(e.message)
         }
-
-        return true
     }
 }

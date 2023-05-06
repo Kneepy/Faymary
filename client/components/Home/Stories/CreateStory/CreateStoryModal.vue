@@ -4,8 +4,7 @@ const close = () => emit("onClose")
 
 const pages = reactive({
     text: false, 
-    paint: false,
-    upload: true
+    paint: true,
 })
 const closePages = () => Object.keys(pages).forEach(key => pages[key] = false)
 const openTextPage = () => {
@@ -15,10 +14,6 @@ const openTextPage = () => {
 const openPaintPage = () => {
     closePages()
     pages.paint = true
-}
-const openUploadPage = () => {
-    closePages()
-    pages.upload = true
 }
 
 
@@ -49,11 +44,58 @@ const previewFile = (e: any) => {
     }
     currentImage.value = files.value.length
 }
+
+
+/**
+ * Эту хрень нужно распилить на три компонента
+ */
+const canvas = ref()
+const canvasBox = ref()
+const ctx = computed(() => canvas.value?.getContext("2d"))
+const storiesStore = useStoriesStore()
+const draw = ref(false)
+const canvasStates = ref([])
+const canvasSize = computed(() => ({width: canvasBox.value?.offsetWidth, height: canvasBox.value?.offsetHeight}))
+const paint = (e: any) => {
+    if(draw.value) {
+        ctx.value.beginPath()
+
+        ctx.value.lineJoin = "round"
+        ctx.value.fillStyle = storiesStore.createOptions.draw.color
+        ctx.value.globalAlpha = Number(storiesStore.createOptions.draw.opacity) / 100
+
+        ctx.value.arc(e.offsetX, e.offsetY, (Number(storiesStore.createOptions.draw.width) / 2.5 || 1), 0, Math.PI*2, true)
+        ctx.value.fill()
+    }
+}
+const saveCurrentCavnvasState = () => {
+    canvasStates.value.push(ctx.value.getImageData(0, 0, canvasSize.value.width, canvasSize.value.height))
+    draw.value = false
+}
+const rollBackCanvasState = (e: KeyboardEvent) => {
+    if(e.key == "z" && e.ctrlKey) {
+        ctx.value?.clearRect(0, 0, 100000, 100000);
+        canvasStates.value.pop()
+
+        if(canvasStates.value[canvasStates.value.length - 1]) ctx.value.putImageData(canvasStates.value[canvasStates.value.length - 1], 0, 0)
+    }
+}
+onMounted(() => document.addEventListener("keydown", rollBackCanvasState))
+onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
 </script>
 <template>
     <ModalBox @onClose="close">
         <div class="create-story">
-            <div class="canvas" :style="{backgroundImage: `url(${files[currentImage]})`}">
+            <div @keyup="rollBackCanvasState" ref="canvasBox" class="canvas" :style="{backgroundImage: `url(${files[currentImage]})`}">
+                <canvas 
+                    ref="canvas" 
+                    @mousemove="paint" 
+                    @mousedown="(e) => (draw = true, paint(e))" 
+                    @mouseup="saveCurrentCavnvasState" 
+                    @mouseout="draw = false" 
+                    :width="canvasSize.width" 
+                    :height="canvasSize.height"
+                ></canvas>
                 <HorizontalScroll @wheel="flipImages" :count="countImages + 1" class="images">
                     <template #default="{ shift }">
                         <div class="images__box" :style="{transform: `translateX(${shift}px)`}">
@@ -76,10 +118,10 @@ const previewFile = (e: any) => {
                 <div class="edit-panel__moves">
                     <Button 
                         class="edit_move" 
-                        @click="openUploadPage" 
-                        :class="{active: pages.upload}"
+                        @click="openPaintPage" 
+                        :class="{active: pages.paint}"
                     >
-                        <span class="material-symbols-rounded">photo_library</span>
+                        <span class="material-symbols-rounded">palette</span>
                     </Button>
                     <Button 
                         class="edit_move letters" 
@@ -88,17 +130,9 @@ const previewFile = (e: any) => {
                     >
                         <span class="material-symbols-rounded">match_case</span>
                     </Button>
-                    <Button 
-                        class="edit_move" 
-                        @click="openPaintPage" 
-                        :class="{active: pages.paint}"
-                    >
-                        <span class="material-symbols-rounded">palette</span>
-                    </Button>
                 </div>
-                <div v-if="pages.upload" class="edit-panel__add edit-panel__img"></div>
+                <PaintPage v-if="pages.paint" />
                 <div v-if="pages.text" class="edit-panel__add edit-panel__text"></div>
-                <div v-if="pages.paint" class="edit-panel__add edit-panel__paint"></div>
             </div>
         </div>
     </ModalBox>
@@ -118,6 +152,7 @@ const previewFile = (e: any) => {
         background-size: cover;
         position: relative;
         overflow: hidden;
+        border-right: 1px solid $border_1;
         &::after {
             position: absolute;
             bottom: 0;
@@ -127,6 +162,9 @@ const previewFile = (e: any) => {
             opacity: .9;
             transition: background-color 100ms ease-out;
             content: "";
+        }
+        canvas {
+            position: absolute;
         }
         .images {
             position: absolute;
