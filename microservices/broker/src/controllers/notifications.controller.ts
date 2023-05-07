@@ -16,10 +16,10 @@ export class NotificationController {
  
     @Get()
     async getAllUserNotifications(@Query() {skip, take}: NotificationGetDTO, @Req() {user_id}: ICustomRequest): Promise<BrokerResponse.Notification[]> {
-        const notifications = (await this.notificationService.getAllUserNotifications({user_id, take, skip}).toPromise()).notifications
+        const notifications = (await this.notificationService.getAllUserNotifications({user_id, take, skip}).toPromise()).notifications ?? []
         const to = await this.userService.findUser({id: user_id}).toPromise()
 
-        return Promise.all(notifications.map(async notification => {
+        return Promise.all(notifications?.map(async notification => {
             const parent = this.utilsService.getItem<any>(notification.parent_type, notification.parent_id)
             const item = this.utilsService.getItem<any>(notification.type, notification.item_id)
             const from = await this.userService.findUser({id: notification.from_id}).toPromise()

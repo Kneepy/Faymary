@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccessCodes } from './access-codes.entity';
-import { MODULE_PACKAGE_NAME, MYSQL_HOST, MYSQL_PASS, MYSQL_PORT, MYSQL_USER, MYSQL_DB } from './constants';
+import { MYSQL_HOST, MYSQL_PASS, MYSQL_PORT, MYSQL_USER, MYSQL_DB } from './constants';
 import { MailController } from './mail.controller';
 import { AccessCodesService } from './providers';
 import { MailerService } from './providers/mailer.service';

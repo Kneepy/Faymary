@@ -86,7 +86,7 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
 <template>
     <ModalBox @onClose="close">
         <div class="create-story">
-            <div @keyup="rollBackCanvasState" ref="canvasBox" class="canvas" :style="{backgroundImage: `url(${files[currentImage]})`}">
+            <!-- <div @keyup="rollBackCanvasState" ref="canvasBox" class="canvas" :style="{backgroundImage: `url(${files[currentImage]})`}">
                 <canvas 
                     ref="canvas" 
                     @mousemove="paint" 
@@ -113,7 +113,8 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
                         </div>
                     </template>
                 </HorizontalScroll>
-            </div>
+            </div> -->
+            <CanvasStory />
             <div class="edit-panel">
                 <div class="edit-panel__moves">
                     <Button 

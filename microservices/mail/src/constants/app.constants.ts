@@ -22,6 +22,6 @@ export const MAILER_SERVICE = "MAILER_SERVICE"
 export enum SMTP {
     HOST = "smtp.gmail.com",
     PORT = 465,
-    PASS = "rhwdejvnmlrfgtgn",
-    USER = "ilyafamin4@gmail.com"
+    PASS = "lquxeopertpfsnew",
+    USER = "kneepydev@gmail.com"
 }
