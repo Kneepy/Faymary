@@ -1,15 +1,15 @@
 <script setup lang="ts">
-const emit = defineEmits(["changeCanvas"])
-const currentImage = ref(null)
+const emit = defineEmits(["changeCanvas", "addFile"])
+const storiesStore = useStoriesStore()
 const files = ref<string[]>([])
 const countImages = computed(() => files.value?.length)
 
 const flipImages = (e: WheelEvent) => {
-    if(currentImage.value <= 0 && Math.sign(e.deltaY) > 0) return 
-    if(currentImage.value >= countImages.value - 1 && Math.sign(e.deltaY) < 0) return
-    currentImage.value -= Math.sign(e.deltaY)
+    if(storiesStore.createOptions.currentCanvas <= 0 && Math.sign(e.deltaY) > 0) return 
+    if(storiesStore.createOptions.currentCanvas >= countImages.value - 1 && Math.sign(e.deltaY) < 0) return
+    storiesStore.createOptions.currentCanvas -= Math.sign(e.deltaY)
 }
-const changeImage = (index: number) => currentImage.value = index
+const changeCanvas = (index: number) => storiesStore.createOptions.currentCanvas = index
 
 const formUpload = ref()
 
@@ -20,11 +20,15 @@ const previewFile = (e: any) => {
     // я хз это должно быть временно - далее можно будет загружать видосы
     if(!file || file.type.split('/')[0] !== "image") return
 
-    files.value.push(URL.createObjectURL(e.target?.files[0]))
-    currentImage.value = files.value.length - 1
+    storiesStore.createOptions.canvases.push({
+        history: [] as any
+    })
+    // файл не рисуется на панели холстов при этой штуке
+    storiesStore.createOptions.currentCanvas = storiesStore.createOptions.canvases.length - 1
+    emit("addFile", URL.createObjectURL(e.target?.files[0]))
 }
 
-watch(() => currentImage.value, index => emit("changeCanvas", files.value[index]))
+watch(() => storiesStore.createOptions.currentCanvas, index => emit("changeCanvas", index))
 </script>
 <template>
     <HorizontalScroll @wheel="flipImages" :count="countImages + 1" class="images">
@@ -35,11 +39,11 @@ watch(() => currentImage.value, index => emit("changeCanvas", files.value[index]
                     <span class="material-symbols-rounded">add</span>
                 </Button>
                 <div 
-                    v-for="(image, i) in files" 
+                    v-for="(image, i) in storiesStore.createOptions.canvases" 
                     :key="i" class="img" 
-                    :class="{active: (currentImage) === i}"
-                    :style="{backgroundImage: `url(${image})`}"
-                    @click="() => changeImage(i)"
+                    :class="{active: storiesStore.createOptions.currentCanvas === i}"
+                    :style="{backgroundImage: `url(${image.current})`}"
+                    @click="() => changeCanvas(i)"
                 ></div>
             </div>
         </template>
@@ -65,13 +69,13 @@ watch(() => currentImage.value, index => emit("changeCanvas", files.value[index]
             transform: scale(1) !important;
             span {
                 color: $black;
-                font-size: 35px;
+                font-size: 27px;
                 font-weight: bold;
             }
         }
         .img {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 10px;
             background-position: center;
             background-size: cover;

@@ -18,24 +18,45 @@ const paint = (e: any) => {
         ctx.value.fill()
     }
 }
-const saveCurrentCavnvasState = () => {
-    canvasStates.value.push(ctx.value.getImageData(0, 0, canvasSize.value.width, canvasSize.value.height))
-    draw.value = false
+const saveCurrentCavnvas = () => {
+    const currentCanvas = storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas]
+    currentCanvas.history.push(ctx.value.getImageData(0, 0, canvasSize.value.width, canvasSize.value.height))
+    currentCanvas.current = canvas.value.toDataURL()
 }
 const rollBackCanvasState = (e: KeyboardEvent) => {
     if(e.key == "z" && e.ctrlKey) {
-        ctx.value?.clearRect(0, 0, 100000, 100000);
-        canvasStates.value.pop()
+        ctx.value?.clearRect(0, 0, ctx.value.canvas.width, ctx.value.canvas.height);
 
-        if(canvasStates.value[canvasStates.value.length - 1]) ctx.value.putImageData(canvasStates.value[canvasStates.value.length - 1], 0, 0)
+        const currentCanvasHistory = storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas].history
+        currentCanvasHistory.pop()
+
+        if(currentCanvasHistory.length > 0) {
+            ctx.value.putImageData(storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas].history[storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas].history.length - 1], 0, 0)
+        }
+        storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas].current = canvas.value.toDataURL()
     }
 }
-const changeCanvas = (file: string) => {
+const changeCanvas = (canvasIndex: number) => {
+    ctx.value.clearRect(0, 0, canvasSize.value.width, canvasSize.value.height)
+    ctx.value.putImageData(storiesStore.createOptions.canvases[canvasIndex].history[storiesStore.createOptions.canvases[canvasIndex].history.length - 1], 0, 0)
+}
+const addFile = (file: string) => {
     const img = new Image()
     img.src = file
-    img.onload = () => ctx.value.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasSize.value.width, canvasSize.value.height)
+
+    img.onload = () => {
+        const imgWidth = canvasSize.value.width
+        const imgHeight = (imgWidth * img.height) / img.width  
+        const offsetY = (canvasSize.value.height - imgHeight) / 2
+
+        ctx.value.drawImage(img, 0, offsetY, imgWidth, imgHeight)
+
+        saveCurrentCavnvas()
+    }
 }
-onMounted(() => document.addEventListener("keydown", rollBackCanvasState))
+onMounted(() => {
+    document.addEventListener("keydown", rollBackCanvasState)
+})
 onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
 </script>
 <template>
@@ -44,12 +65,12 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
             ref="canvas" 
             @mousemove="paint" 
             @mousedown="(e) => (draw = true, paint(e))" 
-            @mouseup="saveCurrentCavnvasState" 
+            @mouseup="() => (draw = false, saveCurrentCavnvas())" 
             @mouseout="draw = false" 
             :width="canvasSize.width" 
             :height="canvasSize.height"
         ></canvas>
-        <StoryImages @changeCanvas="changeCanvas" />
+        <StoryImages @addFile="addFile" @changeCanvas="changeCanvas" />
     </div>
 </template>
 <style lang="scss" scoped>
