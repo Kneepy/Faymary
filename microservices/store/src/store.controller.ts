@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
+import { Controller, Get, NotFoundException, Param, Post, Res, UploadedFile, UploadedFiles } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import { createReadStream } from "fs";
 import * as path from "path";

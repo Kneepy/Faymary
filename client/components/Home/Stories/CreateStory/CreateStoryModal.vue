@@ -16,104 +16,12 @@ const openPaintPage = () => {
     pages.paint = true
 }
 
-
-
-const currentImage = ref(0)
-const files = ref([])
-const countImages = computed(() => files.value?.length)
-const flipImages = (e: WheelEvent) => {
-    if(currentImage.value <= 0 && Math.sign(e.deltaY) > 0) return 
-    if(currentImage.value >= countImages.value - 1 && Math.sign(e.deltaY) < 0) return
-    currentImage.value -= Math.sign(e.deltaY)
-}
-const changeImage = (index: number) => currentImage.value = index
-
-const formUpload = ref()
-const clickFileInput = (e: any) => formUpload.value.click()
-const previewFile = (e: any) => {
-    const file = e.target?.files[0] ?? e.dataTransfer?.files[0]
-
-    // я хз это должно быть временно - далее можно будет загружать видосы
-    if(!file || file.type.split('/')[0] !== "image") return
-
-    const reader = new FileReader()
-
-    reader.readAsDataURL(file)
-    reader.onload = () => {
-        files.value.push(reader.result as string)
-    }
-    currentImage.value = files.value.length
-}
-
-
-/**
- * Эту хрень нужно распилить на три компонента
- */
-const canvas = ref()
-const canvasBox = ref()
-const ctx = computed(() => canvas.value?.getContext("2d"))
 const storiesStore = useStoriesStore()
-const draw = ref(false)
-const canvasStates = ref([])
-const canvasSize = computed(() => ({width: canvasBox.value?.offsetWidth, height: canvasBox.value?.offsetHeight}))
-const paint = (e: any) => {
-    if(draw.value) {
-        ctx.value.beginPath()
-
-        ctx.value.lineJoin = "round"
-        ctx.value.fillStyle = storiesStore.createOptions.draw.color
-        ctx.value.globalAlpha = Number(storiesStore.createOptions.draw.opacity) / 100
-
-        ctx.value.arc(e.offsetX, e.offsetY, (Number(storiesStore.createOptions.draw.width) / 2.5 || 1), 0, Math.PI*2, true)
-        ctx.value.fill()
-    }
-}
-const saveCurrentCavnvasState = () => {
-    canvasStates.value.push(ctx.value.getImageData(0, 0, canvasSize.value.width, canvasSize.value.height))
-    draw.value = false
-}
-const rollBackCanvasState = (e: KeyboardEvent) => {
-    if(e.key == "z" && e.ctrlKey) {
-        ctx.value?.clearRect(0, 0, 100000, 100000);
-        canvasStates.value.pop()
-
-        if(canvasStates.value[canvasStates.value.length - 1]) ctx.value.putImageData(canvasStates.value[canvasStates.value.length - 1], 0, 0)
-    }
-}
-onMounted(() => document.addEventListener("keydown", rollBackCanvasState))
-onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
+const publishStories = () => storiesStore.publishedStories()
 </script>
 <template>
     <ModalBox @onClose="close">
         <div class="create-story">
-            <!-- <div @keyup="rollBackCanvasState" ref="canvasBox" class="canvas" :style="{backgroundImage: `url(${files[currentImage]})`}">
-                <canvas 
-                    ref="canvas" 
-                    @mousemove="paint" 
-                    @mousedown="(e) => (draw = true, paint(e))" 
-                    @mouseup="saveCurrentCavnvasState" 
-                    @mouseout="draw = false" 
-                    :width="canvasSize.width" 
-                    :height="canvasSize.height"
-                ></canvas>
-                <HorizontalScroll @wheel="flipImages" :count="countImages + 1" class="images">
-                    <template #default="{ shift }">
-                        <div class="images__box" :style="{transform: `translateX(${shift}px)`}">
-                            <input ref="formUpload" @change="previewFile" type="file" accept="image/*" style="display:none">
-                            <Button @click="clickFileInput" class="img add__img">
-                                <span class="material-symbols-rounded">add</span>
-                            </Button>
-                            <div 
-                                v-for="(image, i) in files" 
-                                :key="i" class="img" 
-                                :class="{active: (currentImage) === i}"
-                                :style="{backgroundImage: `url(${image})`}"
-                                @click="() => changeImage(i)"
-                            ></div>
-                        </div>
-                    </template>
-                </HorizontalScroll>
-            </div> -->
             <CanvasStory />
             <div class="edit-panel">
                 <div class="edit-panel__moves">
@@ -133,7 +41,8 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
                     </Button>
                 </div>
                 <PaintPage v-if="pages.paint" />
-                <div v-if="pages.text" class="edit-panel__add edit-panel__text"></div>
+                <TextPage v-if="pages.text" class="edit-panel__add edit-panel__text"></TextPage>
+                <Button @click="publishStories" class="publish-story">Опубликовать</Button>
             </div>
         </div>
     </ModalBox>
@@ -158,7 +67,7 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 240px;
+            height: 130px;
             background: linear-gradient(0deg, $black 0%, transparent 100%);
             opacity: .9;
             transition: background-color 100ms ease-out;
@@ -218,6 +127,7 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
     }
     .edit-panel {
         flex: 1;
+        position: relative;
         &__moves {
             background-color: $panel_background;
             display: flex;
@@ -251,6 +161,13 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
                     font-size: 26px;
                 }
             }
+        }
+        .publish-story {
+            position: absolute;
+            bottom: 15px;
+            width: 130px;
+            font-size: 14px;
+            right: 15px;
         }
     }
 }

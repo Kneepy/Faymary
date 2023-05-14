@@ -1,42 +1,4 @@
-# Nuxt 3 Minimal Starter
-
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
-# pnpm
-pnpm install
+### TODO
 ```
-
-## Development Server
-
-Start the development server on http://localhost:3000
-
-```bash
-npm run dev
+1. Т.к я не хочу лезть в пучину фронта то оставлю конструктор историй только с добалением фотографий без их изменения, фильтров и т.п (сейчас только фотка по центру), и рисовалкой, без выбора текста и т.п. А вообще по красоте это нужно делать через html, а не так что всё только в канвасе и потом превращать это в канвас через html2canvas
 ```
-
-## Production
-
-Build the application for production:
-
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

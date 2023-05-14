@@ -11,7 +11,9 @@ export const GetMulterConfig = (): MulterOptions => ({
             cb(null, STORE_FOLDER_PATH);
         },
         filename: (req, file, cb) => {
-            cb(null, Buffer.from(`${Date.now()}`).toString("base64") + path.extname(file.originalname));
+            const extname = path.extname(file.originalname)
+
+            cb(null, Buffer.from(`${Date.now()}`).toString("base64") + (!!extname ? extname : ".png"));
         }
     })
 })

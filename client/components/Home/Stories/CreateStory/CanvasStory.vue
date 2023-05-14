@@ -1,11 +1,15 @@
 <script setup lang="ts">
-const canvas = ref()
-const canvasBox = ref<HTMLCanvasElement>()
+
+/**
+ * Такс ну всё что было написано с сохранением изображений и их добавлением на холст полное дерьмо поэтому нужно вынести добавление изображений в отдельный блок вне канваса и потом для отправки на сервак сохранять этот блок через html2canvas
+ */
+const canvas = ref<HTMLCanvasElement>()
+const canvasBox = ref()
 const ctx = computed<CanvasRenderingContext2D>(() => canvas.value.getContext("2d"))
 const storiesStore = useStoriesStore()
 const draw = ref(false)
-const canvasStates = ref([])
 const canvasSize = computed(() => ({width: canvasBox.value?.offsetWidth, height: canvasBox.value?.offsetHeight}))
+
 const paint = (e: any) => {
     if(draw.value) {
         ctx.value.beginPath()
@@ -21,7 +25,8 @@ const paint = (e: any) => {
 const saveCurrentCavnvas = () => {
     const currentCanvas = storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas]
     currentCanvas.history.push(ctx.value.getImageData(0, 0, canvasSize.value.width, canvasSize.value.height))
-    currentCanvas.current = canvas.value.toDataURL()
+
+    currentCanvas.current = canvas.value.toDataURL("image/png")
 }
 const rollBackCanvasState = (e: KeyboardEvent) => {
     if(e.key == "z" && e.ctrlKey) {
@@ -38,25 +43,48 @@ const rollBackCanvasState = (e: KeyboardEvent) => {
 }
 const changeCanvas = (canvasIndex: number) => {
     ctx.value.clearRect(0, 0, canvasSize.value.width, canvasSize.value.height)
-    ctx.value.putImageData(storiesStore.createOptions.canvases[canvasIndex].history[storiesStore.createOptions.canvases[canvasIndex].history.length - 1], 0, 0)
+
+    const imgData = storiesStore.createOptions.canvases[canvasIndex].history[storiesStore.createOptions.canvases[canvasIndex].history.length - 1]
+    
+    if(imgData) {
+        ctx.value.putImageData(imgData, 0, 0)
+    }
 }
 const addFile = (file: string) => {
     const img = new Image()
     img.src = file
 
     img.onload = () => {
+        ctx.value.clearRect(0, 0, canvasSize.value.width, canvasSize.value.height)
+        // параметры заблюренного фона
+        const backgroundWidth = (img.width * canvasSize.value.height) / img.height
+        const backgroundOffsetX = (canvasSize.value.width - backgroundWidth) / 2
+
+        // фон истории это заблюренное изображение
+        ctx.value.filter = "blur(50px)"
+        ctx.value.drawImage(img, backgroundOffsetX, 0, backgroundWidth, canvasSize.value.height)
+
+        // само изображение
         const imgWidth = canvasSize.value.width
         const imgHeight = (imgWidth * img.height) / img.width  
         const offsetY = (canvasSize.value.height - imgHeight) / 2
-
+        
+        ctx.value.filter = "none"
         ctx.value.drawImage(img, 0, offsetY, imgWidth, imgHeight)
 
         saveCurrentCavnvas()
     }
 }
-onMounted(() => {
-    document.addEventListener("keydown", rollBackCanvasState)
+const createCanvas = () => {
+    storiesStore.createOptions.canvases.push({
+        history: []
+    })
+}
+onUpdated(() => {
+    if(!storiesStore.createOptions.canvases.length) createCanvas()
+    changeCanvas(storiesStore.createOptions.currentCanvas)
 })
+onMounted(() => document.addEventListener("keydown", rollBackCanvasState))
 onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
 </script>
 <template>
@@ -64,13 +92,13 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
         <canvas 
             ref="canvas" 
             @mousemove="paint" 
-            @mousedown="(e) => (draw = true, paint(e))" 
-            @mouseup="() => (draw = false, saveCurrentCavnvas())" 
+            @mousedown.left="(e) => (draw = true, paint(e))" 
+            @mouseup.left="() => (draw = false, saveCurrentCavnvas())" 
             @mouseout="draw = false" 
             :width="canvasSize.width" 
             :height="canvasSize.height"
         ></canvas>
-        <StoryImages @addFile="addFile" @changeCanvas="changeCanvas" />
+        <StoryOptions @createCanvas="createCanvas" @addFile="addFile" @changeCanvas="changeCanvas" />
     </div>
 </template>
 <style lang="scss" scoped>
@@ -86,7 +114,7 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
         position: absolute;
         bottom: 0;
         width: 100%;
-        height: 240px;
+        height: 140px;
         background: linear-gradient(0deg, $black 0%, transparent 100%);
         opacity: .9;
         transition: background-color 100ms ease-out;

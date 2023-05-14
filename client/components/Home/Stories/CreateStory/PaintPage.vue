@@ -3,7 +3,7 @@ const canvas = ref()
 const ctx = computed(() => canvas.value?.getContext("2d"))
 const colors = reactive(COLORS)
 const storiesStore = useStoriesStore()
-const canvasOptions = storiesStore.createOptions.draw
+const canvasOptions = reactive(storiesStore.createOptions.draw)
 
 const updateCanvas = () => {
     ctx.value.clearRect(0, 0, 100000, 100000);

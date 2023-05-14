@@ -2,10 +2,8 @@ import { UseFetchOptions } from "nuxt/app"
 
 export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useFetch(href, {
     async onRequest({ options }) {
-        const config = useRuntimeConfig()
         const appStateStore = useAppStateStore()
 
-        options.baseURL = config.public.baseApiURL
         options.headers = {
             ...data.headers,
             authorization: `Bearer ${appStateStore.authorization}`,
@@ -24,6 +22,7 @@ export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useF
         const appStateStore = useAppStateStore()
         appStateStore.authorization = response.headers.get("authorization") as string ?? appStateStore.authorization
     },
+    server: false,
+    baseURL: useRuntimeConfig().public.baseApiURL,
     ...data,
-    server: false
 })
