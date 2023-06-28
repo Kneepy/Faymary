@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { UserAPI } from '~/api';
 import { Account } from '~~/store/types/user.type';
 
 const emit = defineEmits(["onClose"])
@@ -10,7 +11,7 @@ const changeAccount = async (account: Account) => {
             /**
              * Не заносим токены в с стор т.к страница обновляется => состоямние хранилища сбросится
              */
-            await userStore.changeAccount(account.id)
+            await UserAPI.changeAccount(account.id)
             location.reload()
         } catch (e) {
             console.log(e)
@@ -19,7 +20,7 @@ const changeAccount = async (account: Account) => {
 }
 
 if(!userStore.me.profile?.accounts) {
-    userStore.me.profile = await userStore.getMeProfile()
+    userStore.me.profile = await UserAPI.getMeProfile()
 }
 </script>
 <template>

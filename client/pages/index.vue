@@ -4,6 +4,7 @@
     </div>
 </template>
 <script setup lang="ts">
+import { StoriesAPI } from "~/api/stories";
 import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({

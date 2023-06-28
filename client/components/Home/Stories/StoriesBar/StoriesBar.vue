@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import { StoriesAPI } from '~/api/stories'
+
 const storiesStore = useStoriesStore()
 const visibleButtons = ref(false)
 const openCreateStoryModal = ref(false)
 
-storiesStore.stories = await storiesStore.getCollectionStories({take: 10, skip: 0})
-
 const toggleCreateStoryModal = () => openCreateStoryModal.value = !openCreateStoryModal.value
+
+storiesStore.stories = await StoriesAPI.getCollectionStories({take: 10, skip: 0})
 </script>
 <template>
     <div class="stories-bar">
-        <HorizontalScroll @mouseleave="() => visibleButtons = false" @mouseenter="() => visibleButtons = true" class="stories" :count="storiesStore.stories.length + 1">
+        <HorizontalScroll @mouseleave="() => visibleButtons = false" @mouseenter="() => visibleButtons = true" class="stories" :count="storiesStore.stories?.length + 1">
             <template #default="{ shift }">
                 <div class="stories__box">
                     <CreateStoryButton :style="{transform: `translateX(${shift}px)`}" @click="toggleCreateStoryModal" />

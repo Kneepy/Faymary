@@ -9,6 +9,7 @@ import {
     Query,
     Req,
     Res,
+    UnauthorizedException,
 } from "@nestjs/common";
 import {AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
@@ -29,7 +30,7 @@ export class UserController {
         @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profilesService: ProfilesServiceClient,
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient
     ) {}
-
+    
     @Put("login")
     @DisableAuth()
     async loginUser(@Body() data: LoginUserDTO): Promise<{user_id: string}> {

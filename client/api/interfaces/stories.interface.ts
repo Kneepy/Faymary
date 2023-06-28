@@ -1,6 +1,5 @@
-import { Addition, AdditionsType } from "./additions.type";
-import { User } from "./user.type";
-
+import { Addition, AdditionsType } from "./additions.interface";
+import { User } from "./user.interface";
 
 export interface Mark {
     id: string;

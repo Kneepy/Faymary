@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { UserAPI } from '~/api';
 import { ROUTES } from '~~/assets/constants/routes.constants';
 
 definePageMeta({
@@ -13,6 +14,7 @@ const countInputs = 6
 const code: string[] = []
 const countdownDuration = ref(299) // 5 минут
 const countdown = computed(() => `${Math.floor(countdownDuration.value / 60)}:${countdownDuration.value % 60}`)
+
 const resetCountdown = () => {
     if(countdownDuration.value <= 0) countdownDuration.value = 299
 
@@ -27,10 +29,9 @@ const resetCountdown = () => {
 const sendCode = async () => {
     appState.load = true
     try {
-        const tokens = await userStore.confirmUser({user_id: userStore.tempUser.id, code: code.join("")})
+        const tokens = await UserAPI.confirmUser({user_id: userStore.tempUser.id, code: code.join("")})
         
         appState.load = false
-        appState.refresh_token = tokens.refresh_token
         ui.confirmedCode = true
 
         navigateTo({name: ROUTES.HOME})
@@ -39,7 +40,7 @@ const sendCode = async () => {
     }
     appState.load = false
 }
-const resendCode = () => userStore.sendConfirmCode({email: userStore.tempUser.email, user_id: userStore.tempUser.id})
+const resendCode = () => UserAPI.sendConfirmCode({email: userStore.tempUser.email, user_id: userStore.tempUser.id})
 const nextInput = (event: KeyboardEvent) => {
     const keyDeleteCode = "Backspace"
     if(!event.key.trim().length || (event.key.trim().length > 1 && event.key !== keyDeleteCode)) return

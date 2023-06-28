@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
-import {MODULE_HOST, SESSION_PACKAGE_NAME, SESSION_PROTO_PATH } from "./constants";
+import { MODULE_HOST, SESSION_PACKAGE_NAME, SESSION_PROTO_PATH } from "./constants";
 import { AuthModule } from "./auth.module";
 
 (async () => {

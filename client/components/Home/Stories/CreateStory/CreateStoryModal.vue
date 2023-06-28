@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { StoriesAPI } from '~/api/stories'
+
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
@@ -16,8 +18,7 @@ const openPaintPage = () => {
     pages.paint = true
 }
 
-const storiesStore = useStoriesStore()
-const publishStories = () => storiesStore.publishedStories()
+const publishStories = () => StoriesAPI.publishedStories()
 </script>
 <template>
     <ModalBox @onClose="close">

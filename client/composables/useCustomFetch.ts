@@ -1,6 +1,10 @@
 import { UseFetchOptions } from "nuxt/app"
 
-export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useFetch(href, {
+/**
+ * Если запрос прошёл успешно то результатом будет ответ 
+ * Иначе же будет выдана ошибка которую можно отловить в trycatch
+ */
+export const useCustomFetch = <DataT>(href: string, data: UseFetchOptions<any>): Promise<DataT> => $fetch<DataT>(href, {
     async onRequest({ options }) {
         const appStateStore = useAppStateStore()
 
@@ -9,8 +13,9 @@ export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useF
             authorization: `Bearer ${appStateStore.authorization}`,
             fingerprint: await useNuxtApp().$fingerprint,
         } as HeadersInit
-        this.credentials = "include"
-        this.mode = "cors"
+        options.credentials = "include"
+        options.mode = "cors"
+        options.baseURL = useRuntimeConfig().public.baseApiURL as string
     },
     async onResponse({ response }) {
         /**
@@ -22,7 +27,11 @@ export const useCustomFetch = (href: string, data: UseFetchOptions<any>) => useF
         const appStateStore = useAppStateStore()
         appStateStore.authorization = response.headers.get("authorization") as string ?? appStateStore.authorization
     },
-    server: false,
-    baseURL: useRuntimeConfig().public.baseApiURL,
-    ...data,
+    async onResponseError({ response, options }) {
+        throw response._data
+    },
+    /**
+     * Ругается на Enum Methods поэтому всё придётся пометить как any
+     */
+    ...data as any,
 })

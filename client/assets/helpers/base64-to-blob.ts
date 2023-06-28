@@ -9,7 +9,7 @@ export const base64ToBlob = (b64Data: string, contentType = "", sliceSize = 512)
 
         const byteNumbers = new Array(slice.length);
         for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
+            byteNumbers[i] = slice.charCodeAt(i);
         }
 
         const byteArray = new Uint8Array(byteNumbers);

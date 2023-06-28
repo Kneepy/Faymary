@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { ServerError, UserAPI } from '~/api';
 import { ROUTES } from '~~/assets/constants/routes.constants';
-import { ServerError } from '~~/store/types/error';
 
 definePageMeta({
     name: ROUTES.LOGIN_INPUT_DATA,
@@ -19,8 +19,8 @@ const loginUser = async () => {
     try {
         const { user_id } = await (
             exists ? 
-            userStore.loginUser({password: userStore.tempUser.password, email: userStore.tempUser.email}) : 
-            userStore.createUser({password: userStore.tempUser.password, fullName: userStore.tempUser.fullName, email: userStore.tempUser.email})
+            UserAPI.loginUser({password: userStore.tempUser.password, email: userStore.tempUser.email}) : 
+            UserAPI.createUser({password: userStore.tempUser.password, fullName: userStore.tempUser.fullName, email: userStore.tempUser.email})
         )
     
         if(user_id) {

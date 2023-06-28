@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { NotificationEnumType } from '~/api/interfaces';
 import { ROUTES } from '~~/assets/constants/routes.constants';
-import { NotificationEnumType } from '~~/store/types/notification.type';
 
 const notificationsStore = useNotificationStore()
 const emit = defineEmits(['close'])

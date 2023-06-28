@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { UserAPI } from '~/api/user';
 import { ROUTES } from '~~/assets/constants/routes.constants';
 
 definePageMeta({
@@ -12,7 +13,7 @@ const appStateStore = useAppStateStore()
 const isValidData = computed(() => !(!!userData.email?.split("@")[1]))
 const checkExistUser = async () => {
     appStateStore.load = true
-    userStore.tempUser = await userStore.getUserBy({email: userData.email})
+    userStore.tempUser = await UserAPI.getUserBy({email: userData.email})
    
     if(!userStore.tempUser.id) {
         userStore.tempUser.email = userData.email

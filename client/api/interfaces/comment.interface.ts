@@ -1,4 +1,4 @@
-import { AdditionsType } from "./additions.type";
+import { AdditionsType } from "./additions.interface";
 
 export enum CommentState {
     UNACTIVE = 0,

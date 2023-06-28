@@ -1,3 +1,4 @@
+import { UserAPI } from "~/api"
 import { ROUTES } from "~~/assets/constants/routes.constants"
 
 export default defineNuxtRouteMiddleware(route => {
@@ -7,7 +8,7 @@ export default defineNuxtRouteMiddleware(route => {
 
         const authMe = async () => {
             try {
-                userStore.me = await userStore.getMe()
+                userStore.me = await UserAPI.getMe()
             } catch (e) {
                 navigateTo({name: ROUTES.LOGIN_INPUT_EMAIL})
             }
