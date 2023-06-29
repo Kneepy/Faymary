@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import { COLORS } from '~/store/stories';
 /**
  * Такс ну всё что было написано с сохранением изображений и их добавлением на холст полное дерьмо поэтому нужно вынести добавление изображений в отдельный блок вне канваса и потом для отправки на сервак сохранять этот блок через html2canvas
  */
@@ -21,6 +21,10 @@ const paint = (e: any) => {
         ctx.value.arc(e.offsetX, e.offsetY, (Number(storiesStore.createOptions.draw.width) / 2.5 || 1), 0, Math.PI*2, true)
         ctx.value.fill()
     }
+}
+const fillCanvas = (color: typeof COLORS[number]) => {
+    ctx.value.fillStyle = color
+    ctx.value.fillRect(0, 0, canvasSize.value.width, canvasSize.value.height)
 }
 const saveCurrentCavnvas = () => {
     const currentCanvas = storiesStore.createOptions.canvases[storiesStore.createOptions.currentCanvas]
@@ -79,7 +83,17 @@ const createCanvas = () => {
     storiesStore.createOptions.canvases.push({
         history: []
     })
+    storiesStore.createOptions.currentCanvas = storiesStore.createOptions.canvases.length - 1
+    fillCanvas(COLORS[0])
 }
+
+/**
+ * Хочется избить себя тапками за это решение, но при любом изменении индекса текущего холста
+ * Изменение и обновление холста происходит тут, хотя надо было бы сделать функцию в storiesStore для этого
+ * Поэтому в других компонентах просто меняем текщий холст а изменения сами подтянутся
+ */
+watch(() => storiesStore.createOptions.currentCanvas, (canvas_id: number) => changeCanvas(canvas_id))
+
 onUpdated(() => {
     if(!storiesStore.createOptions.canvases.length) createCanvas()
     changeCanvas(storiesStore.createOptions.currentCanvas)

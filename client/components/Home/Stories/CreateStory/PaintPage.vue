@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { COLORS } from "~/store/stories"
+
 const canvas = ref()
 const ctx = computed(() => canvas.value?.getContext("2d"))
 const colors = reactive(COLORS)

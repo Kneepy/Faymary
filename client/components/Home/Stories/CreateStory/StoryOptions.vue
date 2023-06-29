@@ -21,11 +21,7 @@ const previewFile = (e: any) => {
 
     emit("addFile", URL.createObjectURL(e.target?.files[0]))
 }
-const createCanvas = () => {
-    emit("createCanvas")
-    storiesStore.createOptions.currentCanvas = storiesStore.createOptions.canvases.length - 1
-}
-watch(() => storiesStore.createOptions.currentCanvas, index => emit("changeCanvas", index))
+const createCanvas = () => emit("createCanvas")
 </script>
 <template>
     <div class="story-options">

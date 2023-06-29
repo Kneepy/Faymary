@@ -27,5 +27,15 @@ export const useStoriesStore = defineStore("stories", {
             canvases: [] as Canvas[],
             currentCanvas: 0,
         }
-    })
+    }),
+    actions: {
+        deleteCanvas(canvas_id: number) {
+            if(this.createOptions.canvases.length > 2) {
+                this.createOptions.canvases.splice(canvas_id, 1)
+                this.createOptions.currentCanvas = canvas_id >= 1 ? canvas_id - 1 : this.createOptions.canvases.length - 1
+            } else {
+                console.log("нельзя удалить холс если их меньше двух!")
+            }
+        }
+    }
 })

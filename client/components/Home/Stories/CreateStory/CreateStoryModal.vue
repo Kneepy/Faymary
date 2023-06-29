@@ -4,6 +4,8 @@ import { StoriesAPI } from '~/api/stories'
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
+const storiesStore = useStoriesStore()
+
 const pages = reactive({
     text: false, 
     paint: true,
@@ -19,6 +21,7 @@ const openPaintPage = () => {
 }
 
 const publishStories = () => StoriesAPI.publishedStories()
+const deleteCanvas = () => storiesStore.deleteCanvas(storiesStore.createOptions.currentCanvas)
 </script>
 <template>
     <ModalBox @onClose="close">
@@ -43,7 +46,12 @@ const publishStories = () => StoriesAPI.publishedStories()
                 </div>
                 <PaintPage v-if="pages.paint" />
                 <TextPage v-if="pages.text" class="edit-panel__add edit-panel__text"></TextPage>
-                <Button @click="publishStories" class="publish-story">Опубликовать</Button>
+                <div class="canvas-actions">
+                    <Button @click="deleteCanvas" class="delete-canvas">
+                        <span class="material-symbols-rounded">delete</span>
+                    </Button>
+                    <Button @click="publishStories" class="publish-story">Опубликовать</Button>
+                </div>
             </div>
         </div>
     </ModalBox>
@@ -163,12 +171,45 @@ const publishStories = () => StoriesAPI.publishedStories()
                 }
             }
         }
-        .publish-story {
+        .canvas-actions {
             position: absolute;
             bottom: 15px;
-            width: 130px;
-            font-size: 14px;
-            right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            .delete-canvas {
+                width: 45px;
+                margin-left: 15px;
+                background-color: transparent;
+                border-radius: 50%;
+                height: 45px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: 100ms;
+                &:hover {
+                    transition: 100ms;
+                    background-color: $transparent_button_hover;
+                    span {
+                        color: $white;
+                        opacity: 1;
+                    }
+                }
+                span {
+                    color: $white;
+                    opacity: .7;
+                    font-weight: 400;
+                    font-size: 27px;
+                    font-variation-settings: "wght" 200, "GRAD" 100, "opsz" 48;
+                }
+            }
+            .publish-story {
+                width: 130px;
+                height: 35px;
+                font-size: 14px;
+                margin-right: 15px;
+            }
         }
     }
 }
