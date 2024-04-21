@@ -1,12 +1,15 @@
-import { Controller } from "@nestjs/common";
+import { Controller, Inject } from "@nestjs/common";
 import { GrpcMethod } from "@nestjs/microservices";
 import {
     FailedDeleteMessage,
     Messages,
     MESSAGES_SERVICE_METHODS,
     MESSAGES_SERVICE_NAME,
+    MessagesEnumType,
     NotFoundDialog,
-    NotFoundMessage
+    NotFoundMessage,
+    REDIS_DEFAULT_TTL,
+    REDIS_PROVIDER
 } from "src/common";
 import {
     CreateMessageDTO,
@@ -15,21 +18,32 @@ import {
     UpdateMessageDTO
 } from "./dto";
 import { MessagesService } from "./messages.service";
+import { RedisClientType } from "redis";
 
 @Controller()
 export class MessagesController {
-    constructor(private messagesService: MessagesService) {}
+    constructor(
+        @Inject(REDIS_PROVIDER) private redisService: RedisClientType,
+        private messagesService: MessagesService
+    ) {}
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.CREATE_MESSAGE)
     async createMessage(data: CreateMessageDTO): Promise<Messages> {
         if (!data.dialog_id) throw NotFoundDialog;
+
+        const msg = await this.messagesService.create(data)
+
+        await this.redisService.hSet(`dialog-${msg.dialog_id}:${msg.id}`, Object.entries(msg))
+        await this.redisService.expire(msg.id, REDIS_DEFAULT_TTL)
         
-        return await this.messagesService.create(data);
+        return msg;
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_DIALOG_MESSAGES)
     async getDialogMessages(data: GetDialogMessagesDTO): Promise<{messages: Messages[]}> {
         if (!data.dialog_id) throw NotFoundDialog;
+
+        const keys = this.redisService.keys(`dialog-${data.dialog_id}:*`)
 
         return {messages: await this.messagesService.find(
             { dialog_id: data.dialog_id },
@@ -39,7 +53,31 @@ export class MessagesController {
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_MESSAGE)
     async getMessage(data: GetMessageDTO): Promise<Messages> {
-        return await this.messagesService.findOne({id: data.id})
+        const cacheMsg = await this.redisService.hGetAll(data.id)
+
+        /**
+         * Если нашли такое же сообщение в кеше то отдаём его обратно пользоваетлю
+         */
+        if (cacheMsg.id) {
+            return <Messages>{
+                ...cacheMsg,
+                createdAt: Number(cacheMsg.createdAt),
+                attachment: Number(cacheMsg.attachment) 
+            } 
+        }
+        
+        /**
+         * Иначе же ищем это сообщение в бд
+         */
+        const msg = await this.messagesService.findOne({id: data.id})
+
+        /**
+         * Добавляем сообщение в кеш
+         */
+        await this.redisService.hSet(`dialog-${msg.dialog_id}:${msg.id}`, Object.entries(msg))
+        await this.redisService.expire(data.id, REDIS_DEFAULT_TTL)
+
+        return msg
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.UPDATE_MESSAGE)

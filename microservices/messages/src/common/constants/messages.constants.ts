@@ -8,10 +8,11 @@ export const MESSAGES_PROTO_PATH = path.join(
     "proto/messages.proto"
 );
 
-export const MYSQL_PASS = "root";
-export const MYSQL_USER = "root";
-export const MYSQL_PORT = 3306;
-export const MYSQL_HOST = "localhost";
+export const DB_TYPE = "postgres"
+export const POSTGRES_PASS = "postgres";
+export const POSTGRES_USER = "postgres";
+export const POSTGRES_PORT = 5432;
+export const POSTGRES_HOST = "127.0.0.1";
 
 export const DEFAULT_SKIP_MESSAGES = 0;
 export const DEFAULT_TAKE_MESSAGES = 20;

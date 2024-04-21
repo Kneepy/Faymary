@@ -2,28 +2,38 @@ import { MessagesController } from './messages.controller';
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
+    DB_TYPE,
     Messages,
     MODULE_PACKAGE_NAME,
-    MYSQL_HOST,
-    MYSQL_PASS,
-    MYSQL_PORT,
-    MYSQL_USER
+    POSTGRES_HOST,
+    POSTGRES_PASS,
+    POSTGRES_PORT,
+    POSTGRES_USER,
+    REDIS_PASS,
+    REDIS_URL,
+    REDIS_USER
 } from "./common";
 import { MessagesService } from "./messages.service";
+import { RedisModule } from './redis';
 
 @Module({
     imports: [
         TypeOrmModule.forRoot({
-            type: "mysql",
-            host: MYSQL_HOST,
-            port: MYSQL_PORT,
-            username: MYSQL_USER,
-            password: MYSQL_PASS,
+            type: DB_TYPE,
+            host: POSTGRES_HOST,
+            port: POSTGRES_PORT,
+            username: POSTGRES_USER,
+            password: POSTGRES_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [Messages],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([Messages])
+        TypeOrmModule.forFeature([Messages]),
+        RedisModule.forRoot({
+            url: REDIS_URL,
+            username: REDIS_USER,
+            password: REDIS_PASS,
+        })
     ],
     providers: [MessagesService],
     controllers: [MessagesController]
