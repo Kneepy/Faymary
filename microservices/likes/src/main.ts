@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
-import {MODULE_PACKAGE_NAME, DIALOG_PROTO_PATH, MODULE_HOST} from "./common";
+import {MODULE_PACKAGE_NAME, MODULE_HOST, LIKES_PROTO_PATH} from "./common";
 import {Logger} from "@nestjs/common"
 
 (async () => {
@@ -11,7 +11,7 @@ import {Logger} from "@nestjs/common"
             transport: Transport.GRPC,
             options: {
                 package: MODULE_PACKAGE_NAME,
-                protoPath: DIALOG_PROTO_PATH,
+                protoPath: LIKES_PROTO_PATH,
                 url: MODULE_HOST,
                 loader: {
                     keepCase: true

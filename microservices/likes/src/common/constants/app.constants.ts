@@ -4,7 +4,7 @@ import { LikeStateEnum } from "../enums/like-state.enum";
 export const MODULE_PORT = 5001;
 export const MODULE_PACKAGE_NAME = "likes";
 export const MODULE_HOST = `localhost:${MODULE_PORT}`;
-export const DIALOG_PROTO_PATH = path.join(
+export const LIKES_PROTO_PATH = path.join(
     process.cwd(),
     "proto/likes.proto"
 );
@@ -16,10 +16,12 @@ export const DEFAULT_LIKE_STATE = LikeStateEnum.ACTIVE;
 
 export const LIKES_SERVICE_NAME = "LikesService";
 
-export const MYSQL_PASS = "root";
-export const MYSQL_USER = "root";
-export const MYSQL_PORT = 3306;
-export const MYSQL_HOST = "localhost";
+export const DB = "likes"
+export const DB_TYPE = "postgres"
+export const DB_HOST = "127.0.0.1"
+export const DB_PORT = 5432
+export const DB_USERNAME = "postgres"
+export const DB_PASSWORD = "postgres"
 
 export enum  SERVICE_METHODS {
     ADD_LIKE = "AddLike",

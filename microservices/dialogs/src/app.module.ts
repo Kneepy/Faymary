@@ -1,14 +1,15 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
+    DB_TYPE,
     DialogHistory,
     DialogParticipants,
     Dialogs,
     MODULE_PACKAGE_NAME,
-    MYSQL_HOST,
-    MYSQL_PASS,
-    MYSQL_PORT,
-    MYSQL_USER,
+    POSTGRES_HOST,
+    POSTGRES_PASS,
+    POSTGRES_PORT,
+    POSTGRES_USER,
 } from "./common";
 import { DialogsController } from "./dialogs.controller";
 import { DialogsService } from "./dialogs.service";
@@ -16,11 +17,11 @@ import { DialogsService } from "./dialogs.service";
 @Module({
     imports: [
         TypeOrmModule.forRoot({
-            type: "mysql",
-            host: MYSQL_HOST,
-            port: MYSQL_PORT,
-            username: MYSQL_USER,
-            password: MYSQL_PASS,
+            type: DB_TYPE,
+            host: POSTGRES_HOST,
+            port: POSTGRES_PORT,
+            username: POSTGRES_USER,
+            password: POSTGRES_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [DialogHistory, Dialogs, DialogParticipants],
             synchronize: false

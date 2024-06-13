@@ -1,22 +1,22 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Sessions } from "./entities";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from '@nestjs/jwt';
-import { JWT_EXPIRES_IN_ACCESS, JWT_SECRET } from "./constants/session.constants";
+import { DB, DB_HOST, DB_PASSWORD, DB_PORT, DB_TYPE, DB_USERNAME, JWT_EXPIRES_IN_ACCESS, JWT_SECRET } from "./constants/session.constants";
 import { AuthService, SessionService } from "./services";
 
 @Module({
     imports: [
         TypeOrmModule.forRoot({
-            type: "mysql",
-            host: "localhost",
-            port: 3306,
-            username: "root",
-            password: "root",
-            database: "auth",
+            type: DB_TYPE,
+            host: DB_HOST,
+            port: DB_PORT,
+            username: DB_USERNAME,
+            password: DB_PASSWORD,
+            database: DB,
             entities: [Sessions],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Sessions]),
         JwtModule.register({

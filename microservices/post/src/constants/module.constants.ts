@@ -8,6 +8,13 @@ export const POST_PROTO_PATH = path.join(process.cwd(), "proto/post.proto")
 export const DEFAULT_TAKE_POSTS = 15;
 export const DEFAULT_SKIP_POSTS = 0;
 
+export const DB_TYPE = "postgres"
+export const DB_HOST = "127.0.0.1"
+export const DB_PORT = 5432
+export const DB_USERNAME = "postgres"
+export const DB_PASSWORD = "postgres"
+export const DB = "posts"
+
 export const MODULE_SERVICE_NAME = "PostService"
 export enum MODULE_SERVICE_METHODS {
     CREATE_POST = "CreatePost", 

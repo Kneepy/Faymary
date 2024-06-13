@@ -1,15 +1,23 @@
 version: '0.0'
 services:
-  main: 
-    container_name: user
+  postgres: 
+    container_name: postgres
+    environment:
+      PG_PASSWORD: root
+      PG_DATABASE: likes
+    image: postgres:latest
+    restart: always
+    volumes:
+      - db:/var/lib/postgres
+    ports:
+      - 3306:3306
+  likes: 
+    container_name: likes
     build: .
     ports:
-      - "8080:5555"
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: npm run start:dev
-    restart: always
-  mysql: 
-    container_name: mysql
-    image: mysql
+      - 5002:5002
+    command: npm run start:prod
+    depends_on:
+      - postgres
+volumes:
+  db:

@@ -33,7 +33,7 @@ export class MessagesController {
 
         const msg = await this.messagesService.create(data)
 
-        await this.redisService.hSet(`dialog-${msg.dialog_id}:${msg.id}`, Object.entries(msg))
+        await this.redisService.hSet(`new_message_dialog-${msg.dialog_id}:${msg.id}`, Object.entries(msg))
         await this.redisService.expire(msg.id, REDIS_DEFAULT_TTL)
         
         return msg;
@@ -43,8 +43,8 @@ export class MessagesController {
     async getDialogMessages(data: GetDialogMessagesDTO): Promise<{messages: Messages[]}> {
         if (!data.dialog_id) throw NotFoundDialog;
 
-        const keys = this.redisService.keys(`dialog-${data.dialog_id}:*`)
-
+        const keys = this.redisService.keys(`new_message_dialog-${data.dialog_id}:*`)
+        // щас на dialog сервисе нашаманю потом надо будет чисто через getMessage все сообщения отдавать
         return {messages: await this.messagesService.find(
             { dialog_id: data.dialog_id },
             { take: data.take, skip: data.skip }
@@ -74,8 +74,9 @@ export class MessagesController {
         /**
          * Добавляем сообщение в кеш
          */
-        await this.redisService.hSet(`dialog-${msg.dialog_id}:${msg.id}`, Object.entries(msg))
-        await this.redisService.expire(data.id, REDIS_DEFAULT_TTL)
+        const cacheMsgKey = `message:${msg.id}` 
+        await this.redisService.hSet(cacheMsgKey, Object.entries(msg))
+        await this.redisService.expire(cacheMsgKey, REDIS_DEFAULT_TTL)
 
         return msg
     }

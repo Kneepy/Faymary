@@ -11,10 +11,12 @@ export const DEFAULT_TAKE_COMMENTS = 10;
 export const DEFAULT_SKIP_COMMENTS = 0;
 export const DEFAULT_COMMENT_STATE = CommentStateEnum.ACTIVE;
 
-export const MYSQL_PASS = "root";
-export const MYSQL_USER = "root";
-export const MYSQL_PORT = 3306;
-export const MYSQL_HOST = "localhost";
+export const DB = "auth"
+export const DB_TYPE = "postgres"
+export const DB_HOST = "127.0.0.1"
+export const DB_PORT = 5432
+export const DB_USERNAME = "postgres"
+export const DB_PASSWORD = "postgres"
 
 export enum COMMENTS_SERVICE_METHODS {
     CREATE_COMMENT = "CreateComment",

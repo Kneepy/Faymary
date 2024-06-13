@@ -2,11 +2,12 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
     Comments,
+    DB_HOST,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_TYPE,
+    DB_USERNAME,
     MODULE_PACKAGE_NAME,
-    MYSQL_HOST,
-    MYSQL_PASS,
-    MYSQL_PORT,
-    MYSQL_USER,
 } from "./common";
 import {CommentsController} from "./controllers/comments.controller";
 import {CommentsService} from "./providers";
@@ -14,14 +15,14 @@ import {CommentsService} from "./providers";
 @Module({
     imports: [
         TypeOrmModule.forRoot({
-            type: "mysql",
-            host: MYSQL_HOST,
-            port: MYSQL_PORT,
-            username: MYSQL_USER,
-            password: MYSQL_PASS,
+            type: DB_TYPE,
+            host: DB_HOST,
+            port: DB_PORT,
+            username: DB_USERNAME,
+            password: DB_PASSWORD,
             database: MODULE_PACKAGE_NAME,
             entities: [Comments],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Comments])
     ],

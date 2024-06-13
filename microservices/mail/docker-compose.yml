@@ -4,15 +4,15 @@ services:
     container_name: postgres
     environment:
       PG_PASSWORD: root
-      PG_DATABASE: profiles
+      PG_DATABASE: access_codes
     image: postgres:latest
     restart: always
     volumes:
       - db:/var/lib/postgres
     ports:
       - 3306:3306
-  profiles: 
-    container_name: profiles
+  mail: 
+    container_name: mail
     build: .
     ports:
       - 5002:5002

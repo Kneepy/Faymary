@@ -26,7 +26,7 @@ import { RedisModule } from './redis';
             password: POSTGRES_PASS,
             database: MODULE_PACKAGE_NAME,
             entities: [Messages],
-            synchronize: true
+            synchronize: false
         }),
         TypeOrmModule.forFeature([Messages]),
         RedisModule.forRoot({
