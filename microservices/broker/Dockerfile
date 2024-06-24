@@ -1,15 +1,15 @@
-FROM node:lts
+FROM node:current-alpine3.19
 
-WORKDIR /broker
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm i
+RUN npm ci
 
-COPY . .
+COPY . . 
 
 RUN npm run build
 
-COPY ./dist ./dist
+EXPOSE 5000
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:pord"]

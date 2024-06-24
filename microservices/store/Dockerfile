@@ -1,13 +1,15 @@
-FROM node:12.13-alpine
+FROM node:current-alpine3.19
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm i
+RUN npm ci
 
 COPY . . 
 
-COPY ./dist ./dist
+RUN npm run build
 
-CMD ["npm", "run", "start:dev"]
+EXPOSE 5008
+
+CMD ["npm", "run", "start:pord"]

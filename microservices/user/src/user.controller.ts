@@ -1,5 +1,4 @@
-import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
-import { Controller } from "@nestjs/common";
+import { Controller, Get } from "@nestjs/common";
 import {GrpcMethod} from "@nestjs/microservices";
 import * as bcrypt from "bcryptjs"
 import {CreateUserDTO, FindFollowersDTO, FindUserDTO, FindUsersDTO, FollowUserDTO, UpdateUserDTO, UserIsFollowDTO, UsersIsFollowDTO} from "./dtos";
@@ -68,7 +67,7 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USER)
-    async findOne(data: FindUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<Users> {
+    async findOne(data: FindUserDTO): Promise<Users> {
         if(!Object.keys(data).length) throw IncorrectDataError
 
         return await this.userService.findOne(data) ?? {} as Users
@@ -99,7 +98,7 @@ export class UserController {
     }
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FOLLOW_USER)
-    async followUser(data: FollowUserDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<FollowUserInterface>  {
+    async followUser(data: FollowUserDTO): Promise<FollowUserInterface>  {
         if(data.author_id === data.user_id) throw IncorrectDataError
 
         const isFollow = await this.userService.findOne({id: data.author_id, followers: {id: data.user_id}})

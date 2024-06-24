@@ -16,7 +16,7 @@ import { AppModule } from "./user.module";
             }
         }
     })
-
+    
     await app.listen();
     Logger.log("User service successfully started")
 })()

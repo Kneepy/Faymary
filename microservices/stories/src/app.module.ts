@@ -17,12 +17,15 @@ import { StoriesService } from "./providers";
         TypeOrmModule.forRoot({
             type: DB_TYPE,
             host: DB_HOST,
-            port: DB_PORT,
+            port: (() => {
+                console.log(DB_PORT)
+                return DB_PORT
+            })(),
             username: DB_USERNAME,
             password: DB_PASSWORD,
             database: DB,
             entities: [Story, Mark],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Story, Mark])
     ],

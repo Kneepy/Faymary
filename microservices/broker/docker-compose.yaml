@@ -1,0 +1,10 @@
+version: '0.0'
+services:
+  broker: 
+    container_name: broker
+    build: .
+    ports:
+      - 5000:5000
+    command: npm run start:prod
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"

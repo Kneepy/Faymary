@@ -1,23 +1,36 @@
 version: '0.0'
 services:
-  postgres: 
-    container_name: postgres
+  profiles_db: 
     environment:
-      PG_PASSWORD: root
-      PG_DATABASE: profiles
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: profiles
     image: postgres:latest
     restart: always
     volumes:
-      - db:/var/lib/postgres
+      - profiles_db:/var/lib/postgres
     ports:
-      - 3306:3306
+      - 5442:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d profiles"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   profiles: 
-    container_name: profiles
     build: .
     ports:
-      - 5002:5002
+      - 5012:5012
     command: npm run start:prod
     depends_on:
-      - postgres
+      profiles_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: profiles
+      POSTGRES_HOST: profiles_db
+      POSTGRES_PORT: 5432
 volumes:
-  db:
+  profiles_db:

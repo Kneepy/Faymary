@@ -1,10 +1,15 @@
-# init project
-FROM node:lts
+FROM node:current-alpine3.19
 
-WORKDIR /user
+WORKDIR /app
+
 COPY package*.json ./
-RUN npm i
-COPY . .
+
+RUN npm ci
+
+COPY . . 
+
 RUN npm run build
-COPY ./dist ./dist
-CMD ["npm", "run", "start:prod"]
+
+EXPOSE 5002
+
+CMD ["npm", "run", "start:pord"]
