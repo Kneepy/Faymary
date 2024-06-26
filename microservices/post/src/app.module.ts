@@ -15,7 +15,7 @@ import { DB, DB_HOST, DB_PASSWORD, DB_PORT, DB_TYPE, DB_USERNAME } from "./const
             password: DB_PASSWORD,
             database: DB,
             entities: [Posts],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Posts])
     ],

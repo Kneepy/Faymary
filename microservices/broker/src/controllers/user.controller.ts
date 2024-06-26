@@ -34,12 +34,12 @@ export class UserController {
     @Put("login")
     @DisableAuth()
     async loginUser(@Body() data: LoginUserDTO): Promise<{user_id: string}> {
-        const isLogined = await this.userService.loginUser({email: data.email, password: data.password}).toPromise()
+        const isLogin = await this.userService.loginUser({email: data.email, password: data.password}).toPromise()
 
-        if(!isLogined.isLogined) throw IncorrectPasswordError
+        if(!isLogin.isLogined) throw IncorrectPasswordError
 
-        await this.mailService.sendAccessCode({user_id: isLogined.user.id, email: data.email}).toPromise()
-        return {user_id: isLogined.user.id}
+        await this.mailService.sendAccessCode({user_id: isLogin.user.id, email: data.email}).toPromise()
+        return {user_id: isLogin.user.id}
     }
 
     @Post("send-confirm-code")

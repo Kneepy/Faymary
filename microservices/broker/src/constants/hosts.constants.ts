@@ -1,0 +1,12 @@
+export const USER_MS_HOST = process.env.USERS_SERVICE_HOST;
+export const STORIES_MS_HOST = process.env.STORIES_SERVICE_HOST;
+export const STORE_MS_HOST = process.env.STORE_SERVICE_HOST;
+export const PROFILES_MS_HOST = process.env.PROFILES_SERVICE_HOST;
+export const POSTS_MS_HOST = process.env.POSTS_SERVICE_HOST;
+export const NOTIFICATIONS_MS_HOST = process.env.NOTIFICATIONS_SERVICE_HOST;
+export const MESSAGES_MS_HOST = process.env.MESSAGES_SERVICE_HOST;
+export const MAIL_MS_HOST = process.env.MAIL_SERVICE_HOST;
+export const LIKES_MS_HOST = process.env.LIKES_SERVICE_HOST;
+export const DIALOGS_MS_HOST = process.env.DIALOGS_SERVICE_HOST;
+export const COMMENTS_MS_HOST = process.env.COMMENTS_SERVICE_HOST;
+export const AUTH_MS_HOST = process.env.AUTH_SERVICE_HOST;

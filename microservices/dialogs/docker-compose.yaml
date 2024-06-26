@@ -17,6 +17,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - microservices
+      - dialogs_service
   dialogs: 
     container_name: dialogs
     build: .
@@ -34,5 +37,13 @@ services:
       POSTGRES_DB: dialogs
       POSTGRES_HOST: dialogs_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - dialogs_service
 volumes:
   dialogs_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  dialogs_service:

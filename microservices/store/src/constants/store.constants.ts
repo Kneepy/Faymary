@@ -5,6 +5,7 @@ export const MODULE_PORT = 5008
 export const MODULE_HOST = `[::]:${MODULE_PORT}`
 export const STORE_PROTO_PATH = join(process.cwd(), "proto/store.proto")
 
+export const STORE_PORT = 5014
 export const STORE_FOLDER = "files"
 export const STORE_FOLDER_PATH = join(process.cwd(), STORE_FOLDER)
 

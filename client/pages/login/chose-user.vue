@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROUTES } from '~~/assets/constants/routes.constants';
+import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({
     name: ROUTES.LOGIN_CHOSE_USER,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ServerError, UserAPI } from '~/api';
-import { ROUTES } from '~~/assets/constants/routes.constants';
+import { type ServerError, UserAPI } from "~/api";
+import { ROUTES } from '~/assets/constants/routes.constants';
 
 definePageMeta({
     name: ROUTES.LOGIN_INPUT_DATA,

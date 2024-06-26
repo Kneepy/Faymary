@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UserAPI } from '~/api/user';
-import { ROUTES } from '~~/assets/constants/routes.constants';
+import { ROUTES } from '~/assets/constants/routes.constants';
 
 definePageMeta({
     name: ROUTES.LOGIN_INPUT_EMAIL,

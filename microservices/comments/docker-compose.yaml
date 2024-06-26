@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - comments_service
   comments: 
     container_name: comments
     build: .
@@ -34,5 +36,13 @@ services:
       POSTGRES_DB: comments
       POSTGRES_HOST: comments_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - comments_service
 volumes:
   comments_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  comments_service:

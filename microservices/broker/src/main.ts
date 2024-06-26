@@ -8,6 +8,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import fastifyCookie from '@fastify/cookie';
 
 (async () => {
+    // проблема с докером в адаптаре фастифи
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
     app.useWebSocketAdapter(new WsAdapter(app));
@@ -33,7 +34,7 @@ import fastifyCookie from '@fastify/cookie';
      */
     app.enableCors({origin: "http://localhost:3000", credentials: true, exposedHeaders: ["authorization", "set-cookie"]});
 
-    await app.listen(APP_PORT);
+    await app.listen(APP_PORT, "0.0.0.0");
     Logger.log("Broker service successfully started")
 
     /**

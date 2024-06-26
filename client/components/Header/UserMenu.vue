@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROUTES } from '~~/assets/constants/routes.constants';
+import { ROUTES } from '~/assets/constants/routes.constants';
 
 const emit = defineEmits(["destroy", "change-account"])
 const userStore = useUserStore()
@@ -132,7 +132,7 @@ const changeAccount = () => {
             display: flex;
             align-items: center;
             &:hover {
-                background-color: $transperent_hover_content_background_1;
+                background-color: $transparent_hover_content_background_1;
             }
             &.logout {
                 color: $red;

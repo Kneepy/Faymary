@@ -26,7 +26,7 @@ import { RedisModule } from './redis';
             password: DB_PASSWORD,
             database: DB,
             entities: [Messages],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Messages]),
         RedisModule.forRoot({

@@ -22,7 +22,7 @@ import { NotificationController } from "./controllers";
             password: DB_PASSWORD,
             database: DB,
             entities: [Notifications],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Notifications])
     ],

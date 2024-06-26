@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - likes_service
   likes: 
     container_name: likes
     build: .
@@ -34,5 +36,13 @@ services:
       POSTGRES_DB: likes
       POSTGRES_HOST: likes_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - likes_service
 volumes:
   likes_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  likes_service:

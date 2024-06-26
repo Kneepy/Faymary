@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - microservices
   store: 
     container_name: store
     build: .
@@ -34,5 +36,13 @@ services:
       POSTGRES_DB: store
       POSTGRES_HOST: store_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - store_service
 volumes:
   store_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  store_service:

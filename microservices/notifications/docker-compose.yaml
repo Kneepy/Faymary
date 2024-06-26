@@ -1,6 +1,7 @@
 version: '0.0'
 services:
-  notifications_db: 
+  notifications_db:
+    container_name: notifications_db
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -16,7 +17,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  notifications: 
+    networks:
+      - notifications_service
+  notifications:
+    container_name: notifications
     build: .
     ports:
       - 5005:5005
@@ -32,5 +36,13 @@ services:
       POSTGRES_DB: notifications
       POSTGRES_HOST: notifications_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - notifications_service
 volumes:
   notifications_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  notifications_service:

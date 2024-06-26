@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - auth_service
   auth: 
     container_name: auth
     build: .
@@ -34,5 +36,13 @@ services:
       POSTGRES_DB: auth
       POSTGRES_HOST: auth_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - auth_service
 volumes:
   auth_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  auth_service:

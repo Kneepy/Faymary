@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { UserAPI } from '~/api';
-import { ROUTES } from '~~/assets/constants/routes.constants';
+import { ROUTES } from "~/assets/constants/routes.constants";
+import { UserAPI } from "~/api";
 
 definePageMeta({
     name: ROUTES.LOGIN_CONFIRM,
@@ -157,7 +157,7 @@ onMounted(() => {
             background-color: transparent;
             color: $white;
             &:hover {
-                background-color: $transperent_hover_background;
+                background-color: $transparent_hover_background;
             }
         }
     }

@@ -2,7 +2,7 @@
 import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({
-    requredAuth: false,
+    requiredAuth: false,
     layout: false
 })
 useHead({
@@ -10,6 +10,7 @@ useHead({
 })
 const appState = useAppStateStore()
 appState.authorization = useRoute().query.authorization as string
+
 const getBackPage = () => useRouter().go(-1)
 </script>
 
@@ -103,7 +104,7 @@ const getBackPage = () => useRouter().go(-1)
             &__footer__box {
                 span {
                     color: $gray;
-                    font-size: 32px;
+                    font-size: 27px;
                     font-weight: 300;
                     margin-right: 21px;
                 }
@@ -137,7 +138,7 @@ const getBackPage = () => useRouter().go(-1)
                     align-items: center;
                     justify-content: center;
                     &:hover {
-                        background-color: $transperent_hover_background;
+                        background-color: $transparent_hover_background;
                         transition: 100ms;
                     }
                     span {

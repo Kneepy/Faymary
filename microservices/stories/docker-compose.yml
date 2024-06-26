@@ -17,6 +17,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - stories_service
   stories: 
     container_name: stories
     build: .
@@ -34,5 +36,13 @@ services:
       POSTGRES_DB: stories
       POSTGRES_HOST: stories_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - stories_service
 volumes:
   stories_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  stories_service:

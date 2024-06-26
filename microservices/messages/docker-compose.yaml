@@ -1,6 +1,7 @@
 version: '0.0'
 services:
-  messages_db: 
+  messages_db:
+    container_name: messages_db
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -16,12 +17,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  cache_db: 
+    networks:
+      - messages_service
+  cache_db:
+    container_name: messages_cache_db
     image: redis:7.2.3-alpine
     restart: always
     ports:
       - 6374:6379
-  messages: 
+    networks:
+      - messages_service
+  messages:
+    container_name: messages
     build: .
     ports:
       - 5004:5004
@@ -39,5 +46,13 @@ services:
       POSTGRES_PORT: 5432
       REDIS_PORT: 6379
       REDIS_HOST: cache_db
+    networks:
+      - microservices
+      - messages_service
 volumes:
   messages_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  messages_service:

@@ -1,7 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { StoreModule } from "./store.module";
-import { MODULE_HOST, STORE_PACKAGE_NAME, STORE_PROTO_PATH } from "./constants/store.constants";
+import { MODULE_HOST, STORE_PACKAGE_NAME, STORE_PROTO_PATH, MODULE_PORT, STORE_PORT } from "./constants";
 import { Logger } from "@nestjs/common";
 import { middlware } from "./app.middleware";
 
@@ -22,7 +22,7 @@ import { middlware } from "./app.middleware";
         }
     })
     await app.startAllMicroservices();
-    await app.listen(5013, async () => Logger.log(`Serve start on: ${await app.getUrl()}`))
+    await app.listen(STORE_PORT, async () => Logger.log(`Serve start on: ${await app.getUrl()}`))
     
     Logger.log("Store service successfully started")
 })()

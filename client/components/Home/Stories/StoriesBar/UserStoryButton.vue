@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { User, Story } from '~/api';
+import { type User, type Story } from '~/api';
 
 const props = defineProps<{
     user: User

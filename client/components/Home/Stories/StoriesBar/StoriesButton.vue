@@ -28,7 +28,7 @@ const storyFile = useFile(props.fileId)
         position: absolute;
         width: 100%;
         height: 100%;
-        background-color: $transperent_hover_content_background;
+        background-color: $transparent_hover_content_background;
         transition: background-color 100ms ease-out;
         content: "";
     }
@@ -44,7 +44,7 @@ const storyFile = useFile(props.fileId)
     }
     &:hover {
         &::before {
-            background-color: $transperent_hover_content_background_2;
+            background-color: $transparent_hover_content_background_2;
             transition: background-color 100ms ease-out;
         }
         &::after {

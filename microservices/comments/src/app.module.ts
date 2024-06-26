@@ -22,7 +22,7 @@ import {CommentsService} from "./providers";
             password: DB_PASSWORD,
             database: MODULE_PACKAGE_NAME,
             entities: [Comments],
-            synchronize: false
+            synchronize: true
         }),
         TypeOrmModule.forFeature([Comments])
     ],

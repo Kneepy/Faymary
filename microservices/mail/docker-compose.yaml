@@ -1,38 +1,48 @@
 version: '0.0'
 services:
-  access_codes_db: 
-    container_name: access_codes_db
+  mail_db:
+    container_name: mail_db
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POSTGRES_DB: access_codes
+      POSTGRES_DB: mail
     image: postgres:latest
     restart: always
     volumes:
-      - access_codes_db:/var/lib/postgres
+      - mail_db:/var/lib/postgres
     ports:
       - 5441:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -q -U postgres -d access_codes"]
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d mail"]
       interval: 10s
       timeout: 5s
       retries: 5
-  access_codes: 
-    container_name: access_codes
+    networks:
+      - mail_service
+  mail:
+    container_name: mail
     build: .
     ports:
       - 5011:5011
     command: npm run start:prod
     depends_on:
-      access_codes_db:
+      mail_db:
         condition: service_healthy
     extra_hosts:
       - "docker.for.win.localhost:host-gateway"
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POSTGRES_DB: access_codes
-      POSTGRES_HOST: access_codes_db
+      POSTGRES_DB: mail
+      POSTGRES_HOST: mail_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - mail_service
 volumes:
-  access_codes_db:
+  mail_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  mail_service:

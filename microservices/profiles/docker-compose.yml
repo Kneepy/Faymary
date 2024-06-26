@@ -1,6 +1,7 @@
 version: '0.0'
 services:
-  profiles_db: 
+  profiles_db:
+    container_name: profiles_db
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -16,7 +17,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  profiles: 
+    networks:
+      - profiles_service
+  profiles:
+    container_name: profiles
     build: .
     ports:
       - 5012:5012
@@ -32,5 +36,13 @@ services:
       POSTGRES_DB: profiles
       POSTGRES_HOST: profiles_db
       POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - profiles_service
 volumes:
   profiles_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  profiles_service:

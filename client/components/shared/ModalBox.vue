@@ -17,7 +17,7 @@ const checkOutsideClick = (e) => e.target === sideBox.value && emit("onClose")
     position: fixed;
     width: 100%;
     height: 100%;
-    background-color: $transperent_hover_content_background;
+    background-color: $transparent_hover_content_background;
     display: flex;
     align-items: center;
     z-index: 1000;

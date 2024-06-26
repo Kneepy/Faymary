@@ -4,7 +4,6 @@
     </div>
 </template>
 <script setup lang="ts">
-import { StoriesAPI } from "~/api/stories";
 import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({
@@ -19,7 +18,6 @@ useHead({
 .home {
     display: flex;
     width: 900px;
-    margin: 0 auto;
-    margin-top: 15px;
+    margin: 15px auto 0;
 }
 </style>

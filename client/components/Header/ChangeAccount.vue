@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { UserAPI } from '~/api';
-import { Account } from '~~/store/types/user.type';
+import { type Account, UserAPI } from "~/api";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
