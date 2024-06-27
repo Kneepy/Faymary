@@ -6,6 +6,6 @@ export const ROUTES = {
     SETTINGS: "Settings",
     SUPPORT: "Support",
     STORIES: "Stories",
-    MESSAGES: "messages",
-    HOME: "Home"
+    MESSENGER: "messenger",
+    HOME: "Home",
 }

@@ -3,7 +3,7 @@ import { ROUTES } from '~/assets/constants/routes.constants';
 
 definePageMeta({
     name: ROUTES.SUPPORT,
-    requredAuth: true,
+    requiredAuth: true,
 })
 useHead({
     title: "Поддержка",

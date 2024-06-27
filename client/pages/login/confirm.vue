@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ROUTES } from "~/assets/constants/routes.constants";
 import { UserAPI } from "~/api";
+import { LAYOUTS } from "~/layouts/layouts.constants";
 
 definePageMeta({
     name: ROUTES.LOGIN_CONFIRM,
-    middleware: ["presence-email"]
+    middleware: ["presence-email"],
+    layout: LAYOUTS.EMPTY,
 })
 const userStore = useUserStore()
 const appState = useAppStateStore()

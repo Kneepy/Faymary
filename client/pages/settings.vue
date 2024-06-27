@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ROUTES } from '~/assets/constants/routes.constants';
 
 definePageMeta({
     name: ROUTES.SETTINGS,
-    requredAuth: true
+    requiredAuth: true
 })
 useHead({
     title: "Настройки",

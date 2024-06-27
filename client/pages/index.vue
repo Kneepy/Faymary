@@ -7,7 +7,7 @@
 import { ROUTES } from "~/assets/constants/routes.constants";
 
 definePageMeta({
-    requredAuth: true,
+    requiredAuth: true,
     name: ROUTES.HOME,
 })
 useHead({
