@@ -1,8 +1,8 @@
 import { UserAPI } from "~/api"
-import { ROUTES } from "~~/assets/constants/routes.constants"
+import { ROUTES } from "~/assets/constants/routes.constants"
 
 export default defineNuxtRouteMiddleware(route => {
-    if(route.meta.requredAuth) {
+    if(route.meta.requiredAuth) {
         const appStateStore = useAppStateStore()
         const userStore = useUserStore()
 

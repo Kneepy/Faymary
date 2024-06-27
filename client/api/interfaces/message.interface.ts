@@ -1,4 +1,4 @@
-import { AdditionsType } from "./additions.interface";
+import { AdditionsType } from "~/api";
 
 export interface Message {
     id: string;

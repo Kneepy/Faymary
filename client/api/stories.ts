@@ -1,4 +1,4 @@
-import { Story, UserStories } from "./interfaces"
+import type { Story, UserStories } from "./interfaces"
 
 export const StoriesAPI = {
     async getStory({id}: Pick<Story, "id">): Promise<Story> {

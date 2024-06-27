@@ -4,7 +4,7 @@ export default defineNuxtConfig({
             baseApiURL: "http://localhost:5000/",
             baseWsURL: "ws://localhost:5000",
             filesApiURL: "http://localhost:5013/",
-            sessionCookie: "refresh_token"
+            sessionCookie: "refresh_token",
         }
     },
     ssr: true,

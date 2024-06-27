@@ -1,4 +1,4 @@
-import { AuthTokens, Profile, User, UserId } from "./interfaces/user.interface";
+import type { AuthTokens, Profile, User, UserId } from "~/api/interfaces";
 
 export const UserAPI = {
     async getUserBy(data: Partial<Pick<User, "email" | "userName" | "id">>) {

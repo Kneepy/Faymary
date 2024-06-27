@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ROUTES } from "~/assets/constants/routes.constants";
-import { LAYOUTS } from "~/layouts/layouts.constants";
 
 definePageMeta({
     name: ROUTES.LOGIN_CHOSE_USER,
     middleware: ["presence-email"],
-    layout: LAYOUTS.EMPTY,
 })
 const { tempUser } = useUserStore()
 

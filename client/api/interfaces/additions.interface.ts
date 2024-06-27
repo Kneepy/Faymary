@@ -1,8 +1,4 @@
-import { Dialog } from "./dialog.interface"
-import { Message } from "./message.interface"
-import { Post } from "./post.interface"
-import { Story } from "./stories.interface"
-import { User } from "./user.interface"
+import type { Dialog, Post, Story, User, Message } from "~/api";
 
 export enum AdditionsType {
     USER = 0,

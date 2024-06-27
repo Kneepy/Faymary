@@ -9,6 +9,7 @@ export const useCustomFetch = <DataT>(
 ): Promise<DataT> => $fetch<DataT>(href, {
     async onRequest({ options }) {
         const appStateStore = useAppStateStore()
+        const appConfig = useRuntimeConfig()
 
         options.headers = {
             ...data.headers,
@@ -17,7 +18,7 @@ export const useCustomFetch = <DataT>(
         } as HeadersInit
         options.credentials = "include"
         options.mode = "cors"
-        options.baseURL = useRuntimeConfig().public.baseApiURL as string
+        options.baseURL = appConfig.public.baseApiURL
     },
     async onResponse({ response }) {
         /**
