@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { User } from "~/api/interfaces";
+import { type User } from "~/api/interfaces";
 
 interface UserStore {
     tempUser: Partial<User>

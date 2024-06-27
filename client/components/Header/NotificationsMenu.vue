@@ -2,10 +2,10 @@
 import { NotificationEnumType } from '~/api/interfaces';
 import { ROUTES } from '~/assets/constants/routes.constants';
 
-const notificationsStore = useNotificationStore()
 const emit = defineEmits(['close'])
 const closeEmit = () => emit("close")
 
+const notificationsStore = useNotificationStore()
 /** 
  * Этот компонент нужно доделывать когда считай весь проект уже будет сделан
  */

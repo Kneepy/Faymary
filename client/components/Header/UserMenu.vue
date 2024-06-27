@@ -14,7 +14,7 @@ const changeAccount = () => {
     <div class="user_menu">
         <div class="user_menu_container">
             <Button @click="closeMenu" class="user_menu_container__box">
-                <Avatar :href="userStore.me.file_id" :size=40 />
+                <Avatar :href="userStore.me.file_id" :size=40 :rounded=10 />
                 <div class="user_info">
                     <div class="name">{{ userStore.me.fullName }}</div>
                     <div class="id">@{{ userStore.me.userName }}</div>

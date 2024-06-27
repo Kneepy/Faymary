@@ -2,33 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ae536eaf-6f76-49e3-b17e-cf5316d5bb2a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/client/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/app.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/assets/scss/theme.scss" beforeDir="false" afterPath="$PROJECT_DIR$/client/assets/scss/theme.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/Header/ChangeAccount.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/Header/ChangeAccount.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/Header/NotificationsMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/Header/NotificationsMenu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/Header/UserMenu.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/Header/UserMenu.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/Home/Stories/StoriesBar/StoriesBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/Home/Stories/StoriesBar/StoriesBar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/Home/Stories/StoriesBar/StoriesButton.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/Home/Stories/StoriesBar/StoriesButton.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/shared/Logo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/shared/Logo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/components/shared/ModalBox.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/components/shared/ModalBox.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/nuxt.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/nuxt.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/login/chose-user.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/login/chose-user.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/login/confirm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/login/confirm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/login/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/login/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/login/input-data.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/login/input-data.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/settings.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/pages/support.vue" beforeDir="false" afterPath="$PROJECT_DIR$/client/pages/support.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservices/broker/src/constants/app.constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/microservices/broker/src/constants/app.constants.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservices/broker/src/controllers/user.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/microservices/broker/src/controllers/user.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservices/broker/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/microservices/broker/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservices/store/src/constants/store.constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/microservices/store/src/constants/store.constants.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/microservices/store/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/microservices/store/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,23 +12,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2iPz1xTkHTTEVP60ceQBddLuhnj" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "D:/Drafts/Faymary/microservices",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Drafts/Faymary&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -71,7 +45,12 @@
       <option name="presentableId" value="Default" />
       <updated>1719406789134</updated>
       <workItem from="1719406790227" duration="9000" />
+      <workItem from="1719413957606" duration="105000" />
+      <workItem from="1719462175874" duration="95000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
