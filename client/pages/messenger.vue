@@ -1,6 +1,9 @@
 <script setup lang="ts">
 
 import { ROUTES } from "~/assets/constants/routes.constants";
+import Settings from "~/pages/settings.vue";
+import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
+import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 
 definePageMeta({
     requiredAuth: false, // это только на время разработки, так должно быть true
@@ -11,12 +14,26 @@ useHead({
     title: "Сообщения"
 })
 
+const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci consequatur eligendi, id nobis repellat rerum sint tempore vitae. Beatae blanditiis ipsum molestiae! Corporis dolorum eos eveniet nemo porro quasi, vel."
 const cropMessage = (msg: string, maxLength: number) => {
     if (msg.length < maxLength) return msg
 
     return msg.slice(0, maxLength)+ "..."
 }
-const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci consequatur eligendi, id nobis repellat rerum sint tempore vitae. Beatae blanditiis ipsum molestiae! Corporis dolorum eos eveniet nemo porro quasi, vel."
+// функции для открытия списка избранных сообщений
+const isOpenImportantMsgModal = ref(false)
+const openImportantMsgModal = () => isOpenImportantMsgModal.value = true
+const closeImportantMsgModal = () => isOpenImportantMsgModal.value = false
+
+// функции для открытия настроек
+const isOpenSettingsModal = ref(false)
+const openSettingsModal = () => isOpenSettingsModal.value = true
+const closeSettingsModal = () => isOpenSettingsModal.value = false
+
+// функции для открытия списка заблокированных пользователей
+const isOpenBlockedUsersModal = ref(false)
+const openBlockedUsersModal = () => isOpenBlockedUsersModal.value = true
+const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
 </script>
 
 <template>
@@ -25,17 +42,27 @@ const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipi
             <div class="top-menu">
                 <div class="options">
                     <button>
-                        <span class="material-symbols-rounded">star</span>
-                    </button>
-                    <button>
-                        <span class="material-symbols-rounded">settings</span>
-                    </button>
-                    <button>
-                        <span class="material-symbols-rounded">block</span>
-                    </button>
-                    <button>
                         <span class="material-symbols-rounded">stylus</span>
                     </button>
+                    <button @click="openImportantMsgModal">
+                        <span class="material-symbols-rounded">star</span>
+                    </button>
+                    <button @click="openBlockedUsersModal">
+                        <span class="material-symbols-rounded">block</span>
+                    </button>
+                    <button @click="openSettingsModal">
+                        <span class="material-symbols-rounded">settings</span>
+                    </button>
+
+                    <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal">
+
+                    </ImportantMsgModal>
+                    <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal">
+
+                    </SettingsModal>
+                    <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal">
+
+                    </BlockedUsersModal>
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Найдите нужный вам диалог!">
@@ -126,7 +153,7 @@ const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipi
                     background-color: transparent;
                     border: none;
                     outline: none;
-                    top: 5px;
+                    top: 12px;
                     transition: 1.2s;
                     left: 13px;
                     width: fit-content;
