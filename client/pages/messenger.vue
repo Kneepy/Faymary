@@ -33,6 +33,9 @@ const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipi
                     <button>
                         <span class="material-symbols-rounded">block</span>
                     </button>
+                    <button>
+                        <span class="material-symbols-rounded">stylus</span>
+                    </button>
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Найдите нужный вам диалог!">
@@ -92,13 +95,26 @@ const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipi
                     flex: 1;
                     padding: 13px 20px 13px 46px;
                     background-color: $transparent_hover_background;
-                    color: $white;
+                    color: $gray;
                     border: 1px solid $primary_border;
+                    transition: 200ms;
                     &::placeholder {
                         font-size: 16px;
                         display: flex;
                         align-items: center;
                         color: $gray_1;
+                        transition: 200ms;
+                    }
+                }
+                &:hover {
+                    input {
+                        border-color: $border_1;
+                        transition: 200ms;
+                        color: $white;
+                        &::placeholder {
+                            color: $gray;
+                            transition: 200ms;
+                        }
                     }
                 }
                 &-btn {
@@ -110,9 +126,10 @@ const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipi
                     background-color: transparent;
                     border: none;
                     outline: none;
-                    top: 11px;
+                    top: 5px;
                     transition: 1.2s;
                     left: 13px;
+                    width: fit-content;
                     &:hover {
                         transform: rotate(90deg);
                         transition: 1.2s;
@@ -136,13 +153,22 @@ const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipi
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background-color: transparent;
+                    background-color: $transparent_button_hover_1;
                     border: none;
                     cursor: pointer;
                     padding: 5px;
-                    border-radius: 50%;
+                    border-radius: 15px;
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 10px;
+                    transition: 200ms;
                     &:hover {
-                        background-color: $transparent_button_hover_1;
+                        background-color: $transparent_button_hover;
+                        transform: scale(1.1);
+                        transition: 200ms;
+                        span {
+                            color: $gray;
+                        }
                     }
                     span {
                         color: $gray_1;
