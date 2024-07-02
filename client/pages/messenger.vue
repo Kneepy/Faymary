@@ -54,15 +54,9 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                         <span class="material-symbols-rounded">settings</span>
                     </button>
 
-                    <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal">
-
-                    </ImportantMsgModal>
-                    <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal">
-
-                    </SettingsModal>
-                    <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal">
-
-                    </BlockedUsersModal>
+                    <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal" />
+                    <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal" />
+                    <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal" />
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Найдите нужный вам диалог!">
