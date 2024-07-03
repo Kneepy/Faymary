@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import { ROUTES } from "~/assets/constants/routes.constants";
-import Settings from "~/pages/settings.vue";
 import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 
@@ -41,18 +40,25 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
         <div class="left-bar">
             <div class="top-menu">
                 <div class="options">
-                    <button>
-                        <span class="material-symbols-rounded">stylus</span>
-                    </button>
-                    <button @click="openImportantMsgModal">
-                        <span class="material-symbols-rounded">star</span>
-                    </button>
-                    <button @click="openBlockedUsersModal">
-                        <span class="material-symbols-rounded">block</span>
-                    </button>
-                    <button @click="openSettingsModal">
-                        <span class="material-symbols-rounded">settings</span>
-                    </button>
+                    <div class="left">
+                        <button>
+                            <span class="material-symbols-rounded">keyboard_backspace</span>
+                        </button>
+                    </div>
+                    <div class="right">
+                        <button>
+                            <span class="material-symbols-rounded">stylus</span>
+                        </button>
+                        <button @click="openImportantMsgModal">
+                            <span class="material-symbols-rounded">star</span>
+                        </button>
+                        <button @click="openBlockedUsersModal">
+                            <span class="material-symbols-rounded">block</span>
+                        </button>
+                        <button @click="openSettingsModal">
+                            <span class="material-symbols-rounded">settings</span>
+                        </button>
+                    </div>
 
                     <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal" />
                     <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal" />
@@ -168,8 +174,11 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
 
             .options {
                 display: flex;
-                justify-content: end;
+                justify-content: space-between;
                 margin-bottom: 10px;
+                .right, .left {
+                    display: flex;
+                }
                 button {
                     display: flex;
                     align-items: center;
@@ -196,7 +205,7 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                         font-size: 20px;
                         font-variation-settings:
                             'FILL' 1,
-                            'wght' 400,
+                            'wght' 700,
                             'GRAD' 0,
                             'opsz' 24
                         ;
