@@ -102,16 +102,16 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
     border: 1px solid $border_1;
     border-radius: 5px;
     padding: 5px 0;
-    margin-top: 100px; // это нужно убрать после того как закончу разработку чата
+    margin-top: 80px; // это нужно убрать после того как закончу разработку чата
 
     .left-bar {
         flex: 0.5;
         border-right: 1px solid $primary_border;
-        padding: 10px;
         display: flex;
         flex-direction: column;
-
+        padding-right: 5px;
         .top-menu {
+            padding: 10px 5px 0 10px;
             .search {
                 display: flex;
                 position: relative;
@@ -154,6 +154,7 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                     border: none;
                     outline: none;
                     top: 12px;
+                    padding: 0;
                     transition: 1.2s;
                     left: 13px;
                     width: fit-content;
@@ -198,10 +199,12 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                         transition: 200ms;
                         span {
                             color: $gray;
+                            transition: 200ms;
                         }
                     }
                     span {
                         color: $gray_1;
+                        transition: 200ms;
                         font-size: 20px;
                         font-variation-settings:
                             'FILL' 1,
@@ -214,6 +217,28 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
             }
         }
         .dialogs {
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 0 3px 0 10px;
+            &:hover {
+                overflow-y: auto;
+            }
+            &::-webkit-scrollbar {
+                width:  5px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background-color: $gray_1;
+                border-radius: 5px;
+                transition: 200ms;
+                &:hover {
+                    background-color: $gray;
+                    transition: 200ms;
+                }
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent;
+            }
             .dialog {
                 display: flex;
                 align-items: center;
