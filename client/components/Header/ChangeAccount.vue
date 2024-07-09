@@ -28,7 +28,7 @@ if(!userStore.me.profile?.accounts) {
             <div class="title">Сменить учётную запись</div>
             <div v-if="!!userStore.me.profile?.accounts" class="accounts">
                 <Button v-for="account in userStore.me.profile?.accounts" @click="changeAccount(account)" :key="account.id" class="account">
-                    <Avatar :href="account.user.file_id" :size=50 />
+                    <Avatar :href="account.user.file_id" :size=50 :user-name="account.user.fullName" />
                     <div class="user_info">
                         <div class="name">{{ account.user.fullName }}</div>
                         <div class="email">{{ account.user.email }}</div>

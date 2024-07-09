@@ -13,12 +13,18 @@ useHead({
     title: "Сообщения"
 })
 
+const messagesBoxRef = ref<HTMLBaseElement>()
+onMounted(() => {
+    messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
+})
+
 const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci consequatur eligendi, id nobis repellat rerum sint tempore vitae. Beatae blanditiis ipsum molestiae! Corporis dolorum eos eveniet nemo porro quasi, vel."
 const cropMessage = (msg: string, maxLength: number) => {
     if (msg.length < maxLength) return msg
 
     return msg.slice(0, maxLength)+ "..."
 }
+
 // функции для открытия списка избранных сообщений
 const isOpenImportantMsgModal = ref(false)
 const openImportantMsgModal = () => isOpenImportantMsgModal.value = true
@@ -33,6 +39,11 @@ const closeSettingsModal = () => isOpenSettingsModal.value = false
 const isOpenBlockedUsersModal = ref(false)
 const openBlockedUsersModal = () => isOpenBlockedUsersModal.value = true
 const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
+
+// функции для открытия информации о диалоге
+const isOpenDialogInfoModal = ref(false)
+const openDialogInfoModal = () => isOpenDialogInfoModal.value = true
+const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
 </script>
 
 <template>
@@ -59,10 +70,6 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                             <span class="material-symbols-rounded">settings</span>
                         </button>
                     </div>
-
-                    <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal" />
-                    <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal" />
-                    <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal" />
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Найдите нужный вам диалог!">
@@ -71,8 +78,8 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                     </button>
                 </div>
             </div>
-            <div class="dialogs">
-                <div class="dialog" v-for="i in Array(2)">
+            <div class="dialogs scroll">
+                <div class="dialog" v-for="i in Array(20)">
                     <Avatar :size=45 :user-name="`Ilya`" :href="`https://images.unsplash.com/photo-1719430074740-a5ee49a67d45?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`" />
                     <div class="dialog__info">
                         <div class="name">Ilya Famin</div>
@@ -80,7 +87,7 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                         <div class="last-message-time">16:27</div>
                     </div>
                 </div>
-                <div class="dialog" v-for="i in Array(2)">
+                <div class="dialog" v-for="i in Array(20)">
                     <Avatar :size=45 :user-name="`Ilya`" :href="`https://images.unsplash.com/photo-1719430074740-a5ee49a67d45?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`" />
                     <div class="dialog__info">
                         <div class="name">Alex Korf</div>
@@ -90,19 +97,65 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                 </div>
             </div>
         </div>
-        <div class="messages"></div>
+        <div class="right-bar">
+            <div class="top-box">
+                <div class="user-info" @click="openDialogInfoModal">
+                    <div class="user-name">Alex Korf</div>
+                    <div class="user-status">был(а) в сети 1 час назад</div>
+                </div>
+                <div class="dialog-options">
+                    <button>
+                        <span class="material-symbols-rounded">search</span>
+                    </button>
+                    <button>
+                        <span class="material-symbols-rounded">call</span>
+                    </button>
+                    <button>
+                        <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                </div>
+            </div>
+            <div class="wrapper">
+                <div class="messages scroll" ref="messagesBoxRef">
+                    <div v-for="(i, key) in Array(4)" :class="[`message`, key % 2 === 0 ? `interlocutor` : ``]">
+                        <Avatar v-if="key % 2 === 0" :size=18 :user-name="`Alex Korf`" class="avatar" />
+                        <div class="container">
+                            <span>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo id et felis. Aenean elementum egestas nunc eu iaculis. Vestibulum eget tincidunt nibh. Cras sit amet diam porta, vulputate nunc sed, ultrices elit. Ut eu commodo justo. Suspendisse tincidunt, ipsum vel pellentesque tincidunt, metus massa ullamcorper orci, sit amet ultrices lectus diam ac felis. Curabitur egestas varius massa, eget luctus sapien iaculis quis. Fusce volutpat neque fringilla, gravida odio imperdiet, malesuada diam. Phasellus consequat, elit et dictum mollis, turpis lorem convallis eros, sit amet varius nunc massa eget erat. Pellentesque et purus orci.
+                            </span>
+                            <div class="addition">
+                                <div class="reactions">
+                                    <div class="reaction noselect active">
+                                        ✌️ <span>200</span>
+                                    </div>
+                                    <div class="reaction noselect">
+                                        🍻 <span>652</span>
+                                    </div>
+                                </div>
+                                <div class="date">17:42</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal" />
+        <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal" />
+        <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal" />
+        <DialogInfoModal v-if="isOpenDialogInfoModal" @on-close="closeDialogInfoModal" />
     </div>
 </template>
 
 <style scoped lang="scss">
 .messenger {
     width: 1200px;
-    margin: 0 auto;
     display: flex;
     border: 1px solid $border_1;
     border-radius: 5px;
-    padding: 5px 0;
-    margin-top: 80px; // это нужно убрать после того как закончу разработку чата
+    padding: 0;
+    // это нужно убрать после того как закончу разработку чата
+    margin: 80px auto 0;
 
     .left-bar {
         flex: 0.5;
@@ -115,6 +168,17 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
             .search {
                 display: flex;
                 position: relative;
+                &:hover {
+                    input {
+                        border-color: $border_1;
+                        transition: 200ms;
+                        color: $white;
+                        &::placeholder {
+                            color: $gray;
+                            transition: 200ms;
+                        }
+                    }
+                }
                 input {
                     margin-bottom: 10px;
                     border-radius: 10px;
@@ -131,17 +195,6 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
                         align-items: center;
                         color: $gray_1;
                         transition: 200ms;
-                    }
-                }
-                &:hover {
-                    input {
-                        border-color: $border_1;
-                        transition: 200ms;
-                        color: $white;
-                        &::placeholder {
-                            color: $gray;
-                            transition: 200ms;
-                        }
                     }
                 }
                 &-btn {
@@ -220,25 +273,6 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
             max-height: 450px;
             overflow-y: auto;
             padding: 0 3px 0 10px;
-            &:hover {
-                overflow-y: auto;
-            }
-            &::-webkit-scrollbar {
-                width:  5px;
-            }
-            &::-webkit-scrollbar-thumb {
-                background-color: $gray_1;
-                border-radius: 5px;
-                transition: 200ms;
-                &:hover {
-                    background-color: $gray;
-                    transition: 200ms;
-                }
-            }
-
-            &::-webkit-scrollbar-track {
-                background: transparent;
-            }
             .dialog {
                 display: flex;
                 align-items: center;
@@ -290,8 +324,131 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
             }
         }
     }
-    .messages {
+    .right-bar {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        .top-box {
+            background-color: $transparent_hover_background;
+            display: flex;
+            justify-content: space-between;
+            .user-info {
+                flex: 1;
+                padding: 10px 30px;
+                cursor: pointer;
+                .user-name {
+                    color: $white;
+                    font-weight: 600;
+                    font-size: 16px;
+                }
+                .user-status {
+                    color: $gray;
+                    font-size: 14px;
+                }
+            }
+            .dialog-options {
+                display: flex;
+                align-items: center;
+                padding-right: 10px;
+                button {
+                    cursor: pointer;
+                    background-color: transparent;
+                    border: none;
+                    margin-right: 5px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: 200ms;
+                    border-radius: 15px;
+                    height: fit-content;
+                    padding: 9px;
+                    &:hover {
+                        background-color: $transparent_button_hover_17;
+                        transition: 200ms;
+                        span {
+                            color: $white_gray;
+                            transition: 200ms;
+                        }
+                    }
+                    span {
+                        color: $gray;
+                        font-size: 22px;
+                        font-variation-settings:
+                            'FILL' 1
+                    }
+                }
+            }
+        }
+        .wrapper {
+            padding-right: 5px;
+            .messages {
+                display: flex;
+                flex-direction: column;
+                padding: 0 10px;
+                max-height: 450px;
+                overflow-y: auto;
+                flex: 1;
+                padding-bottom: 20px; // убрать позже
+                .message {
+                    align-self: end;
+                    max-width: 80%;
+                    display: flex;
+                    margin-bottom: 20px;
+                    &:first-child {
+                        margin-top: 20px;
+                    }
+                    &.interlocutor {
+                        align-self: auto;
+                        .container {
+                            border-radius: 10px 10px 10px 0;
+                        }
+                    }
+                    .avatar {
+                        align-self: end;
+                        margin-right: 10px;
+                    }
+                    .container {
+                        color: $white;
+                        background-color: $message_background;
+                        width: fit-content;
+                        border-radius: 10px 10px 0 10px;
+                        padding: 10px 15px 5px;
+                        .addition {
+                            display: flex;
+                            justify-content: space-between;
+                            .reactions {
+                                display: flex;
+                                .reaction {
+                                    color: $gray;
+                                    cursor: pointer;
+                                    padding: 2px 5px;
+                                    background-color: $transparent_button_hover_17;
+                                    border-radius: 15px;
+                                    font-size: 16px;
+                                    margin-right: 5px;
+                                    margin-top: 5px;
+                                    &.active {
+                                        background-color: $gray_1;
+                                        color: $white;
+                                    }
+                                    span {
+                                        font-size: 13px;
+                                        font-weight: bold;
+                                        margin-right: 4px;
+                                    }
+                                }
+                            }
+                            .date {
+                                color: $gray;
+                                font-size: 12px;
+                                align-self: end;
+                                margin-left: 35px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 </style>
