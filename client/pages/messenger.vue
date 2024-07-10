@@ -120,6 +120,10 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                     <div v-for="(i, key) in Array(4)" :class="[`message`, key % 2 === 0 ? `interlocutor` : ``]">
                         <Avatar v-if="key % 2 === 0" :size=18 :user-name="`Alex Korf`" class="avatar" />
                         <div class="container">
+                            <span v-if="key % 2 === 0" class="user-name">Alex Korf</span>
+                            <div class="answer-message">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo...
+                            </div>
                             <span>
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo id et felis. Aenean elementum egestas nunc eu iaculis. Vestibulum eget tincidunt nibh. Cras sit amet diam porta, vulputate nunc sed, ultrices elit. Ut eu commodo justo. Suspendisse tincidunt, ipsum vel pellentesque tincidunt, metus massa ullamcorper orci, sit amet ultrices lectus diam ac felis. Curabitur egestas varius massa, eget luctus sapien iaculis quis. Fusce volutpat neque fringilla, gravida odio imperdiet, malesuada diam. Phasellus consequat, elit et dictum mollis, turpis lorem convallis eros, sit amet varius nunc massa eget erat. Pellentesque et purus orci.
                             </span>
@@ -137,6 +141,18 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="bottom-box">
+                <button>
+                    <span class="material-symbols-rounded" style="transform: rotate(30deg)">attach_file</span>
+                </button>
+                <input class="input-message" type="text" placeholder="Напишите что-нибудь!">
+                <button>
+                    <span class="material-symbols-rounded">family_star</span>
+                </button>
+                <button>
+                    <span class="material-symbols-rounded">play_arrow</span>
+                </button>
             </div>
         </div>
 
@@ -380,7 +396,7 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
             }
         }
         .wrapper {
-            padding-right: 5px;
+            padding: 5px 5px 5px 0px;
             .messages {
                 display: flex;
                 flex-direction: column;
@@ -411,8 +427,23 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                         color: $white;
                         background-color: $message_background;
                         width: fit-content;
+                        display: flex;
+                        flex-direction: column;
                         border-radius: 10px 10px 0 10px;
-                        padding: 10px 15px 5px;
+                        padding: 10px 20px 8px;
+                        .user-name {
+                            font-size: 16px;
+                            font-weight: bold;
+                            color: $white; // этот цвет должен выбираться в настройках мессенджера
+                        }
+                        .answer-message {
+                            margin: 10px;
+                            padding: 5px 20px;
+                            background-color: rgba(90, 90, 90, 0.2);
+                            border-radius: 5px;
+                            cursor: pointer;
+                            border-left: 6px solid $white; // этот цвет должен выбираться в настройках мессенджера
+                        }
                         .addition {
                             display: flex;
                             justify-content: space-between;
@@ -445,6 +476,63 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                                 margin-left: 35px;
                             }
                         }
+                    }
+                }
+            }
+        }
+        .bottom-box {
+            padding: 10px;
+            display: flex;
+            border-top: 1px solid $primary_border;
+            align-items: center;
+            button {
+                cursor: pointer;
+                background-color: $transparent_button_hover_1;
+                border: none;
+                margin: 0 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: 200ms;
+                flex: 0;
+                border-radius: 15px;
+                height: fit-content;
+                padding: 9px;
+                &:hover {
+                    background-color: $transparent_button_hover_17;
+                    transition: 200ms;
+                    span {
+                        color: $white_gray;
+                        transition: 200ms;
+                    }
+                }
+                span {
+                    color: $gray;
+                    font-size: 22px;
+                    transition: 200ms;
+                    font-variation-settings:
+                        'FILL' 1
+                }
+            }
+            input {
+                flex: 4;
+                background-color: $transparent_hover_background;
+                border-radius: 10px;
+                color: $white;
+                border: 1px solid $primary_border;
+                padding: 10px 20px;
+                transition: 200ms;
+                &::placeholder {
+                    color: $gray_1;
+                    transition: 200ms;
+                }
+                &:hover {
+                    border-color: $border_1;
+                    transition: 200ms;
+                    color: $white;
+                    &::placeholder {
+                        color: $gray;
+                        transition: 200ms;
                     }
                 }
             }
