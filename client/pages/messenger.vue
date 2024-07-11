@@ -45,18 +45,6 @@ const isOpenDialogInfoModal = ref(false)
 const openDialogInfoModal = () => isOpenDialogInfoModal.value = true
 const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
 
-const resizeInput = (e: Event) => {
-    const { offsetHeight, scrollHeight } = e.target
-    const paddingTop = getComputedStyle(<Element>e.target).getPropertyValue("padding-top").split("px")[0]
-    const paddingBottom = getComputedStyle(<Element>e.target).getPropertyValue("padding-bottom").split("px")[0]
-    const padding = Number(paddingTop) + Number(paddingBottom)
-
-    console.log(offsetHeight, scrollHeight)
-
-    if(offsetHeight !== scrollHeight) {
-        e.target.style.height = `${scrollHeight - padding}px`
-    }
-}
 </script>
 
 <template>
@@ -159,7 +147,7 @@ const resizeInput = (e: Event) => {
                 <button>
                     <span class="material-symbols-rounded" style="transform: rotate(30deg)">attach_file</span>
                 </button>
-                <textarea @input="resizeInput" class="input-message" placeholder="Напишите что-нибудь!"></textarea>
+                <TextareaAutosize class="scroll" placeholder="Напишите что-нибудь!"/>
                 <button>
                     <span class="material-symbols-rounded">family_star</span>
                 </button>
@@ -538,6 +526,7 @@ const resizeInput = (e: Event) => {
                 resize: none;
                 overflow: hidden;
                 height: 18px;
+                max-height: 450px;
                 &::placeholder {
                     color: $gray_1;
                     transition: 200ms;
