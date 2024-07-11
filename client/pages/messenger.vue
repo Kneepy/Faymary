@@ -44,6 +44,19 @@ const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
 const isOpenDialogInfoModal = ref(false)
 const openDialogInfoModal = () => isOpenDialogInfoModal.value = true
 const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
+
+const resizeInput = (e: Event) => {
+    const { offsetHeight, scrollHeight } = e.target
+    const paddingTop = getComputedStyle(<Element>e.target).getPropertyValue("padding-top").split("px")[0]
+    const paddingBottom = getComputedStyle(<Element>e.target).getPropertyValue("padding-bottom").split("px")[0]
+    const padding = Number(paddingTop) + Number(paddingBottom)
+
+    console.log(offsetHeight, scrollHeight)
+
+    if(offsetHeight !== scrollHeight) {
+        e.target.style.height = `${scrollHeight - padding}px`
+    }
+}
 </script>
 
 <template>
@@ -146,7 +159,7 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                 <button>
                     <span class="material-symbols-rounded" style="transform: rotate(30deg)">attach_file</span>
                 </button>
-                <input class="input-message" type="text" placeholder="Напишите что-нибудь!">
+                <textarea @input="resizeInput" class="input-message" placeholder="Напишите что-нибудь!"></textarea>
                 <button>
                     <span class="material-symbols-rounded">family_star</span>
                 </button>
@@ -430,7 +443,7 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                         display: flex;
                         flex-direction: column;
                         border-radius: 10px 10px 0 10px;
-                        padding: 10px 20px 8px;
+                        padding: 10px 15px 8px;
                         .user-name {
                             font-size: 16px;
                             font-weight: bold;
@@ -514,19 +527,25 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                         'FILL' 1
                 }
             }
-            input {
+            textarea {
                 flex: 4;
                 background-color: $transparent_hover_background;
                 border-radius: 10px;
-                color: $white;
+                color: $gray;
                 border: 1px solid $primary_border;
                 padding: 10px 20px;
                 transition: 200ms;
+                resize: none;
+                overflow: hidden;
+                height: 18px;
                 &::placeholder {
                     color: $gray_1;
                     transition: 200ms;
                 }
-                &:hover {
+                &:focus {
+                    outline: none;
+                }
+                &:hover, &:focus {
                     border-color: $border_1;
                     transition: 200ms;
                     color: $white;
