@@ -20,6 +20,8 @@ const props = defineProps<{
 
 const config = useRuntimeConfig()
 const img = computed(() => props.href ? (!!props.href?.split("http")[1] ? props.href : config.public.filesApiURL + props.href) : null)
+
+const fontScale = computed(() => props.size / 2)
 </script>
 
 <template>
@@ -36,7 +38,12 @@ const img = computed(() => props.href ? (!!props.href?.split("http")[1] ? props.
     <div
         v-else
         class="avatar empty noselect"
-        :style="{ borderRadius: !!props.rounded ? props.rounded + `px` : `50%` }"
+        :style="{
+            width: props.size + `px`,
+            height: props.size + `px`,
+            borderRadius: !!props.rounded ? props.rounded + `px` : `50%`,
+            fontSize: fontScale + `px`
+        }"
     >{{ props.userName[0] }}</div>
 </template>
 
@@ -54,8 +61,8 @@ const img = computed(() => props.href ? (!!props.href?.split("http")[1] ? props.
         align-items: center;
         justify-content: center;
         color: $black;
-        font-size: 20px;
         user-select: none;
+        font-weight: 500;
     }
 }
 </style>

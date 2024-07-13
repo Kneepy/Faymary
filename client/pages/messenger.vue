@@ -3,6 +3,7 @@
 import { ROUTES } from "~/assets/constants/routes.constants";
 import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
+import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 
 definePageMeta({
     requiredAuth: false, // это только на время разработки, так должно быть true
@@ -45,6 +46,11 @@ const isOpenDialogInfoModal = ref(false)
 const openDialogInfoModal = () => isOpenDialogInfoModal.value = true
 const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
 
+// функции для открытия информации о диалоге
+const isOpenCreateDialogModal = ref(false)
+const openCreateDialogModal = () => isOpenCreateDialogModal.value = true
+const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
+
 </script>
 
 <template>
@@ -58,7 +64,7 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
                         </button>
                     </div>
                     <div class="right">
-                        <button>
+                        <button @click="openCreateDialogModal">
                             <span class="material-symbols-rounded">stylus</span>
                         </button>
                         <button @click="openImportantMsgModal">
@@ -161,6 +167,7 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
         <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal" />
         <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal" />
         <DialogInfoModal v-if="isOpenDialogInfoModal" @on-close="closeDialogInfoModal" />
+        <CreateDialogModal v-if="isOpenCreateDialogModal" @on-close="closeCreateDialogModal" />
     </div>
 </template>
 
@@ -172,7 +179,8 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
     border-radius: 5px;
     padding: 0;
     // это нужно убрать после того как закончу разработку чата
-    margin: 80px auto 0;
+    margin: 40px auto 0;
+    height: 605px; // эту тему нужно будет менять
 
     .left-bar {
         flex: 0.5;
@@ -287,7 +295,6 @@ const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
             }
         }
         .dialogs {
-            max-height: 450px;
             overflow-y: auto;
             padding: 0 3px 0 10px;
             .dialog {
