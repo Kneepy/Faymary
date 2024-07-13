@@ -14,18 +14,27 @@ const toggleSelectItem = (key: number): void => {
 
     selectedUsers.value.splice(indexItem, 1)
 }
+
+const isOpenSelectedUsersPanel = ref(true)
+const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
 </script>
 
 <template>
     <ModalBox @on-close="close">
         <div class="create-dialog">
-            <div class="title">Создание диалога</div>
+            <div class="header">
+                <div class="title">Создание диалога</div>
+                <button @click="close">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
             <div class="search-users">
                 <input placeholder="Найдите новых собеседников!" type="text">
             </div>
             <div class="result-search scroll">
+                <div v-if="false" class="none">Мы не неашли пользователя с таким именем</div>
                 <div
-                    v-for="(i, key) in Array(20)"
+                    v-for="(i, key) in Array(10)"
                     @click="() => toggleSelectItem(key)"
                     :key="key"
                     :class="[`user`, checkIsSelectItem(key) ? `active` : ``]"
@@ -40,17 +49,37 @@ const toggleSelectItem = (key: number): void => {
                     <span v-if="checkIsSelectItem(key)" class="material-symbols-rounded">check</span>
                 </div>
             </div>
-            <div v-if="!!selectedUsers.length" class="selected-users">
-                <div class="title">Выбранные пользователи</div>
-                <div class="users scroll">
-                    <div
-                        class="user"
-                        v-for="(i, key) in selectedUsers"
-                        @click="toggleSelectItem(i)"
-                    >
-                        <Avatar :size=20 :user-name="`Alex Korf`" />
-                        <div class="user-name">Alex Korf</div>
+
+            <div v-if="!!selectedUsers.length" class="selected-users noselect">
+                <div class="title" @click="toggleSelectedUsersPanel">
+                    Выбранные пользователи
+                    <button :class="[isOpenSelectedUsersPanel ? `open` : `close`]">
+                        <span class="material-symbols-rounded">chevron_right</span>
+                    </button>
+                </div>
+                <Transition name="folding">
+                    <div v-if="isOpenSelectedUsersPanel" class="users scroll">
+                        <div
+                            class="user"
+                            v-for="(i, key) in selectedUsers"
+                            @click="toggleSelectItem(i)"
+                        >
+                            <Avatar :size=20 :user-name="`Alex Korf`" />
+                            <div class="user-name">Alex Korf</div>
+                        </div>
                     </div>
+                </Transition>
+                <div class="input-message">
+                    <button>
+                        <span class="material-symbols-rounded" style="transform: rotate(30deg)">attach_file</span>
+                    </button>
+                    <TextareaAutosize class="scroll" placeholder="Напишите своим новым собеседникам!" :max-height=350 />
+                    <button>
+                        <span class="material-symbols-rounded">family_star</span>
+                    </button>
+                    <button>
+                        <span class="material-symbols-rounded">play_arrow</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -60,24 +89,53 @@ const toggleSelectItem = (key: number): void => {
 <style scoped lang="scss">
 .create-dialog {
     width: 520px;
-    height: 600px;
+    max-height: 820px;
+    min-height: 200px;
     background-color: $primary_content_background;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     border: 1px solid $border_1;
-    padding: 0 5px 5px 5px;
-    .title {
-        padding: 20px 40px;
-        color: $white;
-        font-weight: bold;
-        font-size: 18px;
+    padding: 0 5px 0 5px;
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 40px;
+        .title {
+            color: $white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: none;
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 200ms;
+            &:hover {
+                background-color: $transparent_button_hover_17;
+                transition: 200ms;
+                span {
+                    color: $white;
+                    transition: 200ms;
+                }
+            }
+            span {
+                color: $gray;
+                font-weight: 500;
+                transition: 200ms;
+            }
+        }
     }
     .search-users {
         display: flex;
         border-bottom: 1px solid $primary_border;
         border-top: 1px solid $primary_border;
-        margin-bottom: 10px;
         input {
             border: none;
             flex: 1;
@@ -85,12 +143,30 @@ const toggleSelectItem = (key: number): void => {
             padding: 15px 40px;
             font-size: 14px;
             background-color: transparent;
+            &::placeholder {
+                transition: 200ms;
+            }
+            &:hover {
+                &::placeholder {
+                    color: $gray;
+                    transition: 200ms;
+                }
+            }
         }
     }
     .result-search {
         padding: 10px;
         flex: 1;
         overflow-y: auto;
+        .none {
+            color: $gray_1;
+            font-size: 14px;
+            height: 100%;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .user {
             display: flex;
             color: $white;
@@ -118,7 +194,7 @@ const toggleSelectItem = (key: number): void => {
                 .user-name {
                     margin-left: 15px;
                     font-weight: bold;
-                    font-size: 18px;
+                    font-size: 16px;
                     .user-id {
                         font-size: 14px;
                         font-weight: 600;
@@ -133,16 +209,45 @@ const toggleSelectItem = (key: number): void => {
         .title {
             padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: $white;
+            button {
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 30px;
+                background-color: transparent;
+                cursor: pointer;
+                transition: 100ms;
+                &.open {
+                    transform: rotate(90deg);
+                    transition: 100ms;
+                }
+                &.close {
+                    transform: rotate(0deg);
+                    transition: 100ms;
+                }
+                span {
+                    font-weight: bold;
+                    font-size: 20px;
+                    color: $white;
+                }
+            }
         }
         .users {
             display: flex;
             max-height: 80px;
             flex-wrap: wrap;
             overflow: auto;
+            padding: 0 10px;
             .user {
                 display: flex;
                 color: $white;
-                padding: 5px 10px;
+                padding: 5px 10px 5px 5px;
                 cursor: pointer;
                 background-color: $transparent_panel_hover;
                 align-items: center;
@@ -160,6 +265,63 @@ const toggleSelectItem = (key: number): void => {
                 .user-name {
                     margin-left: 5px;
                 }
+            }
+        }
+        .input-message {
+            flex: 1;
+            display: flex;
+            padding: 10px 20px;
+            button {
+                background-color: transparent;
+                outline: none;
+                border: none;
+                padding: 9px;
+                height: fit-content;
+                cursor: pointer;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:hover {
+                    background-color: $transparent_button_hover_1;
+                }
+                &:last-child {
+                    margin-left: 5px;
+                }
+                span {
+                    font-variation-settings: "FILL" 1;
+                    color: $gray;
+                }
+            }
+            textarea {
+                flex: 1;
+                background-color: transparent;
+                border: none;
+                padding: 10px 20px;
+                color: $white;
+                border-radius: 10px;
+                font-size: 16px;
+                resize: none;
+                max-height: 350px;
+                &:focus {
+                    border: none;
+                    outline: none;
+                }
+            }
+        }
+        .folding-enter-active {
+            animation: folding 200ms;
+        }
+        .folding-leave-active {
+            animation: folding 200ms reverse;
+        }
+        @keyframes folding {
+            0% {
+                max-height: 0;
+                overflow: hidden;
+            }
+            100% {
+                overflow: hidden;
             }
         }
     }
