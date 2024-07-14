@@ -21,7 +21,7 @@ if(!notificationsStore.notifications.length) {
         </div>
         <div class="notifications__menu__container">
             <Button v-for="notification in notificationsStore.notifications" class="notification">
-                <Avatar :size=45 :href="notification.from.file_id" />
+                <Avatar :size=45 :user-name="notification.from.fullName" :href="notification.from.file_id" />
                 <div class="notification__info">
                     <div v-if="notification.notification_type === NotificationEnumType.SUB_USER"  class="subscribe">
                         Пользователь @{{ notification.from.userName }} подписался на вас

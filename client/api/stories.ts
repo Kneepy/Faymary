@@ -7,9 +7,6 @@ export const StoriesAPI = {
     async getCollectionStories({take, skip}): Promise<UserStories[]> {
         return await useCustomFetch<UserStories[]>("/story/me-collection", {method: "GET", query: {take, skip}})
     },
-    async test() {
-        return await useCustomFetch<any>("/user/test", {})
-    },
     async publishedStories(): Promise<any> {
         /*this.createOptions.canvases.forEach(async canvas => {
             const blob = base64ToBlob(canvas.current)

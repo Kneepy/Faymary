@@ -3,14 +3,14 @@ import { type User, type Story } from '~/api';
 
 const props = defineProps<{
     user: User
-    firstStory: Story
+    firstStory: Story | undefined
 }>()
 </script>
 <template>
     <StoriesButton :file-id="props.firstStory.file_id" class="user-story-bth">
         <div class="author">
             <div class="border">
-                <Avatar class="user-avatar" :size=30 :href="props.user.file_id" />  
+                <Avatar class="user-avatar" :size=30 :user-name="props.user.fullName" :href="props.user.file_id" />
             </div>
             <span>{{ props.user.fullName }}</span>
         </div>

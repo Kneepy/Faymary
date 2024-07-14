@@ -8,14 +8,12 @@ export interface FindUserDTO {
     id: string
 }
 
-export class FindUsersDTO implements Partial<Omit<Users, "email" | "id">>, Pick<FindManyOptions, "take" | "skip"> {
+export class FindUsersDTO implements Partial<Omit<Users, "email" | "id" | "state" | "password">>, Pick<FindManyOptions, "take" | "skip"> {
     fullName?: string
     userName?: string
-    password?: string
     file_id?: string
     followers?: Users[]
     subscriptions?: Users[]
-    state?: UserState
     take?: number
     skip?: number
 }

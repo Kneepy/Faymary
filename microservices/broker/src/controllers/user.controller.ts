@@ -13,7 +13,21 @@ import {
 } from "@nestjs/common";
 import {AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
-import {CreateUserDTO, FindFollowersDTO, FindUserDTO, LoginUserDTO, UpdateUserDTO, User, UserIsFollowDTO, UsersIsFollowResult, Users, UserServiceClient, UsersIsFollowDTO, UserState} from "src/proto/user";
+import {
+    CreateUserDTO,
+    FindFollowersDTO,
+    FindUserDTO,
+    LoginUserDTO,
+    UpdateUserDTO,
+    User,
+    UserIsFollowDTO,
+    UsersIsFollowResult,
+    Users,
+    UserServiceClient,
+    UsersIsFollowDTO,
+    UserState,
+    FindUsersDTO
+} from "src/proto/user";
 import { ICustomRequest } from "src/types/request.type";
 import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
@@ -173,6 +187,12 @@ export class UserController {
     @DisableAuth()
     async getUser(@Query() query: FindUserDTO): Promise<User> {
         return await this.userService.findUser(query).toPromise()
+    }
+
+    @Get("/many")
+    @DisableAuth()
+    async getUsers(@Query() query: FindUsersDTO): Promise<Users> {
+        return await this.userService.findUsers(query).toPromise()
     }
 
     @Get("/followers")

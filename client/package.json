@@ -3,7 +3,7 @@
   "name": "client",
   "scripts": {
     "build": "nuxt build",
-    "start:dev": "nuxt dev",
+    "start:dev": "nuxt dev --port 3000",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

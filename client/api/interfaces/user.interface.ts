@@ -12,6 +12,10 @@ export interface User {
     password: string
     profile: Profile
 }
+// эта тема так выглядит на беке чтобы отправлять данные между микросервисами
+export interface Users {
+    users: User[]
+}
 
 export interface Profile {
     commentsNotification: boolean

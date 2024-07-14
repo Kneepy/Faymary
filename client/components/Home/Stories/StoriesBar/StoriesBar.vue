@@ -7,7 +7,9 @@ const openCreateStoryModal = ref(false)
 
 const toggleCreateStoryModal = () => openCreateStoryModal.value = !openCreateStoryModal.value
 
-storiesStore.stories = await StoriesAPI.getCollectionStories({take: 10, skip: 0})
+onMounted(async () => {
+    storiesStore.stories = await StoriesAPI.getCollectionStories({take: 10, skip: 0}) ?? []
+})
 </script>
 <template>
     <div class="stories-bar">
@@ -18,10 +20,10 @@ storiesStore.stories = await StoriesAPI.getCollectionStories({take: 10, skip: 0}
                     <CreateStoryModal v-if="openCreateStoryModal" @onClose="toggleCreateStoryModal" />
 
                     <UserStoryButton
-                        v-for="story in storiesStore.stories" 
-                        :key="story.user.id" 
-                        :user="story.user" 
-                        :first-story="story.stories[0]" 
+                        v-for="story in storiesStore.stories"
+                        :key="story.user.id"
+                        :user="story.user"
+                        :first-story="story.stories[0]"
                         :style="{transform: `translateX(${shift}px)`}"
                     />
                 </div>

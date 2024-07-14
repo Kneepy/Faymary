@@ -22,6 +22,7 @@ const config = useRuntimeConfig()
 const img = computed(() => props.href ? (!!props.href?.split("http")[1] ? props.href : config.public.filesApiURL + props.href) : null)
 
 const fontScale = computed(() => props.size / 2)
+const firstSymbolName = computed(() => !!props.userName && props.userName[0])
 </script>
 
 <template>
@@ -44,7 +45,7 @@ const fontScale = computed(() => props.size / 2)
             borderRadius: !!props.rounded ? props.rounded + `px` : `50%`,
             fontSize: fontScale + `px`
         }"
-    >{{ props.userName[0] }}</div>
+    >{{ firstSymbolName }}</div>
 </template>
 
 <style scoped lang="scss">

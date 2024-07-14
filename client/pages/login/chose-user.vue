@@ -18,7 +18,7 @@ const untieEmail = () => {
             <span>Если это так то войдите в него</span>
         </div>
         <Button :disabled="false" class="user">
-            <Avatar :size=50 :href="tempUser.file_id" />
+            <Avatar :user-name="tempUser.fullName" :size=50 :href="tempUser.file_id" />
             <div class="user__info">
                 <div class="user__info__name">{{ tempUser.fullName }}</div>
                 <div class="user__info__id">@{{ tempUser.userName }}</div>
@@ -66,8 +66,12 @@ const untieEmail = () => {
             opacity: 1;
         }
         &__info {
-            margin-left: 10px;
+            margin-left: 20px;
+            display: flex;
             font-size: 16px;
+            flex-direction: column;
+            align-items: start;
+            justify-content: center;
             color: $white;
             &__name {
                 font-weight: 500;

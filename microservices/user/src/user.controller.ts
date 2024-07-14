@@ -6,8 +6,15 @@ import { Users } from "./entities";
 import { USER_SERVICE, USER_SERVICE_METHODS} from "./constants/user.constants";
 import { UserService } from "./user.service";
 import { IncorrectEmailError, ShortPasswordError, UserAlredyExist, UserIdNotFound, UserEmailNotFound, IncorrectDataError } from "./constants";
-import { UserIsFollowInterface, UsersIsFollowsInterface, UserIsLoginedInterface, FollowUserInterface } from "./interfaces";
+import {
+    UserIsFollowInterface,
+    UsersIsFollowsInterface,
+    UserIsLoginedInterface,
+    FollowUserInterface,
+    FindUsers
+} from "./interfaces";
 import { LoginUserDTO } from "./dtos/login-user.dto";
+import { FindOptionsWhere, ILike } from "typeorm";
 
 type RepeatedUsers = {users: Users[]}
 
@@ -53,7 +60,19 @@ export class UserController {
 
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_USERS)
     async find({take, skip, ...data}: FindUsersDTO): Promise<RepeatedUsers> {
-        return {users: await this.userService.find(data, {take, skip})}
+        const findCriteria: FindOptionsWhere<FindUsers> = data
+
+        // эту тему можно укоротить, но пока таких штук всего 2 смысла нет как мне кажется
+        if (data.fullName) {
+            findCriteria.fullName = ILike(`%${data.fullName}%`)
+        }
+        if (data.userName) {
+            findCriteria.userName = ILike(`%${data.userName}%`)
+        }
+
+        return {
+            users: await this.userService.find(findCriteria, {take, skip})
+        }
     }
     
     @GrpcMethod(USER_SERVICE, USER_SERVICE_METHODS.FIND_FOLLOWERS)

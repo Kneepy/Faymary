@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { type User, UserAPI } from "~/api";
+
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
@@ -17,6 +19,17 @@ const toggleSelectItem = (key: number): void => {
 
 const isOpenSelectedUsersPanel = ref(true)
 const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
+
+/**
+ * Реализация поиска пользователей
+ * Которые будут участвовать в новом диалоге
+ */
+const inputValue = ref("")
+const resultSearch = ref<User[]>([])
+watch(inputValue, async value => {
+    const users = await UserAPI.getUsersBy({fullName: value})
+    resultSearch.value = [...users]
+})
 </script>
 
 <template>
@@ -29,21 +42,21 @@ const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenS
                 </button>
             </div>
             <div class="search-users">
-                <input placeholder="Найдите новых собеседников!" type="text">
+                <input v-model="inputValue" placeholder="Найдите новых собеседников!" type="text">
             </div>
             <div class="result-search scroll">
-                <div v-if="false" class="none">Мы не неашли пользователя с таким именем</div>
+                <div v-if="resultSearch.length <= 0" class="none">Мы не неашли пользователя с таким именем</div>
                 <div
-                    v-for="(i, key) in Array(10)"
+                    v-for="(user, key) in resultSearch"
                     @click="() => toggleSelectItem(key)"
                     :key="key"
                     :class="[`user`, checkIsSelectItem(key) ? `active` : ``]"
                 >
                     <div class="user-info">
-                        <Avatar :size=40 :user-name="`Alex Korf`" />
+                        <Avatar :size=40 :user-name="user.fullName" :href="user.file_id" />
                         <div class="user-name">
-                            Alex Korf
-                            <div class="user-id">@Kneepy</div>
+                            {{ user.fullName }}
+                            <div class="user-id">@{{ user.userName }}</div>
                         </div>
                     </div>
                     <span v-if="checkIsSelectItem(key)" class="material-symbols-rounded">check</span>
@@ -117,6 +130,7 @@ const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenS
             border-radius: 10px;
             cursor: pointer;
             transition: 200ms;
+            flex: 0;
             &:hover {
                 background-color: $transparent_button_hover_17;
                 transition: 200ms;
@@ -223,6 +237,7 @@ const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenS
                 background-color: transparent;
                 cursor: pointer;
                 transition: 100ms;
+                flex: 0;
                 &.open {
                     transform: rotate(90deg);
                     transition: 100ms;
@@ -282,6 +297,7 @@ const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenS
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                flex: 0;
                 &:hover {
                     background-color: $transparent_button_hover_1;
                 }

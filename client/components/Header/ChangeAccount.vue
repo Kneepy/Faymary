@@ -18,9 +18,11 @@ const changeAccount = async (account: Account) => {
     }
 }
 
-if(!userStore.me.profile?.accounts) {
-    userStore.me.profile = await UserAPI.getMeProfile()
-}
+onMounted(async () => {
+    if(!userStore.me.profile?.accounts) {
+        userStore.me.profile = await UserAPI.getMeProfile()
+    }
+})
 </script>
 <template>
     <ModalBox @onClose="close">
