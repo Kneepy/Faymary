@@ -26,9 +26,19 @@ const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenS
  */
 const inputValue = ref("")
 const resultSearch = ref<User[]>([])
+const isLoading = ref(false)
+let debounceTimeout = null
+
 watch(inputValue, async value => {
-    const users = await UserAPI.getUsersBy({fullName: value})
-    resultSearch.value = [...users]
+    isLoading.value = true
+
+    clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(() => {
+        const users = [] //await UserAPI.getUsersBy({fullName: value})
+        resultSearch.value = [...users]
+
+        isLoading.value = false
+    }, 500)
 })
 </script>
 
@@ -45,7 +55,9 @@ watch(inputValue, async value => {
                 <input v-model="inputValue" placeholder="Найдите новых собеседников!" type="text">
             </div>
             <div class="result-search scroll">
-                <div v-if="resultSearch.length <= 0" class="none">Мы не неашли пользователя с таким именем</div>
+                <div v-if="resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
+                <Loader v-if="isLoading" />
+                <SkeletonLoader />
                 <div
                     v-for="(user, key) in resultSearch"
                     @click="() => toggleSelectItem(key)"
@@ -102,8 +114,8 @@ watch(inputValue, async value => {
 <style scoped lang="scss">
 .create-dialog {
     width: 520px;
-    max-height: 820px;
-    min-height: 200px;
+    max-height: 90vh;
+    min-height: 30vh;
     background-color: $primary_content_background;
     border-radius: 10px;
     display: flex;
@@ -172,6 +184,9 @@ watch(inputValue, async value => {
         padding: 10px;
         flex: 1;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
         .none {
             color: $gray_1;
             font-size: 14px;
