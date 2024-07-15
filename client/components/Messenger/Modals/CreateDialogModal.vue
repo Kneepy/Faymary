@@ -4,19 +4,6 @@ import { type User, UserAPI } from "~/api";
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
-const selectedUsers = ref<number[]>([])
-const checkIsSelectItem = (key: number): boolean => selectedUsers.value.indexOf(key) !== -1
-const toggleSelectItem = (key: number): void => {
-    const indexItem = selectedUsers.value.indexOf(key)
-
-    if (indexItem === -1) {
-        selectedUsers.value.push(key)
-        return
-    }
-
-    selectedUsers.value.splice(indexItem, 1)
-}
-
 const isOpenSelectedUsersPanel = ref(true)
 const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
 
@@ -32,6 +19,7 @@ let debounceTimeout = null
 watch(inputValue, async value => {
     isLoading.value = true
 
+    // таймаут нужен чтобы оптимизировать работу живого поиска
     clearTimeout(debounceTimeout)
     debounceTimeout = setTimeout(() => {
         const users = [] //await UserAPI.getUsersBy({fullName: value})
@@ -40,6 +28,22 @@ watch(inputValue, async value => {
         isLoading.value = false
     }, 500)
 })
+
+/**
+ * Выбор пользователей из результатов поиска
+ */
+const selectedUsers = ref<User[]>([])
+const checkUserIsSelected = (user: User): boolean => selectedUsers.value.indexOf(user) !== -1
+const toggleSelectUser = (user: User): void => {
+    const indexItem = selectedUsers.value.indexOf(user)
+
+    if (indexItem === -1) {
+        selectedUsers.value.push(user)
+        return
+    }
+
+    selectedUsers.value.splice(indexItem, 1)
+}
 </script>
 
 <template>
@@ -57,12 +61,11 @@ watch(inputValue, async value => {
             <div class="result-search scroll">
                 <div v-if="resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
                 <Loader v-if="isLoading" />
-                <SkeletonLoader />
                 <div
                     v-for="(user, key) in resultSearch"
-                    @click="() => toggleSelectItem(key)"
+                    @click="() => toggleSelectUser(user)"
                     :key="key"
-                    :class="[`user`, checkIsSelectItem(key) ? `active` : ``]"
+                    :class="[`user`, checkUserIsSelected(user) ? `active` : ``]"
                 >
                     <div class="user-info">
                         <Avatar :size=40 :user-name="user.fullName" :href="user.file_id" />
@@ -71,7 +74,7 @@ watch(inputValue, async value => {
                             <div class="user-id">@{{ user.userName }}</div>
                         </div>
                     </div>
-                    <span v-if="checkIsSelectItem(key)" class="material-symbols-rounded">check</span>
+                    <span v-if="checkUserIsSelected(user)" class="material-symbols-rounded">check</span>
                 </div>
             </div>
 
@@ -86,11 +89,12 @@ watch(inputValue, async value => {
                     <div v-if="isOpenSelectedUsersPanel" class="users scroll">
                         <div
                             class="user"
-                            v-for="(i, key) in selectedUsers"
-                            @click="toggleSelectItem(i)"
+                            v-for="(user, key) in selectedUsers"
+                            :key="key"
+                            @click="toggleSelectUser(user)"
                         >
-                            <Avatar :size=20 :user-name="`Alex Korf`" />
-                            <div class="user-name">Alex Korf</div>
+                            <Avatar :size=20 :user-name="user.fullName" :href="user.file_id" />
+                            <div class="user-name">{{ user.fullName }}</div>
                         </div>
                     </div>
                 </Transition>
