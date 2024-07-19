@@ -60,7 +60,10 @@ const toggleSelectUser = (user: User): void => {
             </div>
             <div class="result-search scroll">
                 <div v-if="resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
-                <Loader v-if="isLoading" />
+                <SkeletonLoader
+                    v-if="isLoading"
+                    :count=2
+                />
                 <div
                     v-for="(user, key) in resultSearch"
                     @click="() => toggleSelectUser(user)"
