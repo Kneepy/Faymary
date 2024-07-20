@@ -1,4 +1,4 @@
-export enum MessagesEnumType {
+export enum AttachmentType {
     USER = 0,
     STORY = 1,
     POST = 2,

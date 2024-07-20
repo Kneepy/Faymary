@@ -17,7 +17,7 @@ export namespace BrokerResponse {
     export interface DialogHistory extends BaseDialogHistory {
         attachments?: Addition
     }
-    export interface Message extends BaseMessage {
+    export interface Message extends Omit<BaseMessage, "attachments"> {
         attachments: Addition
         user: User
     }

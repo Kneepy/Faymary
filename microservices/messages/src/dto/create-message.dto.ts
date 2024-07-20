@@ -1,7 +1,7 @@
-import { Messages, MessagesEnumType } from "src/common";
+import { Messages, AttachmentType, Attachments } from "src/common";
 
 export class CreateMessageDTO implements Omit<Messages, "id" | "createdAt"> {
-    attachment: MessagesEnumType;
+    attachments: Attachments[];
     dialog_id!: string;
     item_id: string;
     msg: string;

@@ -23,8 +23,8 @@ export class MessagesService {
         return await this.repository.save({ ...args, createdAt: Date.now() });
     }
 
-    async findOne(args: MessageFindOneInterface): Promise<Messages> {
-        return await this.repository.findOne({ where: args });
+    async findOne(args: MessageFindOneInterface, otherOpt?: Omit<FindManyOptions<Messages>, "where">): Promise<Messages> {
+        return await this.repository.findOne({ where: args, ...otherOpt });
     }
 
     async find(

@@ -8,7 +8,7 @@ const close = () => emit("onClose")
         <div class="dialog-info">
             <div class="header">
                 <div class="title">Информация о пользователе</div>
-                <button>
+                <button @click="close">
                     <span class="material-symbols-rounded">close</span>
                 </button>
             </div>

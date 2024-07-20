@@ -54,8 +54,8 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     this.notificationsService.createNotification({...data, to_id: null}).subscribe({
                         next: notification => {
                             forkJoin({
-                                parent: this.utilsService.getItem<any>(notification.parent_type, notification.parent_id).data,
-                                item: this.utilsService.getItem<any>(notification.type, notification.item_id).data,
+                                parent: this.utilsService.getItem(<any>notification.parent_type, notification.parent_id).data,
+                                item: this.utilsService.getItem(<any>notification.type, notification.item_id).data,
                                 to: this.userService.findUser({id: notification.to_id}),
                                 from: this.userService.findUser({id: notification.from_id})
                             }).subscribe({
@@ -79,7 +79,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
              * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
             */
             if (data.parent_type in NotificationAdditionsEnumType && data.parent_id && !data.to_id) {
-                const parent = this.utilsService.getItem(data.parent_type, data.parent_id)
+                const parent = this.utilsService.getItem(<any>data.parent_type, data.parent_id)
 
                 parent.data.subscribe({
                     next: item => subjectNotification.next(parent.key === Fields.USER ? item.id : item.user_id),
@@ -94,13 +94,17 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     /*
-        эта штука зменяет нам return из функции т.к пользователь может быть подлюченн к сокетам с разных устройст и об изменениях на одном устройстве должны знать сразу все устройства пользователя
+    * эта штука зменяет нам return из функции т.к пользователь может быть подлюченн к сокетам с разных устройст
+    * и об изменениях на одном устройстве должны знать сразу все устройства пользователя
     */
-    async broadcastUser<T>(user_id: string, data: WsResponse<T>): Promise<boolean> {
+    broadcastUser<T>(user_id: string, data: WsResponse<T>): boolean {
         const wsSessions = this.users.get(user_id)
 
         if (!wsSessions) return false
-        wsSessions.forEach(socket => socket.send(JSON.stringify(data)))
+
+        wsSessions.forEach(socket =>
+            socket.send(JSON.stringify(data))
+        )
 
         return true
     }

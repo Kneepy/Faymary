@@ -5,7 +5,7 @@ import {
     Messages,
     MESSAGES_SERVICE_METHODS,
     MESSAGES_SERVICE_NAME,
-    MessagesEnumType,
+    AttachmentType,
     NotFoundDialog,
     NotFoundMessage,
     REDIS_DEFAULT_TTL,
@@ -47,7 +47,7 @@ export class MessagesController {
         // щас на dialog сервисе нашаманю потом надо будет чисто через getMessage все сообщения отдавать
         return {messages: await this.messagesService.find(
             { dialog_id: data.dialog_id },
-            { take: data.take, skip: data.skip }
+            { take: data.take, skip: data.skip, relations: {attachments: true} }
         )}
     }
 
@@ -62,14 +62,13 @@ export class MessagesController {
             return <Messages>{
                 ...cacheMsg,
                 createdAt: Number(cacheMsg.createdAt),
-                attachment: Number(cacheMsg.attachment) 
-            } 
+            }
         }
         
         /**
          * Иначе же ищем это сообщение в бд
          */
-        const msg = await this.messagesService.findOne({id: data.id})
+        const msg = await this.messagesService.findOne({id: data.id}, {relations: {attachments: true}})
 
         /**
          * Добавляем сообщение в кеш

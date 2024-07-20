@@ -1,16 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { MessagesEnumType } from "../enums";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Attachments } from "./attachments.entity";
 
 @Entity()
 export class Messages {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({nullable: true})
-    attachment: MessagesEnumType;
-
-    @Column({nullable: true})
-    item_id: string;
+    @OneToMany(() => Attachments, (attachments: Attachments) => attachments.message, {cascade: true})
+    attachments: Attachments[];
 
     @Column()
     dialog_id: string;

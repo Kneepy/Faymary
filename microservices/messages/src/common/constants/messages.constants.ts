@@ -18,7 +18,7 @@ export const DB = process.env.POSTGRES_DB
 export const DEFAULT_SKIP_MESSAGES = 0;
 export const DEFAULT_TAKE_MESSAGES = 20;
 
-export const MESSAGES_SERVICE_NAME = "MessagesSerivce";
+export const MESSAGES_SERVICE_NAME = "MessagesService";
 export enum MESSAGES_SERVICE_METHODS {
     CREATE_MESSAGE = "CreateMessage",
     GET_DIALOG_MESSAGES = "GetDialogMessages",

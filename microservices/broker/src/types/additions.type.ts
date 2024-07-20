@@ -1,5 +1,5 @@
 import { Dialog } from "src/proto/dialogs"
-import { Message } from "src/proto/messages"
+import {Attachment, Message} from "src/proto/messages"
 import { Post } from "src/proto/post"
 import { Story } from "src/proto/stories"
 import { User } from "src/proto/user"
@@ -11,7 +11,7 @@ export enum AdditionsType {
     COMMENT = 3,
     MESSAGE = 4,
     DIALOG = 5,
-    LIKE = 6,
+    FILE = 7
 }
 
 export enum Fields {
@@ -20,15 +20,18 @@ export enum Fields {
     DIALOG = "dialog",
     MESSAGE = "message",
     STORY = "story",
-    POST = "post"
+    POST = "post",
+    FILE = "file",
+    LIKE = "like"
 }
 
 export interface Addition {
-    [Fields.USER]?: User
-    [Fields.POST]?: Post
-    [Fields.COMMENT]?: Comment
-    [Fields.STORY]?: Story
-    [Fields.MESSAGE]?: Message
-    [Fields.DIALOG]?: Dialog
-    [key: string]: any
+    [Fields.USER]?: User | User[]
+    [Fields.POST]?: Post | Post[]
+    [Fields.COMMENT]?: Comment | Comment[]
+    [Fields.STORY]?: Story | Story[]
+    [Fields.MESSAGE]?: Message | Message[]
+    [Fields.DIALOG]?: Dialog | Dialog[]
+    [Fields.FILE]?: { id: string } | { id: string }[]
+    [key: string]: any | any[]
 }
