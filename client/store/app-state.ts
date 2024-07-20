@@ -9,3 +9,9 @@ export const useAppStateStore = defineStore("app-state", {
         authorization: "",
     })
 })
+
+export const useTestStore = defineStore("test-store", {
+    state: () => ({
+        tmp: ""
+    })
+})

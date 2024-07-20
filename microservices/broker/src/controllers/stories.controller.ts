@@ -18,9 +18,11 @@ export class StoriesController {
     @Post()
     async createStory(@Req() req: ICustomRequest, @Body() data: Omit<CreateStoryDTO, "user_id">): Promise<Story> {
         if(data.marks.length) {
-            data.marks.forEach(async mark => {
-                if(!(await this.utilsService.getItem(mark.type, mark.item_id).data.toPromise())) throw new NotFoundException()
-            })
+            for (const mark of data.marks) {
+
+                if(!(await this.utilsService.getItem(<any>mark.type, mark.item_id).data.toPromise())) throw new NotFoundException()
+
+            }
         }
 
         return await this.storiesService.createStory({...data, user_id: req.user_id}).toPromise()
@@ -64,7 +66,7 @@ export class StoriesController {
             ...story,
             marks: await Promise.all(
                 story.marks.map(async (mark): Promise<BrokerResponse.StoryMark> => {
-                    const attachment = this.utilsService.getItem(mark.type, mark.item_id)
+                    const attachment = this.utilsService.getItem(<any>mark.type, mark.item_id)
                     
                     return {...mark, attachment: {[attachment.key]: await attachment.data.toPromise()}}
                 })

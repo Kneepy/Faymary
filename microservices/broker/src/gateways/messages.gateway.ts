@@ -121,8 +121,9 @@ export class MessagesGateway {
 
     @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.DELETE)
     async deleteMessage(@MessageBody() {id}: Omit<DeleteMessageDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
-   
-        this.messagesService.deleteMessage({user_id: client.user_id, id}).subscribe({
+        const deletedMessage = this.messagesService.deleteMessage({user_id: client.user_id, id})
+
+        deletedMessage.subscribe({
             next: message => this.dialogsService.getDialog({id: message.dialog_id}).subscribe({
                 next: dialog => dialog.participants.forEach(async participant => 
                     this.serverGateway.broadcastUser<Message>(participant.user_id, {

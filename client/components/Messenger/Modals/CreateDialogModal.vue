@@ -1,29 +1,28 @@
 <script setup lang="ts">
 import { type User, UserAPI } from "~/api";
+import { useCreateDialogStore } from "~/store/messenger/create-dialog";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
-const isOpenSelectedUsersPanel = ref(true)
-const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
+const createDialogStore = useCreateDialogStore()
 
 /**
  * Реализация поиска пользователей
  * Которые будут участвовать в новом диалоге
  */
-const inputValue = ref("")
-const resultSearch = ref<User[]>([])
 const isLoading = ref(false)
 let debounceTimeout = null
 
-watch(inputValue, async value => {
+watch(() => createDialogStore.inputSearch, async value => {
     isLoading.value = true
 
     // таймаут нужен чтобы оптимизировать работу живого поиска
     clearTimeout(debounceTimeout)
     debounceTimeout = setTimeout(async () => {
-        resultSearch.value = await UserAPI.getUsersBy({ fullName: value })
+        const users = await UserAPI.getUsersBy({ fullName: value })
 
+        createDialogStore.setResultSearch(users)
         isLoading.value = false
     }, 500)
 })
@@ -31,17 +30,22 @@ watch(inputValue, async value => {
 /**
  * Выбор пользователей из результатов поиска
  */
-const selectedUsers = ref<User[]>([])
-const checkUserIsSelected = (user: User): boolean => selectedUsers.value.indexOf(user) !== -1
+// панелька показывающая выбранных пользователей
+const isOpenSelectedUsersPanel = ref(true)
+const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
+
+// сами выбранные пользователи
+const checkUserIsSelected = (user: User): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
 const toggleSelectUser = (user: User): void => {
-    const indexItem = selectedUsers.value.indexOf(user)
+    const indexItem = createDialogStore.selectedUsers.indexOf(user)
 
     if (indexItem === -1) {
-        selectedUsers.value.push(user)
+        createDialogStore.selectUser(user)
+
         return
     }
 
-    selectedUsers.value.splice(indexItem, 1)
+    createDialogStore.removeUserByIndex(indexItem)
 }
 </script>
 
@@ -55,16 +59,16 @@ const toggleSelectUser = (user: User): void => {
                 </button>
             </div>
             <div class="search-users">
-                <input v-model="inputValue" placeholder="Найдите новых собеседников!" type="text">
+                <input v-model="createDialogStore.inputSearch" placeholder="Найдите новых собеседников!" type="text">
             </div>
             <div class="result-search scroll">
-                <div v-if="resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
+                <div v-if="createDialogStore.resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
                 <SkeletonLoader
                     v-if="isLoading"
                     :count=2
                 />
                 <div
-                    v-for="(user, key) in resultSearch"
+                    v-for="(user, key) in createDialogStore.resultSearch"
                     @click="() => toggleSelectUser(user)"
                     :key="key"
                     :class="[`user`, checkUserIsSelected(user) ? `active` : ``]"
@@ -81,7 +85,7 @@ const toggleSelectUser = (user: User): void => {
                 </div>
             </div>
 
-            <div v-if="!!selectedUsers.length" class="selected-users noselect">
+            <div v-if="!!createDialogStore.selectedUsers.length" class="selected-users noselect">
                 <div class="title" @click="toggleSelectedUsersPanel">
                     Выбранные пользователи
                     <button :class="[isOpenSelectedUsersPanel ? `open` : `close`]">
@@ -92,7 +96,7 @@ const toggleSelectUser = (user: User): void => {
                     <div v-if="isOpenSelectedUsersPanel" class="users scroll">
                         <div
                             class="user"
-                            v-for="(user, key) in selectedUsers"
+                            v-for="(user, key) in createDialogStore.selectedUsers"
                             :key="key"
                             @click="toggleSelectUser(user)"
                         >

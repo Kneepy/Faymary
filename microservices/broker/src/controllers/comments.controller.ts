@@ -26,7 +26,7 @@ export class CommentsController {
         const comments = (await this.commentsService.getComments(query).toPromise()).comments
 
         return Promise.all(comments.map(async comment => {
-            const item = this.utilsService.getItem(comment.type, comment.id)
+            const item = this.utilsService.getItem(<any>comment.type, comment.id)
             const user = await this.userService.findUser({id: comment.user_id}).toPromise()
 
             return {...comment, attachments: {[item.key]: await item.data.toPromise()}, user}
@@ -37,7 +37,7 @@ export class CommentsController {
     @DisableAuth()
     async getComment(@Query() query: GetCommentDTO): Promise<BrokerResponse.Comment> {
         const comment = await this.commentsService.getComment(query).toPromise()
-        const item = this.utilsService.getItem(comment.type, comment.id)
+        const item = this.utilsService.getItem(<any>comment.type, comment.id)
         const user = await this.userService.findUser({id: comment.user_id}).toPromise()
 
         return {...comment, attachments: {[item.key]: await item.data.toPromise()}, user}

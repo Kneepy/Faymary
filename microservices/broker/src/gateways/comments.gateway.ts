@@ -39,7 +39,7 @@ export class CommentsGateway {
                     notification_type: NotificationEnumType.ADD_COMMENT
                 })
 
-                const attachments = this.utilsService.getItem(comment.type, comment.item_id)
+                const attachments = this.utilsService.getItem(<any>comment.type, comment.item_id)
                 
                 forkJoin({
                     attach: attachments.data,
@@ -60,7 +60,7 @@ export class CommentsGateway {
              * Ну тут мне кажется что обновлённый комментарий нужно возвращать только отправителю
              */
             next: comment => {
-                const attachments = this.utilsService.getItem(comment.type, comment.item_id)
+                const attachments = this.utilsService.getItem(<any>comment.type, comment.item_id)
             
                 forkJoin({
                     attach: attachments.data,

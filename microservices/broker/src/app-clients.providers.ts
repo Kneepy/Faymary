@@ -13,7 +13,7 @@ import { CommentsServiceClient } from "./proto/comments";
 import { DialogsServiceClient } from "./proto/dialogs";
 import {LikesServiceClient} from "./proto/likes";
 import { MailServiceClient } from "./proto/mail";
-import { MessagesSerivceClient } from "./proto/messages";
+import { MessagesServiceClient } from "./proto/messages";
 import { NotificationsServiceClient } from "./proto/notification";
 import { PostServiceClient } from "./proto/post";
 import { ProfilesServiceClient } from "./proto/profiles";
@@ -43,7 +43,7 @@ export const PostClientDependency = GetClientOptionsByConfig(POST_MODULE_CONFIG)
 export const NotificationsClient = GetClientProvider<NotificationsServiceClient>(NOTIFICATIONS_MODULE_CONFIG)
 export const NotificationsClientDependency = GetClientOptionsByConfig(NOTIFICATIONS_MODULE_CONFIG)
 
-export const MessagesClient = GetClientProvider<MessagesSerivceClient>(MESSAGES_MODULE_CONFIG)
+export const MessagesClient = GetClientProvider<MessagesServiceClient>(MESSAGES_MODULE_CONFIG)
 export const MessagesClientDependency = GetClientOptionsByConfig(MESSAGES_MODULE_CONFIG)
 
 export const DialogsClient = GetClientProvider<DialogsServiceClient>(DIALOGS_MODULE_CONFIG)

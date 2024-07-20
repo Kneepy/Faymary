@@ -21,7 +21,7 @@ export class LikesGateway {
     async addLike(@MessageBody() {item_id, type}: Omit<AddLikeDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         this.likesService.addLike({type, item_id, user_id: client.user_id}).subscribe({
             next: async (like: BrokerResponse.Like) => {
-                const attachment = this.utilsService.getItem(type, item_id)
+                const attachment = this.utilsService.getItem(<any>type, item_id)
                 
                 attachment.data.subscribe(async attach => {
                     like.attachments = {[attachment.key]: attach}

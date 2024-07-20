@@ -20,8 +20,8 @@ export class NotificationController {
         const to = await this.userService.findUser({id: user_id}).toPromise()
 
         return Promise.all(notifications?.map(async notification => {
-            const parent = this.utilsService.getItem<any>(notification.parent_type, notification.parent_id)
-            const item = this.utilsService.getItem<any>(notification.type, notification.item_id)
+            const parent = this.utilsService.getItem<any>(<any>notification.parent_type, notification.parent_id)
+            const item = this.utilsService.getItem<any>(<any>notification.type, notification.item_id)
             const from = await this.userService.findUser({id: notification.from_id}).toPromise()
 
             return {...notification, parent: {[parent.key]: await parent.data.toPromise()}, item: {[item.key]: await item.data.toPromise()}, from, to}

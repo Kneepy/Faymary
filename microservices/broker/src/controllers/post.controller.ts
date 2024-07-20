@@ -28,7 +28,7 @@ export class PostController {
 
     @Delete(":id/delete")
     async deletePost(@Param() query: Omit<PostDeleteDTO, "user_id">, @Req() req: ICustomRequest): Promise<boolean> {
-        return await this.postService.deletePost({id: query.id, user_id: req.user_id}).toPromise() ? true : false
+        return !!(await this.postService.deletePost({id: query.id, user_id: req.user_id}).toPromise())
     }
 
     @Get()
