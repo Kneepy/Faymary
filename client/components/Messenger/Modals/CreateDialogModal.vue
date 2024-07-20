@@ -21,9 +21,8 @@ watch(inputValue, async value => {
 
     // таймаут нужен чтобы оптимизировать работу живого поиска
     clearTimeout(debounceTimeout)
-    debounceTimeout = setTimeout(() => {
-        const users = [] //await UserAPI.getUsersBy({fullName: value})
-        resultSearch.value = [...users]
+    debounceTimeout = setTimeout(async () => {
+        resultSearch.value = await UserAPI.getUsersBy({ fullName: value })
 
         isLoading.value = false
     }, 500)
@@ -69,6 +68,7 @@ const toggleSelectUser = (user: User): void => {
                     @click="() => toggleSelectUser(user)"
                     :key="key"
                     :class="[`user`, checkUserIsSelected(user) ? `active` : ``]"
+                    v-else
                 >
                     <div class="user-info">
                         <Avatar :size=40 :user-name="user.fullName" :href="user.file_id" />
@@ -208,14 +208,14 @@ const toggleSelectUser = (user: User): void => {
             color: $white;
             align-items: center;
             cursor: pointer;
-            padding: 10px 20px;
+            padding: 10px 15px;
             margin-bottom: 10px;
-            opacity: .8;
             transition: 200ms;
             border-radius: 10px;
             justify-content: space-between;
+            background-color: $transparent_button_hover_17;
             &:hover, &.active {
-                background-color: $transparent_button_hover_17;
+                background-color: $transparent_panel_hover;
                 opacity: 1;
                 transition: 200ms;
             }
@@ -250,6 +250,10 @@ const toggleSelectUser = (user: User): void => {
             justify-content: space-between;
             font-weight: 600;
             color: $white;
+            opacity: .8;
+            &:hover {
+                opacity: 1;
+            }
             button {
                 border: none;
                 display: flex;

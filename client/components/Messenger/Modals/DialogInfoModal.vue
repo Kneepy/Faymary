@@ -14,7 +14,7 @@ const close = () => emit("onClose")
             </div>
             <div class="info">
                 <div class="user">
-                    <Avatar :size=70 :user-name="`Alex Korf`" :href="`https://images.unsplash.com/photo-1719430074740-a5ee49a67d45?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`" />
+                    <Avatar :size=65 :user-name="`Alex Korf`" :href="`https://images.unsplash.com/photo-1719430074740-a5ee49a67d45?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`" />
                     <div class="user__info">
                         <div class="wrapper">
                             <div class="name">Alex Korf</div>
@@ -38,13 +38,11 @@ const close = () => emit("onClose")
     display: flex;
     flex-direction: column;
     border: 1px solid $border_1;
-    padding: 0 5px 0 5px;
     .header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 10px 40px;
-        border-bottom: 1px solid $primary_border;
         .title {
             flex: 1;
             color: $white;
@@ -78,7 +76,8 @@ const close = () => emit("onClose")
         }
     }
     .info {
-        padding: 10px 30px;
+        border-bottom: 5px solid $primary_border;
+        padding: 10px 30px 20px;
         .user {
             display: flex;
             align-items: center;
