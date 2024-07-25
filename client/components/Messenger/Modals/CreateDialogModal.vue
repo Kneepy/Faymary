@@ -53,12 +53,19 @@ const toggleSelectUser = (user: CreateDialog.IUser): void => {
  * Штука для получения файла и прикрепления его к сообщению
  */
 const inputFile = ref<HTMLInputElement>(null)
+const refFiles = computed(() => createDialogStore.files.map((file) => URL.createObjectURL(file)).reverse())
+
 const clickAttachFile = () => inputFile.value.click()
 const getFiles = (e: Event) => {
-    console.log(e.target.files)
+    const files: File[] = Object.entries(e.target.files).map(([key, file]) => <File>file)
+
+    for (const file of files) {
+        createDialogStore.attachFile(file)
+    }
+
+    e.target.value = ""
 }
 </script>
-
 <template>
     <ModalBox @on-close="close">
         <div class="create-dialog">
@@ -121,14 +128,27 @@ const getFiles = (e: Event) => {
                         </div>
                     </div>
                 </Transition>
+                <div class="attachments">
+                    <div class="files">
+                        <div
+                            v-for="file in refFiles"
+                            @click="() => createDialogStore.removeFile(file)"
+                            :style="{
+                                backgroundImage: `url(${file})`
+                            }"
+                            class="file"
+                        ></div>
+                    </div>
+                </div>
                 <div class="input-message">
                     <IconButton>
                         <GIcon @click="clickAttachFile" style="transform: rotate(30deg)">attach_file</GIcon>
                         <input
-                            @change="getFiles"
+                            @input="getFiles"
                             ref="inputFile"
                             type="file"
                             accept="image/*"
+                            multiple
                         >
                     </IconButton>
                     <TextareaAutosize class="scroll" placeholder="Напишите своим новым собеседникам!" :max-height=350 />
@@ -208,6 +228,7 @@ const getFiles = (e: Event) => {
         display: flex;
         flex-direction: column;
         position: relative;
+        min-height: 140px;
         .none {
             color: $gray_1;
             font-size: 14px;
@@ -314,6 +335,23 @@ const getFiles = (e: Event) => {
                 }
             }
         }
+        .attachments {
+            .files {
+                display: flex;
+                .file {
+                    width: 60px;
+                    height: 60px;
+                    background-position: center;
+                    background-size: cover;
+                    margin-left: 10px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    &:hover {
+                        transform: scale(1.05);
+                    }
+                }
+            }
+        }
         .input-message {
             flex: 1;
             display: flex;
@@ -343,9 +381,19 @@ const getFiles = (e: Event) => {
                 font-size: 16px;
                 resize: none;
                 max-height: 350px;
+                &::placeholder {
+                    color: $gray_1;
+                    transition: 200ms;
+                }
                 &:focus {
                     border: none;
                     outline: none;
+                }
+                &:hover {
+                    &::placeholder {
+                        color: $gray;
+                        transition: 200ms;
+                    }
                 }
             }
             input[type="file"] {

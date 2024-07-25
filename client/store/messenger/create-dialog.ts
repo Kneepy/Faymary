@@ -6,15 +6,30 @@ export const useCreateDialogStore = defineStore("create-dialog", {
         selectedUsers: [],
         resultSearch: [],
         inputSearch: "",
-        message: ""
+        message: "",
+        files: []
     }),
     actions: {
+        /**
+         * Обновляет результаты поиска
+         * @param users новые результаты поиска
+         */
         setResultSearch(users: CreateDialog.IUser[]) {
             this.resultSearch = users ?? [];
         },
+
+        /**
+         * Выбирает пользователя при создании диалога
+         * @param user выбранный пользователь
+         */
         selectUser(user: CreateDialog.IUser) {
             this.selectedUsers.push(user);
         },
+
+        /**
+         * Удаляет пользователя из выбранныз при создании диалога
+         * @param user выбранный пользователь
+         */
         removeUser(user: CreateDialog.IUser) {
             const index = this.selectedUsers.indexOf(user);
 
@@ -24,8 +39,21 @@ export const useCreateDialogStore = defineStore("create-dialog", {
 
             return
         },
+
+        /**
+         * Удаляет пользователя из выбранныз при создании диалога по его индексу
+         * @param index index выбранного пользователя (в массиве this.selectedUsers)
+         */
         removeUserByIndex(index: number) {
             this.selectedUsers.splice(index, 1);
+        },
+
+        attachFile(file: File) {
+            this.files.push(file);
+        },
+        removeFile(file: File) {
+            const indexFile = this.files.indexOf(file);
+            this.files.splice(indexFile, 1);
         }
     }
 })

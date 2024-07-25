@@ -1,4 +1,4 @@
-import type { User } from "~/api";
+import type { Attachment, User } from "~/api";
 
 export namespace CreateDialog {
     export interface Store {
@@ -21,6 +21,12 @@ export namespace CreateDialog {
          * Новое сообщение которое будет отправлено всем новым пользователям диалога
          */
         message: string
+
+        /**
+         * Файлы которые прикрепил пользователь
+         * Потом эти файлы будут переделаны во вложения (attachments)
+         */
+        files: File[]
     }
     export interface IUser extends Omit<User, "password" | "profile" | "state"> {}
 }

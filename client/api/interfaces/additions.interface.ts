@@ -8,6 +8,7 @@ export enum AdditionsType {
     MESSAGE = 4,
     DIALOG = 5,
     LIKE = 6,
+    FILE= 7
 }
 
 export interface Addition {
