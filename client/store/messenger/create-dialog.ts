@@ -51,6 +51,9 @@ export const useCreateDialogStore = defineStore("create-dialog", {
         attachFile(file: File) {
             this.files.push(file);
         },
+        removeFileByIndex(index: number) {
+            this.files.splice(index, 1);
+        },
         removeFile(file: File) {
             const indexFile = this.files.indexOf(file);
             this.files.splice(indexFile, 1);

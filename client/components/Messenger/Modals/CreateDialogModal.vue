@@ -53,7 +53,11 @@ const toggleSelectUser = (user: CreateDialog.IUser): void => {
  * Штука для получения файла и прикрепления его к сообщению
  */
 const inputFile = ref<HTMLInputElement>(null)
-const refFiles = computed(() => createDialogStore.files.map((file) => URL.createObjectURL(file)).reverse())
+const refFiles = computed(() => createDialogStore.files.map((file, index) => ({
+    blob: URL.createObjectURL(file),
+    index,
+})).reverse())
+const currentHoverFile = ref(null)
 
 const clickAttachFile = () => inputFile.value.click()
 const getFiles = (e: Event) => {
@@ -128,17 +132,32 @@ const getFiles = (e: Event) => {
                         </div>
                     </div>
                 </Transition>
-                <div class="attachments">
-                    <div class="files">
-                        <div
-                            v-for="file in refFiles"
-                            @click="() => createDialogStore.removeFile(file)"
-                            :style="{
-                                backgroundImage: `url(${file})`
-                            }"
-                            class="file"
-                        ></div>
-                    </div>
+                <div v-if="!!refFiles.length" class="attachments">
+                    <HorizontalScroll :count="refFiles.length">
+                        <div class="files">
+                            <div
+                                v-for="({blob, index}) in refFiles"
+                                @click="() => createDialogStore.removeFileByIndex(index)"
+                                @mouseenter="() => currentHoverFile = index"
+                                @mouseleave="() => currentHoverFile = null"
+                                :class="{active: currentHoverFile === index}"
+                                class="file"
+                            >
+                                <div
+                                    :style="{
+                                    backgroundImage: `url(${blob})`
+                                }"
+                                    class="img"
+                                >
+                                </div>
+                                <Transition name="delete_img">
+                                    <div v-if="currentHoverFile === index" class="remove">
+                                        <GIcon :size=15 fill>delete</GIcon>
+                                    </div>
+                                </Transition>
+                            </div>
+                        </div>
+                    </HorizontalScroll>
                 </div>
                 <div class="input-message">
                     <IconButton>
@@ -336,18 +355,53 @@ const getFiles = (e: Event) => {
             }
         }
         .attachments {
+            overflow-x: auto;
+            padding: 5px 0;
+            &::-webkit-scrollbar {
+                width: 0;
+                height: 0;
+            }
             .files {
                 display: flex;
                 .file {
                     width: 60px;
                     height: 60px;
-                    background-position: center;
-                    background-size: cover;
                     margin-left: 10px;
                     border-radius: 10px;
                     cursor: pointer;
+                    overflow: hidden;
+                    position: relative;
+                    .img {
+                        width: 100%;
+                        height: 100%;
+                        background-position: center;
+                        background-size: cover;
+                    }
                     &:hover {
-                        transform: scale(1.05);
+                        box-shadow: 0 0 0 1px $white;
+                        .img {
+                            filter: blur(3px);
+                        }
+                    }
+                    .delete_img-enter-active, .delete_img-leave-active {
+                        transition: opacity 200ms ease;
+                    }
+                    .delete_img-enter-from, .delete_img-leave-to {
+                        opacity: 0;
+                    }
+                    .remove {
+                        position: absolute;
+                        right: 5px;
+                        top: 5px;
+                        display: flex;
+                        align-items: center;
+                        border-radius: 50%;
+                        background-color: $white;
+                        justify-content: center;
+                        padding: 2px;
+                        .icon {
+                            color: $black;
+                        }
                     }
                 }
             }
