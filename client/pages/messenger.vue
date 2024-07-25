@@ -59,30 +59,30 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             <div class="top-menu">
                 <div class="options">
                     <div class="left">
-                        <button>
-                            <span class="material-symbols-rounded">keyboard_backspace</span>
-                        </button>
+                        <IconButton>
+                            <GIcon fill :weight=600>keyboard_backspace</GIcon>
+                        </IconButton>
                     </div>
                     <div class="right">
-                        <button @click="openCreateDialogModal">
-                            <span class="material-symbols-rounded">stylus</span>
-                        </button>
-                        <button @click="openImportantMsgModal">
-                            <span class="material-symbols-rounded">star</span>
-                        </button>
-                        <button @click="openBlockedUsersModal">
-                            <span class="material-symbols-rounded">block</span>
-                        </button>
-                        <button @click="openSettingsModal">
-                            <span class="material-symbols-rounded">settings</span>
-                        </button>
+                        <IconButton @click="openCreateDialogModal">
+                            <GIcon fill :weight=700>stylus</GIcon>
+                        </IconButton>
+                        <IconButton @click="openImportantMsgModal">
+                            <GIcon fill :weight=700>star</GIcon>
+                        </IconButton>
+                        <IconButton @click="openBlockedUsersModal">
+                            <GIcon fill :weight=700>block</GIcon>
+                        </IconButton>
+                        <IconButton @click="openSettingsModal">
+                            <GIcon fill :weight=700>settings</GIcon>
+                        </IconButton>
                     </div>
                 </div>
                 <div class="search">
                     <input type="text" placeholder="Найдите нужный вам диалог!">
-                    <button class="search-btn">
-                        <span class="material-symbols-rounded">hexagon</span>
-                    </button>
+                    <IconButton class="search-btn">
+                        <GIcon>hexagon</GIcon>
+                    </IconButton>
                 </div>
             </div>
             <div class="dialogs scroll">
@@ -111,15 +111,15 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                     <div class="user-status">был(а) в сети 1 час назад</div>
                 </div>
                 <div class="dialog-options">
-                    <button>
-                        <span class="material-symbols-rounded">search</span>
-                    </button>
-                    <button>
-                        <span class="material-symbols-rounded">call</span>
-                    </button>
-                    <button>
-                        <span class="material-symbols-rounded">more_vert</span>
-                    </button>
+                    <IconButton>
+                        <GIcon fill :size=22>search</GIcon>
+                    </IconButton>
+                    <IconButton>
+                        <GIcon fill :size=22>call</GIcon>
+                    </IconButton>
+                    <IconButton>
+                        <GIcon fill :size=22>more_vert</GIcon>
+                    </IconButton>
                 </div>
             </div>
             <div class="wrapper">
@@ -150,16 +150,16 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 </div>
             </div>
             <div class="bottom-box">
-                <button>
-                    <span class="material-symbols-rounded" style="transform: rotate(30deg)">attach_file</span>
-                </button>
+                <IconButton :size=42>
+                    <GIcon style="transform: rotate(30deg)" fill :size=22>attach_file</GIcon>
+                </IconButton>
                 <TextareaAutosize class="scroll" placeholder="Напишите что-нибудь!"/>
-                <button>
-                    <span class="material-symbols-rounded">family_star</span>
-                </button>
-                <button>
-                    <span class="material-symbols-rounded">play_arrow</span>
-                </button>
+                <IconButton :size=42>
+                    <GIcon fill :size=22>family_star</GIcon>
+                </IconButton>
+                <IconButton :size=42>
+                    <GIcon fill :size=22>play_arrow</GIcon>
+                </IconButton>
             </div>
         </div>
 
@@ -225,28 +225,21 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 &-btn {
                     position: absolute;
                     cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     background-color: transparent;
                     border: none;
-                    outline: none;
                     top: 12px;
                     padding: 0;
                     transition: 1.2s;
                     left: 13px;
-                    width: fit-content;
                     &:hover {
                         transform: rotate(90deg);
                         transition: 1.2s;
-                        span {
+                        .icon {
                             color: $gray;
-                            transition: 200ms;
                         }
                     }
-                    span {
+                    .icon {
                         color: $gray_1;
-                        transition: 200ms;
                     }
                 }
             }
@@ -259,37 +252,23 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                     display: flex;
                 }
                 button {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     background-color: $transparent_button_hover_1;
-                    border: none;
-                    cursor: pointer;
                     padding: 5px;
                     border-radius: 15px;
                     width: 40px;
                     height: 40px;
                     margin-right: 10px;
-                    transition: 200ms;
+                    // transform: scale(0.99);
                     &:hover {
                         background-color: $transparent_button_hover;
-                        transform: scale(1.1);
-                        transition: 200ms;
-                        span {
+                        // transform: scale(1.1);
+                        .icon {
                             color: $gray;
-                            transition: 200ms;
                         }
                     }
-                    span {
+                    .icon {
                         color: $gray_1;
-                        transition: 200ms;
                         font-size: 20px;
-                        font-variation-settings:
-                            'FILL' 1,
-                            'wght' 700,
-                            'GRAD' 0,
-                            'opsz' 24
-                        ;
                     }
                 }
             }
@@ -375,30 +354,17 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 align-items: center;
                 padding-right: 10px;
                 button {
-                    cursor: pointer;
                     background-color: transparent;
-                    border: none;
                     margin-right: 5px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: 200ms;
                     border-radius: 15px;
-                    height: fit-content;
-                    padding: 9px;
                     &:hover {
                         background-color: $transparent_button_hover_17;
-                        transition: 200ms;
-                        span {
+                        .icon {
                             color: $white_gray;
-                            transition: 200ms;
                         }
                     }
-                    span {
+                    .icon {
                         color: $gray;
-                        font-size: 22px;
-                        font-variation-settings:
-                            'FILL' 1
                     }
                 }
             }
@@ -494,32 +460,17 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             border-top: 1px solid $primary_border;
             align-items: center;
             button {
-                cursor: pointer;
                 background-color: $transparent_button_hover_1;
-                border: none;
                 margin: 0 5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: 200ms;
-                flex: 0;
                 border-radius: 15px;
-                height: fit-content;
-                padding: 9px;
                 &:hover {
                     background-color: $transparent_button_hover_17;
-                    transition: 200ms;
-                    span {
+                    .icon {
                         color: $white_gray;
-                        transition: 200ms;
                     }
                 }
-                span {
+                .icon {
                     color: $gray;
-                    font-size: 22px;
-                    transition: 200ms;
-                    font-variation-settings:
-                        'FILL' 1
                 }
             }
             textarea {

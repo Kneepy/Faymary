@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { type User, UserAPI } from "~/api";
-import { useCreateDialogStore } from "~/store/messenger/create-dialog";
+import { UserAPI } from "~/api";
+import { type CreateDialog, useCreateDialogStore } from "~/store/messenger";
+import type { ChangeEvent } from "rollup";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
@@ -35,8 +36,8 @@ const isOpenSelectedUsersPanel = ref(true)
 const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
 
 // сами выбранные пользователи
-const checkUserIsSelected = (user: User): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
-const toggleSelectUser = (user: User): void => {
+const checkUserIsSelected = (user: CreateDialog.IUser): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
+const toggleSelectUser = (user: CreateDialog.IUser): void => {
     const indexItem = createDialogStore.selectedUsers.indexOf(user)
 
     if (indexItem === -1) {
@@ -47,6 +48,15 @@ const toggleSelectUser = (user: User): void => {
 
     createDialogStore.removeUserByIndex(indexItem)
 }
+
+/**
+ * Штука для получения файла и прикрепления его к сообщению
+ */
+const inputFile = ref<HTMLInputElement>(null)
+const clickAttachFile = () => inputFile.value.click()
+const getFiles = (e: Event) => {
+    console.log(e.target.files)
+}
 </script>
 
 <template>
@@ -54,9 +64,9 @@ const toggleSelectUser = (user: User): void => {
         <div class="create-dialog">
             <div class="header">
                 <div class="title">Создание диалога</div>
-                <button @click="close">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
+                <IconButton @click="close">
+                    <GIcon :weight=500>close</GIcon>
+                </IconButton>
             </div>
             <div class="search-users">
                 <input v-model="createDialogStore.inputSearch" placeholder="Найдите новых собеседников!" type="text">
@@ -85,12 +95,18 @@ const toggleSelectUser = (user: User): void => {
                 </div>
             </div>
 
-            <div v-if="!!createDialogStore.selectedUsers.length" class="selected-users noselect">
+            <div
+                v-if="() => {
+                    !!createDialogStore.selectedUsers.length
+                    return true
+                }"
+                class="selected-users noselect"
+            >
                 <div class="title" @click="toggleSelectedUsersPanel">
                     Выбранные пользователи
-                    <button :class="[isOpenSelectedUsersPanel ? `open` : `close`]">
-                        <span class="material-symbols-rounded">chevron_right</span>
-                    </button>
+                    <IconButton :class="[isOpenSelectedUsersPanel ? `open` : `close`]">
+                        <GIcon :size=20 :weight=700>chevron_right</GIcon>
+                    </IconButton>
                 </div>
                 <Transition name="folding">
                     <div v-if="isOpenSelectedUsersPanel" class="users scroll">
@@ -106,16 +122,22 @@ const toggleSelectUser = (user: User): void => {
                     </div>
                 </Transition>
                 <div class="input-message">
-                    <button>
-                        <span class="material-symbols-rounded" style="transform: rotate(30deg)">attach_file</span>
-                    </button>
+                    <IconButton>
+                        <GIcon @click="clickAttachFile" style="transform: rotate(30deg)">attach_file</GIcon>
+                        <input
+                            @change="getFiles"
+                            ref="inputFile"
+                            type="file"
+                            accept="image/*"
+                        >
+                    </IconButton>
                     <TextareaAutosize class="scroll" placeholder="Напишите своим новым собеседникам!" :max-height=350 />
-                    <button>
-                        <span class="material-symbols-rounded">family_star</span>
-                    </button>
-                    <button>
-                        <span class="material-symbols-rounded">play_arrow</span>
-                    </button>
+                    <IconButton>
+                        <GIcon fill>family_star</GIcon>
+                    </IconButton>
+                    <IconButton>
+                        <GIcon fill>play_arrow</GIcon>
+                    </IconButton>
                 </div>
             </div>
         </div>
@@ -144,28 +166,16 @@ const toggleSelectUser = (user: User): void => {
             font-size: 18px;
         }
         button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background-color: transparent;
-            border: none;
-            padding: 8px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 200ms;
             flex: 0;
             &:hover {
                 background-color: $transparent_button_hover_17;
-                transition: 200ms;
-                span {
+                .icon {
                     color: $white;
-                    transition: 200ms;
                 }
             }
-            span {
+            .icon {
                 color: $gray;
-                font-weight: 500;
-                transition: 200ms;
             }
         }
     }
@@ -259,13 +269,7 @@ const toggleSelectUser = (user: User): void => {
                 opacity: 1;
             }
             button {
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 30px;
                 background-color: transparent;
-                cursor: pointer;
                 transition: 100ms;
                 flex: 0;
                 &.open {
@@ -277,8 +281,6 @@ const toggleSelectUser = (user: User): void => {
                     transition: 100ms;
                 }
                 span {
-                    font-weight: bold;
-                    font-size: 20px;
                     color: $white;
                 }
             }
@@ -315,18 +317,11 @@ const toggleSelectUser = (user: User): void => {
         .input-message {
             flex: 1;
             display: flex;
-            padding: 10px 20px;
+            padding: 10px;
             button {
                 background-color: transparent;
-                outline: none;
-                border: none;
-                padding: 9px;
-                height: fit-content;
                 cursor: pointer;
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                padding: 10px;
                 flex: 0;
                 &:hover {
                     background-color: $transparent_button_hover_1;
@@ -335,7 +330,6 @@ const toggleSelectUser = (user: User): void => {
                     margin-left: 5px;
                 }
                 span {
-                    font-variation-settings: "FILL" 1;
                     color: $gray;
                 }
             }
@@ -353,6 +347,9 @@ const toggleSelectUser = (user: User): void => {
                     border: none;
                     outline: none;
                 }
+            }
+            input[type="file"] {
+                width: 0;
             }
         }
         .folding-enter-active {

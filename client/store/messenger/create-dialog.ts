@@ -1,22 +1,21 @@
 import { defineStore } from "pinia";
-import type { CreateDialogInterface } from "~/store/messenger/types";
-import type { User } from "~/api";
+import type { CreateDialog } from "~/store/messenger/types";
 
 export const useCreateDialogStore = defineStore("create-dialog", {
-    state: (): CreateDialogInterface => ({
+    state: (): CreateDialog.Store => ({
         selectedUsers: [],
         resultSearch: [],
         inputSearch: "",
         message: ""
     }),
     actions: {
-        setResultSearch(users: User[]) {
+        setResultSearch(users: CreateDialog.IUser[]) {
             this.resultSearch = users ?? [];
         },
-        selectUser(user: User) {
+        selectUser(user: CreateDialog.IUser) {
             this.selectedUsers.push(user);
         },
-        removeUser(user: User) {
+        removeUser(user: CreateDialog.IUser) {
             const index = this.selectedUsers.indexOf(user);
 
             if (index !== -1) {

@@ -8,9 +8,9 @@ const close = () => emit("onClose")
         <div class="dialog-info">
             <div class="header">
                 <div class="title">Информация о пользователе</div>
-                <button @click="close">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
+                <IconButton @click="close">
+                    <GIcon>close</GIcon>
+                </IconButton>
             </div>
             <div class="info">
                 <div class="user">
@@ -50,9 +50,6 @@ const close = () => emit("onClose")
             font-size: 18px;
         }
         button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background-color: transparent;
             border: none;
             padding: 8px;
