@@ -60,8 +60,9 @@ const refFiles = computed(() => createDialogStore.files.map((file, index) => ({
 const currentHoverFile = ref(null)
 
 const clickAttachFile = () => inputFile.value.click()
-const getFiles = (e: Event) => {
-    const files: File[] = Object.entries(e.target.files).map(([key, file]) => <File>file)
+const receiveFiles = (e: Event | DragEvent) => {
+    const fileList = e.dataTransfer?.files ?? e.target.files
+    const files: File[] = Object.entries(fileList).map(([key, file]) => <File>file)
 
     for (const file of files) {
         createDialogStore.attachFile(file)
@@ -159,11 +160,11 @@ const getFiles = (e: Event) => {
                         </div>
                     </HorizontalScroll>
                 </div>
-                <div class="input-message">
+                <div @dragover.prevent @drop.stop.prevent="receiveFiles" class="input-message">
                     <IconButton>
                         <GIcon @click="clickAttachFile" style="transform: rotate(30deg)">attach_file</GIcon>
                         <input
-                            @input="getFiles"
+                            @input="receiveFiles"
                             ref="inputFile"
                             type="file"
                             accept="image/*"
