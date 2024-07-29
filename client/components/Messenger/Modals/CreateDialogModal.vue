@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { UserAPI } from "~/api";
 import { type CreateDialog, useCreateDialogStore } from "~/store/messenger";
-import type { ChangeEvent } from "rollup";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
@@ -58,9 +57,10 @@ const refFiles = computed(() => createDialogStore.files.map((file, index) => ({
     index,
 })).reverse())
 const currentHoverFile = ref(null)
+const isDragOver = ref(false)
 
 const clickAttachFile = () => inputFile.value.click()
-const receiveFiles = (e: Event | DragEvent) => {
+const receiveFiles = (e: Event) => {
     const fileList = e.dataTransfer?.files ?? e.target.files
     const files: File[] = Object.entries(fileList).map(([key, file]) => <File>file)
 
@@ -68,12 +68,21 @@ const receiveFiles = (e: Event | DragEvent) => {
         createDialogStore.attachFile(file)
     }
 
+    // чтобы багав не была
     e.target.value = ""
+    isDragOver.value = false
+}
+const test = () => {
+    isDragOver.value = false
+    console.log("fwefef")
 }
 </script>
 <template>
     <ModalBox @on-close="close">
-        <div class="create-dialog">
+        <div
+            @dragover.stop.prevent="isDragOver = true"
+            class="create-dialog"
+        >
             <div class="header">
                 <div class="title">Создание диалога</div>
                 <IconButton @click="close">
@@ -106,7 +115,6 @@ const receiveFiles = (e: Event | DragEvent) => {
                     <span v-if="checkUserIsSelected(user)" class="material-symbols-rounded">check</span>
                 </div>
             </div>
-
             <div
                 v-if="() => {
                     !!createDialogStore.selectedUsers.length
@@ -180,6 +188,21 @@ const receiveFiles = (e: Event | DragEvent) => {
                     </IconButton>
                 </div>
             </div>
+
+            <div v-if="isDragOver" class="attach-file">
+                <div
+                    @dragleave.stop.prevent="isDragOver = false"
+                    @drop.stop.prevent="receiveFiles"
+                    class="wrapper"
+                >
+                    <div class="drop-file">
+                        <GIcon fill :size=80>folder</GIcon>
+                        <div class="text">
+                            Перетащите сюда файлы, которые хотите отправить
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </ModalBox>
 </template>
@@ -188,13 +211,15 @@ const receiveFiles = (e: Event | DragEvent) => {
 .create-dialog {
     width: 520px;
     max-height: 90vh;
-    min-height: 30vh;
+    min-height: 395px;
     background-color: $primary_content_background;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     border: 1px solid $border_1;
     padding: 0 5px 0 5px;
+    position: relative;
+    overflow: hidden;
     .header {
         display: flex;
         align-items: center;
@@ -468,6 +493,43 @@ const receiveFiles = (e: Event | DragEvent) => {
             }
             100% {
                 overflow: hidden;
+            }
+        }
+    }
+    .attach-file {
+        background-color: $drop_file_background;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        .wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            flex: 1;
+            .drop-file {
+                border: 3px solid $gray;
+                border-style: dashed;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                flex-direction: column;
+                .icon {
+                    color: $gray;
+                }
+                .text {
+                    color: $gray;
+                    font-size: 16px;
+                    font-weight: 500;
+                    width: 300px;
+                    text-align: center;
+                }
             }
         }
     }
