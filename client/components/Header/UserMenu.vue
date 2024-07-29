@@ -99,7 +99,7 @@ const changeAccount = () => {
             background-color: $panel_background;
             border-radius: 0px 0px 10px 10px;
             text-align: inherit;
-            border-top: 1px solid $border_1;
+            border-top: 1px solid $border_8;
             color: $gray;
             font-size: 14px;
             &:hover {
@@ -118,7 +118,7 @@ const changeAccount = () => {
             content: "";
             width: 100%;
             height: 1px;
-            background-color: $border_1;
+            background-color: $border_8;
         }
         .option {
             width: 100%;

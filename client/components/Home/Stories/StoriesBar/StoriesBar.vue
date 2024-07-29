@@ -59,7 +59,7 @@ onMounted(async () => {
     .stories {
         width: 100%;
         margin: 0 auto;
-        border: 1px solid $border_1;
+        border: 1px solid $border_8;
         border-radius: 20px;
         background-color: $primary_content_background;
         display: flex;

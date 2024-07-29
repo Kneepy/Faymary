@@ -132,7 +132,7 @@ onMounted(() => {
             width: 40px;
             height: 50px;
             &:hover, &:focus {
-                border-color: $border_1;
+                border-color: $border_8;
                 transition: 100ms;
             }
             &.incorrect {

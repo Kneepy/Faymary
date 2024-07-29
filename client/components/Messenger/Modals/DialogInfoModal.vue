@@ -37,7 +37,7 @@ const close = () => emit("onClose")
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    border: 1px solid $border_1;
+    border: 1px solid $border_8;
     .header {
         display: flex;
         align-items: center;

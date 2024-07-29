@@ -71,7 +71,7 @@ const deleteCanvas = () => storiesStore.deleteCanvas(storiesStore.createOptions.
         background-size: cover;
         position: relative;
         overflow: hidden;
-        border-right: 1px solid $border_1;
+        border-right: 1px solid $border_8;
         &::after {
             position: absolute;
             bottom: 0;
@@ -141,7 +141,7 @@ const deleteCanvas = () => storiesStore.deleteCanvas(storiesStore.createOptions.
             background-color: $panel_background;
             display: flex;
             padding: 0 20px;
-            border-bottom: 1px solid $border_1;
+            border-bottom: 1px solid $border_8;
             .edit_move {
                 background-color: transparent;
                 padding: 15px;
@@ -150,7 +150,7 @@ const deleteCanvas = () => storiesStore.deleteCanvas(storiesStore.createOptions.
                 justify-content: center;
                 border-radius: 0;
                 &:hover {
-                    box-shadow: inset 0px -2px 0px $border_1;
+                    box-shadow: inset 0px -2px 0px $border_8;
                 }
                 
                 &.letters {

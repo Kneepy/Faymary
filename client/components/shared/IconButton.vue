@@ -13,11 +13,15 @@ const props = defineProps<IconButtonProps>()
 </script>
 
 <template>
-<button
-    :style="{borderRadius: `${props.round}px`, width: `${props.size}px`, height: `${props.size}px`}"
->
-    <slot />
-</button>
+    <button
+        :style="{
+            borderRadius: props.round &&`${props.round}px`,
+            width: props.size && `${props.size}px`,
+            height: props.size && `${props.size}px`
+        }"
+    >
+        <slot />
+    </button>
 </template>
 
 <style scoped lang="scss">

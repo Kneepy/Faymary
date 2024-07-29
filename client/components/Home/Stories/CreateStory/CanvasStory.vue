@@ -123,7 +123,7 @@ onUnmounted(() => document.removeEventListener("keydown", rollBackCanvasState))
     background-size: cover;
     position: relative;
     overflow: hidden;
-    border-right: 1px solid $border_1;
+    border-right: 1px solid $border_8;
     &::after {
         position: absolute;
         bottom: 0;

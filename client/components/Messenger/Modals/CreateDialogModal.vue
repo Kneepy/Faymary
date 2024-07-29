@@ -35,8 +35,8 @@ const isOpenSelectedUsersPanel = ref(true)
 const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
 
 // сами выбранные пользователи
-const checkUserIsSelected = (user: CreateDialog.IUser): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
-const toggleSelectUser = (user: CreateDialog.IUser): void => {
+const checkUserIsSelected = (user: CreateDialog.CustomUser): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
+const toggleSelectUser = (user: CreateDialog.CustomUser): void => {
     const indexItem = createDialogStore.selectedUsers.indexOf(user)
 
     if (indexItem === -1) {
@@ -57,7 +57,6 @@ const refFiles = computed(() => createDialogStore.files.map((file, index) => ({
     index,
 })).reverse())
 const currentHoverFile = ref(null)
-const isDragOver = ref(false)
 
 const clickAttachFile = () => inputFile.value.click()
 const receiveFiles = (e: Event) => {
@@ -72,15 +71,17 @@ const receiveFiles = (e: Event) => {
     e.target.value = ""
     isDragOver.value = false
 }
-const test = () => {
-    isDragOver.value = false
-    console.log("fwefef")
-}
+
+/**
+ * Обработка на нажатие кнопки отправки
+ */
+const sendMessage = () => {}
 </script>
 <template>
     <ModalBox @on-close="close">
         <div
-            @dragover.stop.prevent="isDragOver = true"
+            @drop.stop.prevent="receiveFiles"
+            @dragover.stop.prevent
             class="create-dialog"
         >
             <div class="header">
@@ -116,10 +117,7 @@ const test = () => {
                 </div>
             </div>
             <div
-                v-if="() => {
-                    !!createDialogStore.selectedUsers.length
-                    return true
-                }"
+                v-if="!!createDialogStore.selectedUsers.length"
                 class="selected-users noselect"
             >
                 <div class="title" @click="toggleSelectedUsersPanel">
@@ -168,7 +166,7 @@ const test = () => {
                         </div>
                     </HorizontalScroll>
                 </div>
-                <div @dragover.prevent @drop.stop.prevent="receiveFiles" class="input-message">
+                <div class="input-message">
                     <IconButton>
                         <GIcon @click="clickAttachFile" style="transform: rotate(30deg)">attach_file</GIcon>
                         <input
@@ -183,24 +181,9 @@ const test = () => {
                     <IconButton>
                         <GIcon fill>family_star</GIcon>
                     </IconButton>
-                    <IconButton>
+                    <IconButton @click="sendMessage">
                         <GIcon fill>play_arrow</GIcon>
                     </IconButton>
-                </div>
-            </div>
-
-            <div v-if="isDragOver" class="attach-file">
-                <div
-                    @dragleave.stop.prevent="isDragOver = false"
-                    @drop.stop.prevent="receiveFiles"
-                    class="wrapper"
-                >
-                    <div class="drop-file">
-                        <GIcon fill :size=80>folder</GIcon>
-                        <div class="text">
-                            Перетащите сюда файлы, которые хотите отправить
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -216,7 +199,7 @@ const test = () => {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    border: 1px solid $border_1;
+    border: 1px solid $border_8;
     padding: 0 5px 0 5px;
     position: relative;
     overflow: hidden;
@@ -321,7 +304,7 @@ const test = () => {
         }
     }
     .selected-users {
-        border-top: 1px solid $border_1;
+        border-top: 1px solid $border_8;
         .title {
             padding: 10px 20px;
             font-size: 16px;

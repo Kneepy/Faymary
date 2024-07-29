@@ -1,9 +1,10 @@
 <script setup lang="ts">
-
 import { ROUTES } from "~/assets/constants/routes.constants";
 import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
+import { type Messenger, useMessengerStore } from "~/store/messenger";
+import { DialogsAPI } from "~/api";
 
 definePageMeta({
     requiredAuth: false, // это только на время разработки, так должно быть true
@@ -14,17 +15,17 @@ useHead({
     title: "Сообщения"
 })
 
+const messengerStore = useMessengerStore()
 const messagesBoxRef = ref<HTMLBaseElement>()
-onMounted(() => {
+
+onMounted(async () => {
+    // это чтобы при открытии блока с сообщениями прокуртка была внизу блока а не вверху
     messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
+
+    // получаем все переписки пользователя и заносим их в состояние
+    const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
+    messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
 })
-
-const testMsg = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci consequatur eligendi, id nobis repellat rerum sint tempore vitae. Beatae blanditiis ipsum molestiae! Corporis dolorum eos eveniet nemo porro quasi, vel."
-const cropMessage = (msg: string, maxLength: number) => {
-    if (msg.length < maxLength) return msg
-
-    return msg.slice(0, maxLength)+ "..."
-}
 
 // функции для открытия списка избранных сообщений
 const isOpenImportantMsgModal = ref(false)
@@ -86,22 +87,12 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 </div>
             </div>
             <div class="dialogs scroll">
-                <div class="dialog" v-for="i in Array(20)">
-                    <Avatar :size=45 :user-name="`Ilya`" :href="`https://images.unsplash.com/photo-1719430074740-a5ee49a67d45?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`" />
-                    <div class="dialog__info">
-                        <div class="name">Ilya Famin</div>
-                        <div class="last-message overflow" :style="{}">{{ cropMessage(testMsg, 40) }}</div>
-                        <div class="last-message-time">16:27</div>
-                    </div>
-                </div>
-                <div class="dialog" v-for="i in Array(20)">
-                    <Avatar :size=45 :user-name="`Ilya`" :href="`https://images.unsplash.com/photo-1719430074740-a5ee49a67d45?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`" />
-                    <div class="dialog__info">
-                        <div class="name">Alex Korf</div>
-                        <div class="last-message">Hello World</div>
-                        <div class="last-message-time">16:24</div>
-                    </div>
-                </div>
+                <DialogBlock
+                    v-for="(dialog, key) in messengerStore.dialogs"
+                    :dialog
+                    :key
+                />
+                <div v-if="messengerStore.dialogs.length <= 0" class="no-dialogs">Пока вы ещё ни с кем не общались!</div>
             </div>
         </div>
         <div class="right-bar">
@@ -175,7 +166,7 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
 .messenger {
     width: 1200px;
     display: flex;
-    border: 1px solid $border_1;
+    border: 1px solid $border_8;
     border-radius: 5px;
     padding: 0;
     // это нужно убрать после того как закончу разработку чата
@@ -193,9 +184,10 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             .search {
                 display: flex;
                 position: relative;
+                border-bottom: 2px solid $border_2;
                 &:hover {
                     input {
-                        border-color: $border_1;
+                        border-color: $border_8;
                         transition: 200ms;
                         color: $white;
                         &::placeholder {
@@ -231,6 +223,8 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                     padding: 0;
                     transition: 1.2s;
                     left: 13px;
+                    width: fit-content;
+                    height: fit-content;
                     &:hover {
                         transform: rotate(90deg);
                         transition: 1.2s;
@@ -276,6 +270,9 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
         .dialogs {
             overflow-y: auto;
             padding: 0 3px 0 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             .dialog {
                 display: flex;
                 align-items: center;
@@ -288,7 +285,6 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 transform: scale(0.99);
                 font-size: 18px;
                 position: relative;
-
                 &:hover {
                     background-color: $transparent_button_hover_17;
                     transition: 200ms;
@@ -324,6 +320,14 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                         color: $gray_1;
                     }
                 }
+            }
+            .no-dialogs {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 1;
+                color: $gray_1;
+                font-size: 14px;
             }
         }
     }
@@ -493,7 +497,7 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                     outline: none;
                 }
                 &:hover, &:focus {
-                    border-color: $border_1;
+                    border-color: $border_8;
                     transition: 200ms;
                     color: $white;
                     &::placeholder {

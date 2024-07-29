@@ -94,7 +94,7 @@ const toggleChangeAccount = () => visibleChangeAccountModal.value = !visibleChan
                     padding-left: 35px;
                     width: 220px;
                     border-radius: 10px;
-                    border: 1px solid $border_1;
+                    border: 1px solid $border_8;
                     background-color: $panel_background;
                     color: $white;
                 }

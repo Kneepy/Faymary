@@ -5,12 +5,12 @@ export namespace CreateDialog {
         /**
          * Пользователи выбранные при поиске
          */
-        selectedUsers: IUser[]
+        selectedUsers: CustomUser[]
 
         /**
          * Все пользователи найденные во время поиска
          */
-        resultSearch: IUser[]
+        resultSearch: CustomUser[]
 
         /**
          * Данные поля ввода
@@ -28,5 +28,5 @@ export namespace CreateDialog {
          */
         files: File[]
     }
-    export interface IUser extends Omit<User, "password" | "profile" | "state"> {}
+    export interface CustomUser extends Omit<User, "password" | "profile" | "state"> {}
 }

@@ -1,11 +1,11 @@
-import type { AuthTokens, Profile, Range, User, UserId, Users } from "~/api/interfaces";
+import type { AuthTokens, Profile, CustomRange, User, UserId, Users } from "~/api/interfaces";
 
 export const UserAPI = {
     async getUserBy(data: Partial<Pick<User, "email" | "userName" | "id">>) {
         return await useCustomFetch("/user", {method: "GET", query: data})
     },
-    async getUsersBy(data: Partial<Pick<User, "userName" | "fullName">> & Range): Promise<User[]> {
-        const { users } = await useCustomFetch<Users>("/user/many", {method: "GET", query: data})
+    async getUsersBy(data: Partial<Pick<User, "userName" | "fullName">> & CustomRange): Promise<User[]> {
+        const users = await useCustomFetch<User[]>("/user/find-many", {method: "GET", query: data})
         return users ?? []
     },
     async getMe(): Promise<User> {

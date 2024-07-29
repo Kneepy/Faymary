@@ -78,7 +78,7 @@ const checkExistUser = async () => {
             transition: 100ms;
             width: 100%;
             &:hover, &:focus {
-                border-color: $border_1;
+                border-color: $border_8;
                 transition: 100ms;
             }
         }

@@ -189,10 +189,11 @@ export class UserController {
         return await this.userService.findUser(query).toPromise()
     }
 
-    @Get("/many")
+    @Get("/find-many")
     @DisableAuth()
-    async getUsers(@Query() query: FindUsersDTO): Promise<Users> {
-        return await this.userService.findUsers(query).toPromise()
+    async findUsers(@Query() query: FindUsersDTO): Promise<User[]> {
+        const { users } = await this.userService.findUsers(query).toPromise()
+        return users
     }
 
     @Get("/followers")

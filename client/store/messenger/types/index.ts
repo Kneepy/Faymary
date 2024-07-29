@@ -1,2 +1,2 @@
 export * from "./create-dialog.namespace"
-export * from "./messenger.interface"
+export * from "./messenger.namespace"

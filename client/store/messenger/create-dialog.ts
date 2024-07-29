@@ -14,7 +14,7 @@ export const useCreateDialogStore = defineStore("create-dialog", {
          * Обновляет результаты поиска
          * @param users новые результаты поиска
          */
-        setResultSearch(users: CreateDialog.IUser[]) {
+        setResultSearch(users: CreateDialog.CustomUser[]) {
             this.resultSearch = users ?? [];
         },
 
@@ -22,7 +22,7 @@ export const useCreateDialogStore = defineStore("create-dialog", {
          * Выбирает пользователя при создании диалога
          * @param user выбранный пользователь
          */
-        selectUser(user: CreateDialog.IUser) {
+        selectUser(user: CreateDialog.CustomUser) {
             this.selectedUsers.push(user);
         },
 
@@ -30,7 +30,7 @@ export const useCreateDialogStore = defineStore("create-dialog", {
          * Удаляет пользователя из выбранныз при создании диалога
          * @param user выбранный пользователь
          */
-        removeUser(user: CreateDialog.IUser) {
+        removeUser(user: CreateDialog.CustomUser) {
             const index = this.selectedUsers.indexOf(user);
 
             if (index !== -1) {
