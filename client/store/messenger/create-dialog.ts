@@ -41,6 +41,14 @@ export const useCreateDialogStore = defineStore("create-dialog", {
         },
 
         /**
+         * Изменяет сообщение которое будет использовано при создании диалога
+         * @param msg новое сообщение
+         */
+        setMessage(msg: string) {
+            this.message = msg.trim();
+        },
+
+        /**
          * Удаляет пользователя из выбранныз при создании диалога по его индексу
          * @param index index выбранного пользователя (в массиве this.selectedUsers)
          */

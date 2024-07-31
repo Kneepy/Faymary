@@ -3,7 +3,8 @@ import type { Messenger } from "~/store/messenger/types";
 
 export const useMessengerStore = defineStore("messenger", {
     state: (): Messenger.Store => ({
-        dialogs: []
+        dialogs: [],
+        currentDialog: null
     }),
     actions: {
         addDialogs(dialogs: Messenger.CustomDialog[]) {
@@ -13,6 +14,9 @@ export const useMessengerStore = defineStore("messenger", {
                 if (!!dialogExist) return
                 this.dialogs.push(dialog);
             }
+        },
+        changeCurrentDialog(id: string) {
+            this.currentDialog = id;
         }
     }
 })

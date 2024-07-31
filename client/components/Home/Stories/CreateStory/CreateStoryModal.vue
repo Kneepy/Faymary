@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { StoriesAPI } from '~/api/stories'
+import { StoriesAPI } from '~/api/http/stories'
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")

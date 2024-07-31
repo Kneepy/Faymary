@@ -60,7 +60,7 @@ const currentHoverFile = ref(null)
 
 const clickAttachFile = () => inputFile.value.click()
 const receiveFiles = (e: Event) => {
-    const fileList = e.dataTransfer?.files ?? e.target.files
+    const fileList = (<DragEvent> e).dataTransfer?.files ?? (<HTMLInputElement> e.target).files
     const files: File[] = Object.entries(fileList).map(([key, file]) => <File>file)
 
     for (const file of files) {
@@ -68,8 +68,7 @@ const receiveFiles = (e: Event) => {
     }
 
     // чтобы багав не была
-    e.target.value = ""
-    isDragOver.value = false
+    (<HTMLInputElement> e.target).value = ""
 }
 
 /**
@@ -177,7 +176,12 @@ const sendMessage = () => {}
                             multiple
                         >
                     </IconButton>
-                    <TextareaAutosize class="scroll" placeholder="Напишите своим новым собеседникам!" :max-height=350 />
+                    <TextareaAutosize
+                        class="scroll"
+                        placeholder="Напишите своим новым собеседникам!"
+                        @change="(v: string) => createDialogStore.setMessage(v)"
+                        :max-height=350
+                    />
                     <IconButton>
                         <GIcon fill>family_star</GIcon>
                     </IconButton>

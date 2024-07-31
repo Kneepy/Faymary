@@ -34,7 +34,8 @@ const sendCode = async () => {
         appState.load = false
         ui.confirmedCode = true
 
-        navigateTo({name: ROUTES.HOME})
+        // эту тему нужно будет поменять на ROUTES.HOME
+        navigateTo({name: ROUTES.MESSENGER})
     } catch (e) {
         ui.incorrectCode = true
     }

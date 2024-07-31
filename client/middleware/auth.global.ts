@@ -1,20 +1,35 @@
-import { UserAPI } from "~/api"
-import { ROUTES } from "~/assets/constants/routes.constants"
+import { UserAPI, WS_EVENTS } from "~/api";
+import { Socket } from "~/api/ws/socket";
+import { ROUTES } from "assets/constants/routes.constants";
 
-export default defineNuxtRouteMiddleware(route => {
+export default defineNuxtRouteMiddleware(async ( route    ) => {
+    if (process.server) return
     if(route.meta.requiredAuth) {
         const appStateStore = useAppStateStore()
         const userStore = useUserStore()
+        const { baseWsURL, sessionCookie } = useRuntimeConfig().public
 
-        const authMe = async () => {
+        /**
+         * Получаем данные пользователя и все необходимые токены авторизации
+         */
+        if(!appStateStore.authorization || !userStore.me) {
             try {
                 userStore.me = await UserAPI.getMe()
             } catch (e) {
-                navigateTo({name: ROUTES.LOGIN_INPUT_EMAIL})
+                return navigateTo({name: ROUTES.LOGIN_INPUT_EMAIL})
             }
         }
-        if(!appStateStore.authorization || !userStore.me) {
-            authMe().then(() => {})
+
+        /**
+         * На этом этапе токены необоходимые для подлкючения уже получены
+         * Поэтому можно подключаться к WebSocket серверу
+         */
+        if(!Socket.isReady()) {
+            Socket.init(baseWsURL, {
+                authorization: appStateStore.authorization,
+                fingerprint: appStateStore.fingerprint,
+                session_id: appStateStore.session
+            })
         }
     }
 })

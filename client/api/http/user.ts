@@ -5,7 +5,7 @@ export const UserAPI = {
         return await useCustomFetch("/user", {method: "GET", query: data})
     },
     async getUsersBy(data: Partial<Pick<User, "userName" | "fullName">> & CustomRange): Promise<User[]> {
-        const users = await useCustomFetch<User[]>("/user/find-many", {method: "GET", query: data})
+        const users = await useCustomFetch<User[]>("/user/search", {method: "GET", query: data})
         return users ?? []
     },
     async getMe(): Promise<User> {

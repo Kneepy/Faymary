@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { StoriesAPI } from '~/api/stories'
+import { StoriesAPI } from '~/api/http/stories'
 
 const storiesStore = useStoriesStore()
 const visibleButtons = ref(false)

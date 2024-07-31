@@ -3,7 +3,7 @@
   "name": "client",
   "scripts": {
     "build": "nuxt build",
-    "start:dev": "nuxt dev --port 3000",
+    "start:dev": "nuxt dev --hostname 0.0.0.0 --port 3000",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -17,7 +17,9 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.4.0",
     "@pinia/nuxt": "^0.4.7",
+    "@types/md5": "^2.3.5",
     "gsap": "^3.11.5",
+    "md5": "^2.3.0",
     "pinia": "^2.0.33"
   },
   "overrides": {

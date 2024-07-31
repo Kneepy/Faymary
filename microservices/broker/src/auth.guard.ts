@@ -1,11 +1,16 @@
-import { AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME, REQUEST_FIELD_ACCESS_TOKEN } from 'src/constants/app.constants';
+import {
+    AUTH_COOKIE_OPTIONS,
+    COOKIE_REFRESH_TOKEN_NAME,
+    REQUEST_FIELD_ACCESS_TOKEN,
+    REQUEST_FIELD_REFRESH_TOKEN
+} from "src/constants/app.constants";
 import { Reflector } from '@nestjs/core';
 import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./constants/app.constants";
 import { SessionServiceClient } from "./proto/session";
-import { ICustomRequest } from './types/request.type';
-import { UnautorizedError } from './constants/errors.constants';
-import { ICustomResponse } from './types/response.type';
+import { UnauthorizedError } from './constants/errors.constants';
+import { ICustomResponse, ICustomRequest } from './types';
+import * as useragent from "useragent"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,20 +32,22 @@ export class AuthGuard implements CanActivate {
             const accessToken = request.headers[REQUEST_FIELD_ACCESS_TOKEN]
             const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
-            if(!refreshToken) throw UnautorizedError
+            if(!refreshToken) throw UnauthorizedError
         
             const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
-            const sessionOptions = {ua: request.headers["user-agent"], fingerprint: request.headers["fingerprint"], ip}
+            const ua = useragent.parse(request.headers["user-agent"])
+            const sessionOptions = {ua: `${ua.device.toString()} ${ua.os.toString()}`, fingerprint: request.headers["fingerprint"], ip}
             const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
-            const verifedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
+            const verifiedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
 
             request.headers.refresh_token = tokens.refresh_token
             request.headers.authorization = tokens.access_token
+            response.header(REQUEST_FIELD_REFRESH_TOKEN, tokens.refresh_token)
             response.header(REQUEST_FIELD_ACCESS_TOKEN, tokens.access_token)
             response.cookie(COOKIE_REFRESH_TOKEN_NAME, request.headers.refresh_token, AUTH_COOKIE_OPTIONS)
 
-            if(!!verifedTokens.user_id) {
-                request.user_id = verifedTokens.user_id
+            if(!!verifiedTokens.user_id) {
+                request.user_id = verifiedTokens.user_id
             }
 
             return true

@@ -7,14 +7,19 @@ import { type NitroFetchOptions } from "nitropack";
 export const useCustomFetch = <DataT>(
     href: string, data: NitroFetchOptions<any>
 ): Promise<DataT> => $fetch<DataT>(href, {
+
     async onRequest({ options }) {
         const appStateStore = useAppStateStore()
         const appConfig = useRuntimeConfig()
 
+        if (!appStateStore.fingerprint) {
+            appStateStore.setFingerprint(useNuxtApp().$fingerprint)
+        }
+
         options.headers = {
             ...data.headers,
             authorization: `Bearer ${appStateStore.authorization}`,
-            fingerprint: await useNuxtApp().$fingerprint,
+            fingerprint: appStateStore.fingerprint,
         } as HeadersInit
         options.credentials = "include"
         options.mode = "cors"
@@ -28,7 +33,9 @@ export const useCustomFetch = <DataT>(
          * appStateStore.refresh_token = useCookie(config.public.sessionCookie).value
          */
         const appStateStore = useAppStateStore()
-        appStateStore.authorization = response.headers.get("authorization") as string ?? appStateStore.authorization
+
+        appStateStore.setAuthorization(response.headers.get("authorization") as string ?? appStateStore.authorization)
+        appStateStore.setSession(response.headers.get("session") as string ?? appStateStore.session)
     },
     async onResponseError({ response, options }) {
         throw response._data
@@ -37,4 +44,5 @@ export const useCustomFetch = <DataT>(
      * Ругается на Enum Methods поэтому всё придётся пометить как any
      */
     ...data,
+
 })

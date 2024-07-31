@@ -18,25 +18,17 @@ const props = withDefaults(defineProps<IconProps>(), {
     weight: 400
 })
 const fill = computed(() => Number(props.fill))
+const iconStyle = computed(() => ({
+    fontSize:  props.size ? `${props.size}px` : ``,
+    "font-variation-settings": `"FILL" ${fill.value}, "wght" ${props.weight}`
+}))
 </script>
 
 <template>
     <span
         :class="[props.rounded ? `material-symbols-rounded` : `material-symbols-outline`, `icon`]"
-        :style="{
-            fontSize: props.size ? `${props.size}px` : ``
-        }"
+        :style="iconStyle"
     >
         <slot />
     </span>
 </template>
-
-<style scoped lang="scss">
-span {
-    font-variation-settings:
-        'FILL' v-bind(fill),
-        'wght' v-bind("props.weight"),
-        'GRAD' 0,
-        'opsz' 24
-}
-</style>

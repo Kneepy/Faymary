@@ -179,6 +179,14 @@ export class UserController {
         return await this.userService.usersIsFollow({author_id: req.user_id, users_ids: data.users_ids}).toPromise()
     }
 
+    @Get("/search")
+    async searchUsers(@Req() req: ICustomRequest, @Query() query: FindUsersDTO): Promise<User[]> {
+        const { users } = await this.userService.findUsers(query).toPromise()
+        const withoutMe = users?.filter((user: User) => user.id !== req.user_id)
+
+        return withoutMe ?? []
+    }
+
 
     /**
      * Все эндпоинты не требующие аутентификации или создания пользователя
@@ -187,13 +195,6 @@ export class UserController {
     @DisableAuth()
     async getUser(@Query() query: FindUserDTO): Promise<User> {
         return await this.userService.findUser(query).toPromise()
-    }
-
-    @Get("/find-many")
-    @DisableAuth()
-    async findUsers(@Query() query: FindUsersDTO): Promise<User[]> {
-        const { users } = await this.userService.findUsers(query).toPromise()
-        return users
     }
 
     @Get("/followers")

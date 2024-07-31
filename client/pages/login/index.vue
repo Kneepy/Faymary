@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UserAPI } from '~/api/user';
+import { UserAPI } from '~/api/http/user';
 import { ROUTES } from '~/assets/constants/routes.constants';
 
 definePageMeta({

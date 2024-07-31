@@ -4,10 +4,9 @@ import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 import { type Messenger, useMessengerStore } from "~/store/messenger";
-import { DialogsAPI } from "~/api";
 
 definePageMeta({
-    requiredAuth: false, // это только на время разработки, так должно быть true
+    requiredAuth: true, // это только на время разработки, так должно быть true
     name: ROUTES.MESSENGER,
     layout: false // только на время разработки, но в обычное время default или просто удалить layout
 })
@@ -23,7 +22,7 @@ onMounted(async () => {
     messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
 
     // получаем все переписки пользователя и заносим их в состояние
-    const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
+    const userDialogs = [] // await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
     messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
 })
 
@@ -89,6 +88,7 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             <div class="dialogs scroll">
                 <DialogBlock
                     v-for="(dialog, key) in messengerStore.dialogs"
+                    @click="messengerStore.changeCurrentDialog(dialog.id)"
                     :dialog
                     :key
                 />
@@ -96,62 +96,70 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             </div>
         </div>
         <div class="right-bar">
-            <div class="top-box">
-                <div class="user-info" @click="openDialogInfoModal">
-                    <div class="user-name">Alex Korf</div>
-                    <div class="user-status">был(а) в сети 1 час назад</div>
+            <template v-if="!!messengerStore.currentDialog || true">
+                <div class="top-box">
+                    <div class="user-info" @click="openDialogInfoModal">
+                        <div class="user-name">Alex Korf</div>
+                        <div class="user-status">был(а) в сети 1 час назад</div>
+                    </div>
+                    <div class="dialog-options">
+                        <IconButton>
+                            <GIcon fill :size=22>search</GIcon>
+                        </IconButton>
+                        <IconButton>
+                            <GIcon fill :size=22>call</GIcon>
+                        </IconButton>
+                        <IconButton>
+                            <GIcon fill :size=22>more_vert</GIcon>
+                        </IconButton>
+                    </div>
                 </div>
-                <div class="dialog-options">
-                    <IconButton>
-                        <GIcon fill :size=22>search</GIcon>
-                    </IconButton>
-                    <IconButton>
-                        <GIcon fill :size=22>call</GIcon>
-                    </IconButton>
-                    <IconButton>
-                        <GIcon fill :size=22>more_vert</GIcon>
-                    </IconButton>
-                </div>
-            </div>
-            <div class="wrapper">
-                <div class="messages scroll" ref="messagesBoxRef">
-                    <div v-for="(i, key) in Array(4)" :class="[`message`, key % 2 === 0 ? `interlocutor` : ``]">
-                        <Avatar v-if="key % 2 === 0" :size=18 :user-name="`Alex Korf`" class="avatar" />
-                        <div class="container">
-                            <span v-if="key % 2 === 0" class="user-name">Alex Korf</span>
-                            <div class="answer-message">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo...
-                            </div>
-                            <span>
+                <div class="wrapper">
+                    <div class="messages scroll" ref="messagesBoxRef">
+                        <div v-for="(i, key) in Array(4)" :class="[`message`, key % 2 === 0 ? `interlocutor` : ``]">
+                            <Avatar v-if="key % 2 === 0" :size=18 :user-name="`Alex Korf`" class="avatar" />
+                            <div class="container">
+                                <span v-if="key % 2 === 0" class="user-name">Alex Korf</span>
+                                <div class="answer-message">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo...
+                                </div>
+                                <span>
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo id et felis. Aenean elementum egestas nunc eu iaculis. Vestibulum eget tincidunt nibh. Cras sit amet diam porta, vulputate nunc sed, ultrices elit. Ut eu commodo justo. Suspendisse tincidunt, ipsum vel pellentesque tincidunt, metus massa ullamcorper orci, sit amet ultrices lectus diam ac felis. Curabitur egestas varius massa, eget luctus sapien iaculis quis. Fusce volutpat neque fringilla, gravida odio imperdiet, malesuada diam. Phasellus consequat, elit et dictum mollis, turpis lorem convallis eros, sit amet varius nunc massa eget erat. Pellentesque et purus orci.
                             </span>
-                            <div class="addition">
-                                <div class="reactions">
-                                    <div class="reaction noselect active">
-                                        ✌️ <span>200</span>
+                                <div class="addition">
+                                    <div class="reactions">
+                                        <div class="reaction noselect active">
+                                            ✌️ <span>200</span>
+                                        </div>
+                                        <div class="reaction noselect">
+                                            🍻 <span>652</span>
+                                        </div>
                                     </div>
-                                    <div class="reaction noselect">
-                                        🍻 <span>652</span>
-                                    </div>
+                                    <div class="date">17:42</div>
                                 </div>
-                                <div class="date">17:42</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="bottom-box">
-                <IconButton :size=42>
-                    <GIcon style="transform: rotate(30deg)" fill :size=22>attach_file</GIcon>
-                </IconButton>
-                <TextareaAutosize class="scroll" placeholder="Напишите что-нибудь!"/>
-                <IconButton :size=42>
-                    <GIcon fill :size=22>family_star</GIcon>
-                </IconButton>
-                <IconButton :size=42>
-                    <GIcon fill :size=22>play_arrow</GIcon>
-                </IconButton>
-            </div>
+                <div class="bottom-box">
+                    <IconButton :size=42>
+                        <GIcon style="transform: rotate(30deg)" fill :size=22>attach_file</GIcon>
+                    </IconButton>
+                    <TextareaAutosize class="scroll" placeholder="Напишите что-нибудь!"/>
+                    <IconButton :size=42>
+                        <GIcon fill :size=22>family_star</GIcon>
+                    </IconButton>
+                    <IconButton :size=42>
+                        <GIcon fill :size=22>play_arrow</GIcon>
+                    </IconButton>
+                </div>
+            </template>
+            <template v-else>
+                <div class="no-dialog">
+                    <GIcon :size=80 :weight=300>forum</GIcon>
+                    <div class="text" @click="openCreateDialogModal">Выберите или создайте новый чат</div>
+                </div>
+            </template>
         </div>
 
         <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal" />
@@ -505,6 +513,24 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                         transition: 200ms;
                     }
                 }
+            }
+        }
+        .no-dialog {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            .icon {
+                color: $border; // цвет кнш да
+            }
+            .text {
+                color: $border;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                width: 200px;
+                text-align: center;
             }
         }
     }

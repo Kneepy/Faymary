@@ -2,8 +2,8 @@ import { WsAdapter } from '@nestjs/platform-ws';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {APP_PORT, REQUEST_FIELD_ACCESS_TOKEN} from "./constants/app.constants";
-import { ICustomRequest } from './types/request.type';
+import { APP_PORT, REQUEST_FIELD_ACCESS_TOKEN, REQUEST_FIELD_REFRESH_TOKEN } from "./constants/app.constants";
+import { ICustomRequest } from "./types";
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import fastifyCookie from '@fastify/cookie';
 
@@ -32,9 +32,13 @@ import fastifyCookie from '@fastify/cookie';
     /**
      * Нужно будет поменять origin на конкретный хост FE
      */
-    app.enableCors({origin: "http://localhost:3000", credentials: true, exposedHeaders: ["authorization", "set-cookie"]});
+    app.enableCors({
+        origin: "http://localhost:3000",
+        credentials: true,
+        exposedHeaders: [REQUEST_FIELD_ACCESS_TOKEN, REQUEST_FIELD_REFRESH_TOKEN, "set-cookie"]
+    });
 
-    await app.listen(APP_PORT, "0.0.0.0");
+    await app.listen(APP_PORT, "0.0.0.0"); // 0.0.0.0
     Logger.log("Broker service successfully started")
 
     /**
