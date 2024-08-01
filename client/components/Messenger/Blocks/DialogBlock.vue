@@ -10,7 +10,7 @@ const cropMessage = (msg: string, maxLength: number) => {
 
     return msg.slice(0, maxLength)+ "..."
 }
-const lastMessage = computed(() => props.dialog.messages[props.dialog.messages.length - 1])
+const lastMessage = computed(() => props.dialog.messages ? props.dialog.messages[props.dialog.messages.length - 1] : {msg: "Тут ещё нет сообщения", createdAt: "17:19"})
 </script>
 
 <template>
@@ -25,5 +25,52 @@ const lastMessage = computed(() => props.dialog.messages[props.dialog.messages.l
 </template>
 
 <style scoped lang="scss">
+.dialog {
+    display: flex;
+    align-items: center;
+    background-color: $transparent_hover_background;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 200ms;
+    margin-bottom: 8px;
+    transform: scale(0.99);
+    font-size: 18px;
+    position: relative;
+    &:hover {
+        background-color: $transparent_button_hover_17;
+        transition: 200ms;
+        transform: scale(1);
+    }
+    &__info {
+        margin-left: 20px;
 
+        .name {
+            color: $white;
+            text-overflow: ellipsis;
+            max-width: 260px;
+            text-wrap: nowrap;
+            overflow: hidden;
+        }
+        .last-message {
+            color: $gray;
+            text-overflow: ellipsis;
+            max-width: 260px;
+            text-wrap: nowrap;
+            overflow: hidden;
+            font-size: 16px;
+            &.overflow {
+                overflow: initial;
+                text-wrap: initial;
+            }
+        }
+        .last-message-time {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 15px;
+            color: $gray_1;
+        }
+    }
+}
 </style>

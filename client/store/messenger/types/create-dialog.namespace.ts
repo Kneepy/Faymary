@@ -29,4 +29,5 @@ export namespace CreateDialog {
         files: File[]
     }
     export interface CustomUser extends Omit<User, "password" | "profile" | "state"> {}
+    export interface CustomAttachment extends Omit<Attachment, "id"> {}
 }

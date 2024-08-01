@@ -23,6 +23,7 @@ export const useCustomFetch = <DataT>(
         } as HeadersInit
         options.credentials = "include"
         options.mode = "cors"
+
         options.baseURL = appConfig.public.baseApiURL
     },
     async onResponse({ response }) {

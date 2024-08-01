@@ -8,6 +8,8 @@ export const GetMulterConfig = (): MulterOptions => ({
     dest: STORE_FOLDER_PATH,
     storage: multer.diskStorage({
         destination: (req: ICustomRequest, file, cb) => {
+            console.log(req.body)
+
             cb(null, STORE_FOLDER_PATH);
         },
         filename: (req, file, cb) => {

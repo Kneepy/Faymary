@@ -4,6 +4,7 @@ import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 import { type Messenger, useMessengerStore } from "~/store/messenger";
+import { DialogsAPI } from "~/api";
 
 definePageMeta({
     requiredAuth: true, // это только на время разработки, так должно быть true
@@ -22,7 +23,7 @@ onMounted(async () => {
     messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
 
     // получаем все переписки пользователя и заносим их в состояние
-    const userDialogs = [] // await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
+    const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
     messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
 })
 
@@ -192,7 +193,7 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             .search {
                 display: flex;
                 position: relative;
-                border-bottom: 2px solid $border_2;
+                // border-bottom: 2px solid $border_2;
                 &:hover {
                     input {
                         border-color: $border_8;
@@ -281,54 +282,6 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             flex: 1;
             display: flex;
             flex-direction: column;
-            .dialog {
-                display: flex;
-                align-items: center;
-                background-color: $transparent_hover_background;
-                padding: 15px;
-                border-radius: 10px;
-                cursor: pointer;
-                transition: 200ms;
-                margin-bottom: 8px;
-                transform: scale(0.99);
-                font-size: 18px;
-                position: relative;
-                &:hover {
-                    background-color: $transparent_button_hover_17;
-                    transition: 200ms;
-                    transform: scale(1);
-                }
-                &__info {
-                    margin-left: 20px;
-
-                    .name {
-                        color: $white;
-                        text-overflow: ellipsis;
-                        max-width: 260px;
-                        text-wrap: nowrap;
-                        overflow: hidden;
-                    }
-                    .last-message {
-                        color: $gray;
-                        text-overflow: ellipsis;
-                        max-width: 260px;
-                        text-wrap: nowrap;
-                        overflow: hidden;
-                        font-size: 16px;
-                        &.overflow {
-                            overflow: initial;
-                            text-wrap: initial;
-                        }
-                    }
-                    .last-message-time {
-                        position: absolute;
-                        top: 15px;
-                        right: 15px;
-                        font-size: 15px;
-                        color: $gray_1;
-                    }
-                }
-            }
             .no-dialogs {
                 display: flex;
                 align-items: center;

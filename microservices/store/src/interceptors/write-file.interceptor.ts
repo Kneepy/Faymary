@@ -15,11 +15,12 @@ export const WriteFileInterceptor = (field: string, multiply: boolean): Type<Nes
             const req = ctx.getRequest<ICustomRequest>()
             const user = req.query.user_id as string
             const getFileObject = (file: Express.Multer.File): CreateFileDAO => ({
-                user_id: user, filename: file.filename.split(".")[0],
+                user_id: user,
+                filename: file.filename.split(".")[0],
                 extname: path.extname(file.filename)
             })
 
-            if(multiply) {            
+            if(multiply) {
                 req[field] = await Promise.all(req[field].map(async (file: Express.Multer.File) => Object.assign(file, {savedAs: await this.storeResourse.create(getFileObject(file))})))
             }
             else {

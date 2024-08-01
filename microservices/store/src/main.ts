@@ -22,7 +22,7 @@ import { middlware } from "./app.middleware";
         }
     })
     await app.startAllMicroservices();
-    await app.listen(STORE_PORT, async () => Logger.log(`Serve start on: ${await app.getUrl()}`))
+    await app.listen(STORE_PORT, "0.0.0.0");
     
     Logger.log("Store service successfully started")
 })()

@@ -40,13 +40,12 @@ export default defineNuxtRouteMiddleware(async ( route    ) => {
          * Поэтому можно подключаться к WebSocket серверу
          */
         if(!Socket.isReady()) {
+
             Socket.init(baseWsURL, {
                 authorization: appStateStore.authorization,
                 fingerprint: appStateStore.fingerprint,
                 session_id: appStateStore.session
             })
-
-            Socket.on<number>(WS_EVENTS.SESSION_TOKEN, (data) => console.log(data, "callback"))
 
         }
     }

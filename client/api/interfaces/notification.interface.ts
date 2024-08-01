@@ -1,5 +1,5 @@
-import { AdditionsType, Addition } from "./additions.interface";
-import { User } from "./user.interface";
+import { AdditionsType, type Addition } from "~/api";
+import { type User } from "~/api";
 
 export enum NotificationEnumType {
     ADD_COMMENT = 0,

@@ -24,6 +24,9 @@ services:
     build: .
     ports:
       - 5008:5008
+      - 5014:5014
+    volumes:
+      - files:/app/files
     command: npm run start:prod
     depends_on:
       store_db:
@@ -36,11 +39,13 @@ services:
       POSTGRES_DB: store
       POSTGRES_HOST: store_db
       POSTGRES_PORT: 5432
+      STORE_FOLDER: files
     networks:
       - microservices
       - store_service
 volumes:
   store_db:
+  files:
 networks:
   microservices:
     name: microservices

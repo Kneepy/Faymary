@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { UserAPI } from "~/api";
+import { DialogsWsAPI, ParticipantRights, UserAPI } from "~/api";
 import { type CreateDialog, useCreateDialogStore } from "~/store/messenger";
+import { StoreAPI } from "~/api/http/store";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
@@ -73,8 +74,22 @@ const receiveFiles = (e: Event) => {
 
 /**
  * Обработка на нажатие кнопки отправки
+ * Тут надо сделать переключатель типа создать беседу или отправить каждому отдельно, но я для теста пока так оставлю
  */
-const sendMessage = () => {}
+const sendMessage = async () => {
+    const attachments: CreateDialog.CustomAttachment[] = []
+    if (!!createDialogStore.files.length) {
+        const fd = new FormData()
+        createDialogStore.files.forEach((file: File) => fd.append("files", file))
+
+        console.log(await StoreAPI.uploadFiles(fd))
+    }
+
+    // создаём чат
+    const participants = createDialogStore.selectedUsers.map(user => ({ user_id: user.id, rights: ParticipantRights.USER }))
+    const name = participants.length > 1 && "Test Dialog"
+    const dialog = await DialogsWsAPI.createDialog({ participants, name })
+}
 </script>
 <template>
     <ModalBox @on-close="close">

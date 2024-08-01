@@ -2,7 +2,7 @@ import { Controller, Get, NotFoundException, Param, Post, Res, UploadedFile, Upl
 import { GrpcMethod } from "@nestjs/microservices";
 import { createReadStream } from "fs";
 import * as path from "path";
-import { SaveFile, SaveFiles } from "./decorators/save-file.decorator";
+import { SaveFile, SaveFiles } from "./decorators";
 import { StoreResource } from "./providers";
 import { STORE_FOLDER_PATH, STORE_SERVICE, STORE_SERVICE_METHODS } from "./constants/store.constants";
 import { ICustomFile, ICustomResponse } from "./types";
