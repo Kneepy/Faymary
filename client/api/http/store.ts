@@ -1,4 +1,4 @@
-import { File } from "~/api"
+import { type File } from "~/api"
 
 export const StoreAPI = {
     /**
