@@ -1,4 +1,5 @@
 export const DialogsWsAPI = {
     createDialog() {
+        
     }
 }

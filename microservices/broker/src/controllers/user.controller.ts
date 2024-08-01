@@ -9,9 +9,16 @@ import {
     Query,
     Req,
     Res,
-    UnauthorizedException,
 } from "@nestjs/common";
-import {AUTH_COOKIE_OPTIONS, COOKIE_REFRESH_TOKEN_NAME, MAIL_MODULE_CONFIG, PROFILES_MODULE_CONFIG, SESSION_MODULE_CONFIG, USER_MODULE_CONFIG} from "src/constants/app.constants";
+import {
+    AUTH_COOKIE_OPTIONS,
+    COOKIE_REFRESH_TOKEN_NAME,
+    MAIL_MODULE_CONFIG,
+    PROFILES_MODULE_CONFIG, REQUEST_FIELD_ACCESS_TOKEN,
+    REQUEST_FIELD_REFRESH_TOKEN,
+    SESSION_MODULE_CONFIG,
+    USER_MODULE_CONFIG
+} from "src/constants/app.constants";
 import { SessionServiceClient, VerifyTokensDTO } from "src/proto/session";
 import {
     CreateUserDTO,
@@ -29,11 +36,11 @@ import {
     FindUsersDTO
 } from "src/proto/user";
 import { ICustomRequest } from "src/types/request.type";
-import {ConfirmAccessCodeDTO, MailServiceClient} from "../proto/mail";
+import { ConfirmAccessCodeDTO, MailServiceClient } from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
 import { IncorrectPasswordError, NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
 import { Account, Profile, ProfilesServiceClient } from "src/proto/profiles";
-import { ICustomResponse, BrokerResponse } from "src/types";
+import { ICustomResponse } from "src/types";
 import { SendAccessCodeDTO } from '../proto/mail';
 
 @Controller("/user")
@@ -142,21 +149,22 @@ export class UserController {
     }
 
     @Post("auth")
-    async getTokensByOldSessionAndAccessToken(@Req() req: ICustomRequest): Promise<VerifyTokensDTO> {
+    getTokensByOldSessionAndAccessToken(@Res({ passthrough: true }) res: ICustomResponse): VerifyTokensDTO {
 
         // получаются при применении к этому маршруту AuthGuard
-        return {
-            refresh_token: req.headers.refresh_token,
-            access_token: req.headers.authorization
-        }
+        const access_token = res.getHeader(REQUEST_FIELD_ACCESS_TOKEN) as string
+        const refresh_token = res.getHeader(REQUEST_FIELD_REFRESH_TOKEN) as string
+
+        return { access_token, refresh_token }
+
     }
 
-    @Get("/me")
+    @Get("me")
     async getUserBySessionTokens(@Req() req: ICustomRequest): Promise<User> {
         return await this.userService.findUser({id: req.user_id}).toPromise()
     }
 
-    @Get("/me/profile")
+    @Get("me/profile")
     async getUserAccounts(@Req() req: ICustomRequest): Promise<Profile> {
         const profile = await this.profilesService.getProfile({user_id: req.user_id}).toPromise()
         profile.accounts = await Promise.all(profile.accounts.map(async account => ({...account, user: await this.userService.findUser({id: account.user_id}).toPromise()})))
@@ -169,17 +177,17 @@ export class UserController {
         return await this.userService.updateUser({...data, id: req.user_id}).toPromise()
     }
 
-    @Get("/user-is-follow")
+    @Get("user-is-follow")
     async userIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UserIsFollowDTO, "user_id">) : Promise<boolean> {
         return (await this.userService.userIsFollow({author_id: data.user_id, user_id: req.user_id}).toPromise()).isFollow
     }
 
-    @Get("/users-is-follow")
+    @Get("users-is-follow")
     async usersIsFollow(@Req() req: ICustomRequest, @Query() data: Pick<UsersIsFollowDTO, "users_ids">): Promise<UsersIsFollowResult> {
         return await this.userService.usersIsFollow({author_id: req.user_id, users_ids: data.users_ids}).toPromise()
     }
 
-    @Get("/search")
+    @Get("search")
     async searchUsers(@Req() req: ICustomRequest, @Query() query: FindUsersDTO): Promise<User[]> {
         const { users } = await this.userService.findUsers(query).toPromise()
         const withoutMe = users?.filter((user: User) => user.id !== req.user_id)
@@ -197,13 +205,13 @@ export class UserController {
         return await this.userService.findUser(query).toPromise()
     }
 
-    @Get("/followers")
+    @Get("followers")
     @DisableAuth()
     async getFollowers(@Query() query: FindFollowersDTO): Promise<Users> {
         return await this.userService.findFollowers(query).toPromise()
     }
 
-    @Get("/subscriptions")
+    @Get("subscriptions")
     @DisableAuth()
     async getSubscriptions(@Query() query: FindFollowersDTO): Promise<Users> {
         return await this.userService.findSubscriptions(query).toPromise()

@@ -35,7 +35,8 @@ import fastifyCookie from '@fastify/cookie';
     app.enableCors({
         origin: "http://localhost:3000",
         credentials: true,
-        exposedHeaders: [REQUEST_FIELD_ACCESS_TOKEN, REQUEST_FIELD_REFRESH_TOKEN, "set-cookie"]
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        exposedHeaders: [REQUEST_FIELD_ACCESS_TOKEN, REQUEST_FIELD_REFRESH_TOKEN, "fingerprint", "set-cookie"]
     });
 
     await app.listen(APP_PORT, "0.0.0.0"); // 0.0.0.0

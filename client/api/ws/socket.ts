@@ -8,7 +8,8 @@ interface SocketInitParams {
 }
 
 export class Socket {
-    static socket: WebSocket
+    private static socket: WebSocket
+    private static listeners: Map<string, Set<(data: any) => void>> = new Map()
 
     static init(host: string, { authorization, fingerprint, session_id, countReconnect }: SocketInitParams): void {
         if(process.server) return
@@ -26,6 +27,16 @@ export class Socket {
 
         this.socket = new WebSocket(urlConnection)
 
+        this.socket.onopen = () => {
+            console.log("ws is connect 🥰💀✌️🌴")
+        }
+
+        this.socket.onmessage = (message: MessageEvent) => {
+            const response: WsResponse = JSON.parse(message.data)
+
+            this.emit(response.event, response.data)
+        }
+
         /**
          * Переподключение в случае отключения
          */
@@ -33,26 +44,36 @@ export class Socket {
             this.socket = null
 
             setInterval(() => {
-                console.log("reconnect to ws server")
+                console.log("reconnect to ws server 💀✌️")
                 this.socket = new WebSocket(urlConnection)
 
             }, 5000)
         }
-        this.socket.onopen = () => {
-            console.log("ws is connect 🥰💀✌️🌴")
-        }
     }
 
-    static on<T = any>(event: string, callback: (data: T) => any) {
-        if (!this.socket) return
+    /**
+     * @param event событие данные из которого мы хотим вытащить
+     * @param callback функция в которую будут переданы данные плученые по этому событию
+     */
+    static on<T = any>(event: string, callback?: (data: T) => any): void {
+        if (!this.listeners.has(event)) this.listeners.set(event, new Set())
 
-        this.socket.onmessage = (e: MessageEvent) => {
-            const response: WsResponse = JSON.parse(e.data)
+        const listener = this.listeners.get(event)
+        listener.add(callback)
+    }
 
-            if (response.event !== event) return
+    private static emit(event: string, data: any): void {
+        if (!this.listeners.has(event)) return
 
-            callback(response.data)
-        }
+        const listeners = this.listeners.get(event)
+
+        listeners.forEach((listener) => listener(data))
+    }
+
+    static send<T = any>(event: string, data: any): void {
+        const request= JSON.stringify({ event, data })
+
+        this.socket.send(request)
     }
 
     static isReady() {

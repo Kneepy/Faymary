@@ -30,6 +30,6 @@ export const UserAPI = {
         return await useCustomFetch<AuthTokens>("/user/confirm", {method: "PUT", query: {user_id, code}})
     },
     async getTokens(): Promise<AuthTokens> {
-        return await useCustomFetch<AuthTokens>("/user/auth", {method: "POST"})
+        return await useCustomFetch("/user/auth", {method: "POST"})
     }
 }

@@ -11,4 +11,9 @@ export const useUserStore = defineStore("user", {
         tempUser: {},
         me: {}
     }),
+    actions: {
+        setMe(user: User) {
+            this.me = user
+        }
+    }
 })
