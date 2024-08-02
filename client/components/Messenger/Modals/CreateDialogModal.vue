@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { DialogsWsAPI, ParticipantRights, UserAPI } from "~/api";
-import { type CreateDialog, useCreateDialogStore } from "~/store/messenger";
-import { StoreAPI } from "~/api/http/store";
+import { AdditionsType, DialogsWsAPI, ParticipantRights, UserAPI, StoreAPI } from "~/api";
+import { type CreateDialog, useCreateDialogStore, useMessengerStore, useUserStore } from "~/store";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
 const createDialogStore = useCreateDialogStore()
+const userStore = useUserStore()
+const messengerStore = useMessengerStore()
 
 /**
  * Реализация поиска пользователей
@@ -78,17 +79,31 @@ const receiveFiles = (e: Event) => {
  */
 const sendMessage = async () => {
     const attachments: CreateDialog.CustomAttachment[] = []
+
     if (!!createDialogStore.files.length) {
         const fd = new FormData()
         createDialogStore.files.forEach((file: File) => fd.append("files", file))
 
-        console.log(await StoreAPI.uploadFiles(fd))
+        const files = await StoreAPI.uploadFiles(fd)
+
+        for (const file of files) {
+            attachments.push({ item_id: file.id, type: AdditionsType.FILE })
+        }
     }
 
     // создаём чат
     const participants = createDialogStore.selectedUsers.map(user => ({ user_id: user.id, rights: ParticipantRights.USER }))
-    const name = participants.length > 1 && "Test Dialog"
+    const name = participants.length > 1 ? "Test Dialog" : ""
     const dialog = await DialogsWsAPI.createDialog({ participants, name })
+    const message = await DialogsWsAPI.createMessage({
+        attachments,
+        dialog_id: dialog.id,
+        user_id: userStore.me.id,
+        msg: createDialogStore.message
+    })
+
+    messengerStore.addDialogs([ dialog ])
+    messengerStore.addMessagesDialog(dialog.id, [ message ])
 }
 </script>
 <template>

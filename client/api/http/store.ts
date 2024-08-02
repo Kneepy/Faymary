@@ -31,6 +31,7 @@ export const StoreAPI = {
             })
         } catch (e) {
             console.error(e)
+            return []
         }
     }
 }

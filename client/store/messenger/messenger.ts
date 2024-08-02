@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Messenger } from "~/store/messenger/types";
+import type { Message } from "~/api";
 
 export const useMessengerStore = defineStore("messenger", {
     state: (): Messenger.Store => ({
@@ -13,6 +14,17 @@ export const useMessengerStore = defineStore("messenger", {
 
                 if (!!dialogExist) return
                 this.dialogs.push(dialog);
+            }
+        },
+        addMessagesDialog(dialog_id: string, messages: Message[]) {
+            const dialog = this.dialogs.find(v => v.id === dialog_id);
+
+            if (!dialog) return
+
+            for (const message of messages) {
+                if (!dialog.messages) dialog.messages = []
+
+                dialog.messages.push(message);
             }
         },
         changeCurrentDialog(id: string) {

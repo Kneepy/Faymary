@@ -3,6 +3,7 @@ import {Attachment, Message} from "src/proto/messages"
 import { Post } from "src/proto/post"
 import { Story } from "src/proto/stories"
 import { User } from "src/proto/user"
+import { File } from "../proto/store";
 
 export enum AdditionsType {
     USER = 0,
@@ -32,6 +33,6 @@ export interface Addition {
     [Fields.STORY]?: Story | Story[]
     [Fields.MESSAGE]?: Message | Message[]
     [Fields.DIALOG]?: Dialog | Dialog[]
-    [Fields.FILE]?: { id: string } | { id: string }[]
+    [Fields.FILE]?: File | File[]
     [key: string]: any | any[]
 }

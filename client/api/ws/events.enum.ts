@@ -12,7 +12,7 @@ export const WS_EVENTS = {
         CHANGE_NAME: "dialog.change_name",
         CHANGE_FILE: "dialog.change_file",
         DELETE: "dialog.delete",
-        MESSAGES: {
+        MESSAGE: {
             CREATE: "dialog.create.message",
             UPDATE: "dialog.update.message",
             DELETE: "dialog.delete.message"

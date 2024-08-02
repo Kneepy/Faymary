@@ -9,7 +9,7 @@ import { ICustomFile, ICustomResponse } from "./types";
 import { FILE_NOT_FOUND } from "./constants";
 import { File } from "./entities";
 import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
-import { RemoveFileDTO } from "./dtos";
+import { GetFileDTO, RemoveFileDTO } from "./dtos";
 
 @Controller()
 export class StoreController {
@@ -30,7 +30,7 @@ export class StoreController {
     }
 
     @Get(":file_id")
-    async getFiles(@Param("file_id") file_id: string, @Res() res: ICustomResponse) {
+    async viewFile(@Param("file_id") file_id: string, @Res() res: ICustomResponse) {
         const file = await this.storeResource.findOne({id: file_id})
 
         if(file) {
@@ -41,6 +41,15 @@ export class StoreController {
         else {
             throw new NotFoundException(FILE_NOT_FOUND)
         }
+    }
+
+    @GrpcMethod(STORE_SERVICE, STORE_SERVICE_METHODS.GET_FILE)
+    async getFileGrpc(data: GetFileDTO): Promise<File> {
+        const file = await this.storeResource.findOne({ id: data.id })
+
+        if (!file) throw new NotFoundException(FILE_NOT_FOUND)
+
+        return file
     }
 
     @GrpcMethod(STORE_SERVICE, STORE_SERVICE_METHODS.REMOVE_FILE) 

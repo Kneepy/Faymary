@@ -1,5 +1,3 @@
-export * from "./http/user"
 export * from "./interfaces"
-export * from "./http/dialogs"
-export * from "./http/stories"
+export * from "./http"
 export * from "./ws"

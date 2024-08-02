@@ -18,5 +18,6 @@ export const DB = process.env.POSTGRES_DB
 
 export const STORE_SERVICE = "StoreService"
 export enum STORE_SERVICE_METHODS {
-    REMOVE_FILE = "RemoveFile"
+    REMOVE_FILE = "RemoveFile",
+    GET_FILE = "GetFile",
 }

@@ -1,13 +1,22 @@
 import { PostServiceClient } from "src/proto/post"
-import { UserServiceClient } from "src/proto/user"
+import { UserServiceClient } from "src/proto/user";
 import { CommentsServiceClient } from "src/proto/comments"
-import { StoriesServiceClient } from "src/proto/stories"
+import { StoriesServiceClient } from "src/proto/stories";
 import { MessagesServiceClient } from "src/proto/messages"
-import { DialogsServiceClient } from "src/proto/dialogs"
+import { DialogsServiceClient } from "src/proto/dialogs";
 import { Inject, Injectable } from "@nestjs/common"
-import { COMMENTS_MODULE_CONFIG, DIALOGS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, POST_MODULE_CONFIG, STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from "src/constants/app.constants"
+import {
+    COMMENTS_MODULE_CONFIG,
+    DIALOGS_MODULE_CONFIG,
+    MESSAGES_MODULE_CONFIG,
+    POST_MODULE_CONFIG,
+    STORE_MODULE_CONFIG,
+    STORIES_MODULE_CONFIG,
+    USER_MODULE_CONFIG
+} from "src/constants/app.constants";
 import { AdditionsType, Fields } from "src/types/additions.type"
 import { Observable } from "rxjs"
+import { StoreServiceClient } from "../proto/store";
 
 @Injectable()
 export class UtilsService {
@@ -17,7 +26,8 @@ export class UtilsService {
         @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient,
         @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
         @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
-        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesServiceClient
+        @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesServiceClient,
+        @Inject(STORE_MODULE_CONFIG.PROVIDER) private storeService: StoreServiceClient,
     ) {}
 
     private handlers = {
@@ -44,6 +54,10 @@ export class UtilsService {
         [AdditionsType.POST]: {
             handler: this.postsService.getPost,
             field: Fields.POST
+        },
+        [AdditionsType.FILE]: {
+            handler: this.storeService.getFile,
+            field: Fields.FILE
         }
     }
 
@@ -53,9 +67,9 @@ export class UtilsService {
      * Эта функция ищет элмент по типу элемента и по его id (те если type = 0 и какой-то id то будет найден user с таким id)
      */
     getItem<T = any>(type: AdditionsType, item_id: string): {key: Fields, data: Observable<T>} {
-        if (!(type in AdditionsType) || !item_id) return 
+        if (!(type in AdditionsType) || !item_id) return
 
         const { handler, field } = this.handlers[type]
-        return {data: handler({id: item_id}), key: field}
+        return { data: handler({id: item_id}) as Observable<T>, key: field }
     }
 }

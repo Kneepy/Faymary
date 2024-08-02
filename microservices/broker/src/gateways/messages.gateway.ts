@@ -39,16 +39,20 @@ export class MessagesGateway {
         const attachments: Addition = {}
 
         if (!!data.attachments.length) {
-            for (const attachment of data.attachments) {
+            try {
+                for (const attachment of data.attachments) {
+                    const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id);
 
-                const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.id);
+                    data.subscribe(value => {
+                        if (!value) return
+                        if (!attachments[key]) attachments[key] = []
 
-                data.subscribe(value => {
-                    if (!value) return
+                        attachments[key].push(value)
+                    });
 
-                    attachments[key] = [...attachments[key], value]
-                });
-
+                }
+            } catch(e) {
+                await this.serverGateway.sendError(client, e)
             }
         }
 
@@ -85,12 +89,13 @@ export class MessagesGateway {
         if (!!data.attachments.length) {
             for (const attachment of data.attachments) {
 
-                const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.id);
+                const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id);
 
                 data.subscribe(value => {
                     if (!value) return
+                    if (!attachments[key]) attachments[key] = []
 
-                    attachments[key] = [...attachments[key], value]
+                    attachments[key].push(value)
                 });
 
             }
