@@ -1,5 +1,5 @@
 import { Dialog } from "src/proto/dialogs"
-import {Attachment, Message} from "src/proto/messages"
+import { Message } from "src/proto/messages";
 import { Post } from "src/proto/post"
 import { Story } from "src/proto/stories"
 import { User } from "src/proto/user"

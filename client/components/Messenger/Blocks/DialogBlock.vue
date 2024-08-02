@@ -10,6 +10,7 @@ const cropMessage = (msg: string, maxLength: number) => {
 
     return msg.slice(0, maxLength)+ "..."
 }
+
 const lastMessage = computed(() => props.dialog.messages ? props.dialog.messages[props.dialog.messages.length - 1] : {msg: "Тут ещё нет сообщения", createdAt: "17:19"})
 </script>
 

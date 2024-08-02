@@ -67,6 +67,17 @@ export interface DialogHistories {
   notes: DialogHistory[];
 }
 
+export interface ManyDialogParticipants {
+  participants: DialogParticipants[];
+}
+
+export interface GetParticipantsDialogDTO {
+  dialog_id?: string | undefined;
+  rights: ParticipantRights[];
+  take?: number | undefined;
+  skip?: number | undefined;
+}
+
 export interface DialogIncludesUserDTO {
   user_id: string;
   dialog_id: string;
@@ -151,6 +162,8 @@ export interface DialogsServiceClient {
   getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
 
   dialogIncludesUser(request: DialogIncludesUserDTO): Observable<DialogIsIncludesUser>;
+
+  getParticipantsDialog(request: GetParticipantsDialogDTO): Observable<ManyDialogParticipants>;
 }
 
 export interface DialogsServiceController {
@@ -173,6 +186,8 @@ export interface DialogsServiceController {
   getHistoryDialog(request: GetHistoryDialogDTO): Observable<DialogHistories>;
 
   dialogIncludesUser(request: DialogIncludesUserDTO): Observable<DialogIsIncludesUser>;
+
+  getParticipantsDialog(request: GetParticipantsDialogDTO): Observable<ManyDialogParticipants>;
 }
 
 export function DialogsServiceControllerMethods() {
@@ -188,6 +203,7 @@ export function DialogsServiceControllerMethods() {
       "changeFileDialog",
       "getHistoryDialog",
       "dialogIncludesUser",
+      "getParticipantsDialog",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

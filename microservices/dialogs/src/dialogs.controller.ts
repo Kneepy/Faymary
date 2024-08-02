@@ -2,7 +2,7 @@ import {Controller} from "@nestjs/common";
 import {GrpcMethod} from "@nestjs/microservices";
 import {
     DialogActionEnum,
-    DialogHistory,
+    DialogHistory, DialogParticipants,
     Dialogs,
     DIALOGS_SERVICE_METHODS,
     DIALOGS_SERVICE_NAME,
@@ -26,6 +26,7 @@ import {
     GetHistoryDialogDTO,
     GetUserDialogsDTO
 } from "./dtos";
+import { GetParticipantsDialogDTO } from "./dtos/get-participants-dialog.dto";
 
 @Controller()
 export class DialogsController {
@@ -48,7 +49,7 @@ export class DialogsController {
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CREATE_DIALOG)
     async createDialog({participants, name}: CreateDialogDTO): Promise<Dialogs> {
         const dialog = await this.dialogsService.create({participants, name})
-        const creatorId = participants.find(participant => participant.rights === ParticipantRights.CREATOR).user_id ?? participants.find(participant => participant.rights === ParticipantRights.ADMIN).user_id
+        const creatorId = participants.find(participant => participant.rights === ParticipantRights.CREATOR)?.user_id ?? participants.find(participant => participant.rights === ParticipantRights.ADMIN)?.user_id
         const historyNote = await this.dialogsService.createHistoryNote({dialog, user_id: creatorId, action: DialogActionEnum.CREATE_DIALOG})
 
         return dialog
@@ -56,24 +57,34 @@ export class DialogsController {
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_DIALOG)
     async getDialog(data: GetDialogDTO): Promise<Dialogs> {
-        const dialog = await this.dialogsService.findOne({id: data.id}, {relations: {participants: true}})
+        const dialog = await this.dialogsService.findOne({id: data.id})
 
         if(!data.id || !dialog) throw NotFoundDialog
 
         return dialog
     }
 
-    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_ALL_USER_DIALOGS)
-    async getUserDialogs({take, skip, ...data}: GetUserDialogsDTO): Promise<{dialogs: Dialogs[]}> {
-        const dialogs = await this.dialogsService.findByUserId({user_id: data.user_id, state: StateDialogEnum.ACTIVE}, {take, skip, relations: {participants: true}});
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_PARTICIPANTS_DIALOG)
+    async getParticipantsDialog(data: GetParticipantsDialogDTO): Promise<{ participants: DialogParticipants[] }> {
+        const participants = await this.dialogsService.findParticipantsDialog({
+            dialog_id: data.dialog_id,
+            rights: data.rights
+        }, {take: data.take, skip: data.skip})
 
-        if(!data.user_id && !dialogs.length)
-            throw NotFoundUserDialogs
-
-        return {dialogs}
+        return { participants: participants ?? [] }
     }
 
-    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.DELETE_DILAOG)
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_ALL_USER_DIALOGS)
+    async getUserDialogs({take, skip, user_id}: GetUserDialogsDTO): Promise<{dialogs: Dialogs[]}> {
+        const dialogs = await this.dialogsService.findByUserId({user_id, state: StateDialogEnum.ACTIVE}, { take, skip });
+
+        if(!user_id && !dialogs.length)
+            throw NotFoundUserDialogs
+
+        return { dialogs }
+    }
+
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.DELETE_DIALOG)
     async deleteDialog(data: DeleteDialogDTO): Promise<DialogHistory> {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
         const participant = await this.dialogsService.findOneParticipantDialog({user_id: data.user_id, dialog_id: data.dialog_id})

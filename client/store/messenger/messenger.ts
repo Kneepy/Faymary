@@ -24,6 +24,10 @@ export const useMessengerStore = defineStore("messenger", {
             for (const message of messages) {
                 if (!dialog.messages) dialog.messages = []
 
+                const messageExist = dialog.messages.find(v => v.id === message.id)
+
+                if (messageExist) return
+
                 dialog.messages.push(message);
             }
         },

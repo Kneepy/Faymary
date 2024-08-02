@@ -2,7 +2,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {
     MessageCreateInterface,
     MessageFindManyInterface,
-    MessageFindOneInterface,
+    MessageFindOneInterface, MessageGetLastInterface,
     MessageUpdateInterface
 } from "./interfaces";
 import {
@@ -29,12 +29,16 @@ export class MessagesService {
 
     async find(
         args: MessageFindManyInterface,
-        otherOpt: Omit<FindManyOptions<Messages>, "where">
+        otherOpt?: Omit<FindManyOptions<Messages>, "where">
     ): Promise<Messages[]> {
         if (!otherOpt.take) otherOpt.take = DEFAULT_TAKE_MESSAGES;
         if (!otherOpt.skip) otherOpt.skip = DEFAULT_SKIP_MESSAGES;
 
         return await this.repository.find({ where: args, ...otherOpt });
+    }
+
+    async getLast({ dialog_id }: MessageGetLastInterface, otherOpt?: Omit<FindManyOptions<Messages>, "where" | "order" | "take" | "skip">): Promise<Messages> {
+        return (await this.repository.find({ where: { dialog_id }, order: { createdAt: "DESC" }, take: 1, ...otherOpt }))[0]
     }
 
     async delete(id: string): Promise<any> {

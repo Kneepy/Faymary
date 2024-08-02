@@ -7,15 +7,15 @@ import {
     DialogHistory,
     Dialogs,
     StateDialogEnum,
-    DialogParticipants
+    DialogParticipants, DEFAULT_TAKE_PARTICIPANTS_DIALOG, DEFAULT_SKIP_PARTICIPANTS_DIALOG
 } from "src/common";
 import {DialogsInterfaces} from "src/interfaces";
-import {DeepPartial, FindManyOptions, FindOneOptions, Repository} from "typeorm";
+import { DeepPartial, FindManyOptions, FindOneOptions, In, Repository } from "typeorm";
 
 export class DialogsService {
     constructor(
         @InjectRepository(Dialogs) private repository: Repository<Dialogs>,
-        @InjectRepository(DialogHistory) private historyRepostiory: Repository<DialogHistory>,
+        @InjectRepository(DialogHistory) private historyRepository: Repository<DialogHistory>,
         @InjectRepository(DialogParticipants) private participantsRepository: Repository<DialogParticipants>
     ) {}
 
@@ -23,24 +23,32 @@ export class DialogsService {
         const existParticipant = await this.findOneParticipantDialog({user_id: participant.user_id, dialog_id: dialog.id})
         const addedParticipant = !!existParticipant ? existParticipant : await this.createParticipantDialog({dialog, user_id: participant.user_id, rights: participant.rights})
 
-        this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).add(addedParticipant)
+        await this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).add(addedParticipant)
     }
 
     async removeUserToDialog(dialog: Dialogs, participant: Omit<DialogParticipants, "id" | "dialog">): Promise<void> {
         const removedParticipant = await this.findOneParticipantDialog({dialog_id: dialog.id, user_id: participant.user_id})
 
-        this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).remove(removedParticipant)
-        this.deleteParticipantDialog(removedParticipant.id)
+        await this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).remove(removedParticipant)
+        await this.deleteParticipantDialog(removedParticipant.id)
     }
 
     // CRUD for participants
-    async findOneParticipantDialog({user_id, dialog_id}: DialogsInterfaces.PindOneParticipantDialog, otherOptions?: Omit<FindOneOptions<DialogParticipants>, "where">): Promise<DialogParticipants> {
-        if(user_id && dialog_id) return await this.participantsRepository.findOne({where: {user_id, dialog: {id: dialog_id}}, ...otherOptions})
-        
-        return {} as any
+    async findOneParticipantDialog({user_id, dialog_id}: DialogsInterfaces.FindOneParticipantDialog, otherOptions?: Omit<FindOneOptions<DialogParticipants>, "where">): Promise<DialogParticipants> {
+        if (!user_id || !dialog_id) return
+
+        return await this.participantsRepository.findOne({where: {user_id, dialog: {id: dialog_id}}, ...otherOptions})
     }
-    async createParticipantDialog(participatnt: Omit<DialogParticipants, "id">): Promise<DialogParticipants> {
-        return await this.participantsRepository.save(participatnt)
+    async findParticipantsDialog({ dialog_id, rights }: DialogsInterfaces.FindParticipantsDialog, otherOptions: Omit<FindManyOptions<DialogParticipants>, "where"> = {take: DEFAULT_TAKE_PARTICIPANTS_DIALOG, skip: DEFAULT_SKIP_PARTICIPANTS_DIALOG}) {
+        if (!dialog_id) return
+
+        const criteria = {} as any
+        if (rights?.length) criteria.rights = In(rights)
+
+        return await this.participantsRepository.find({ where: {dialog: {id: dialog_id}, ...criteria }, ...otherOptions })
+    }
+    async createParticipantDialog(participant: Omit<DialogParticipants, "id">): Promise<DialogParticipants> {
+        return await this.participantsRepository.save(participant)
     }
     async deleteParticipantDialog(id: string): Promise<any> {
         return await this.participantsRepository.delete(id)
@@ -48,10 +56,10 @@ export class DialogsService {
 
     // CRUD for history
     async createHistoryNote(historyData: Omit<DialogHistory, "id" | "createdAt">): Promise<DialogHistory> {
-        return await this.historyRepostiory.save({createdAt: Date.now(), ...historyData})
+        return await this.historyRepository.save({createdAt: Date.now(), ...historyData})
     }
     async findHistoryNotes(data: DeepPartial<DialogHistory>, otherOptions: Omit<FindManyOptions<DialogHistory>, "where"> = {take: DEFAULT_TAKE_HISTORY_DIALOG, skip: DEFAULT_SKIP_HISTORY_DIALOG}): Promise<DialogHistory[]> {
-        return await this.historyRepostiory.find({where: data, ...otherOptions})
+        return await this.historyRepository.find({where: data, ...otherOptions})
     }
 
     // CRUD for dialogs
@@ -72,9 +80,9 @@ export class DialogsService {
     }
 
     async findByUserId({user_id, state = StateDialogEnum.ACTIVE}: DialogsInterfaces.FindManyDialogsByUserId, otherOptions: Omit<FindManyOptions<Dialogs>, "where"> = {take: DEFAULT_TAKE_DIALOGS, skip: DEFAULT_SKIP_DIALOGS}): Promise<Dialogs[]> {
-        if(user_id) {
-            return await this.repository.find({where: {participants: {user_id}, state}, ...otherOptions})
-        }
+        if(!user_id) return
+
+        return await this.repository.find({ where: { participants: { user_id }, state }, ...otherOptions })
     }
 
     // просто изменяет состояние без удаления записи

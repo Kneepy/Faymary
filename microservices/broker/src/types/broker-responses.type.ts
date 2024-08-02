@@ -1,5 +1,5 @@
 import { Comment as BaseComment } from "src/proto/comments";
-import { DialogHistory as BaseDialogHistory } from "src/proto/dialogs";
+import { DialogHistory as BaseDialogHistory, Dialog as BaseDialog, DialogParticipants } from "src/proto/dialogs";
 import { Notification as BaseNotification } from "src/proto/notification";
 import { Message as BaseMessage } from "src/proto/messages";
 import { Post as BasePost } from "src/proto/post"
@@ -16,6 +16,10 @@ export namespace BrokerResponse {
     }
     export interface DialogHistory extends BaseDialogHistory {
         attachments?: Addition
+    }
+    export interface Dialog extends Omit<BaseDialog, "participants"> {
+        lastMessage?: Message
+        participants: Omit<DialogParticipants & User, "dialog" | "user_id">[]
     }
     export interface Message extends Omit<BaseMessage, "attachments"> {
         attachments: Addition

@@ -13,6 +13,7 @@ service DialogsService {
     rpc ChangeFileDialog (ChangeFileDialogDTO) returns (stream DialogHistory);
     rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistories);
     rpc DialogIncludesUser (DialogIncludesUserDTO) returns (stream DialogIsIncludesUser);
+    rpc GetParticipantsDialog (GetParticipantsDialogDTO) returns (stream ManyDialogParticipants);
 }
 
 message Dialog {
@@ -44,6 +45,17 @@ message Dialogs {
 
 message DialogHistories {
     repeated DialogHistory notes = 1;
+}
+
+message ManyDialogParticipants {
+    repeated DialogParticipants participants = 1;
+}
+
+message GetParticipantsDialogDTO {
+    optional string dialog_id = 1;
+    repeated ParticipantRights rights = 2;
+    optional int32 take = 3;
+    optional int32 skip = 4;
 }
 
 message DialogIncludesUserDTO {

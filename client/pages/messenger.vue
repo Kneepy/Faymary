@@ -26,6 +26,12 @@ onMounted(async () => {
     const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
     messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
 })
+watch(() => messengerStore.currentDialog, async (dialog_id) => {
+    if (!dialog_id) return
+
+    const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 20, skip: 0 })
+    messengerStore.addMessagesDialog(dialog_id, messages)
+})
 
 // функции для открытия списка избранных сообщений
 const isOpenImportantMsgModal = ref(false)

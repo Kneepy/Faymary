@@ -1,12 +1,21 @@
-import { MESSAGES_MODULE_CONFIG, USER_MODULE_CONFIG } from './../constants/app.constants';
+import { MESSAGES_MODULE_CONFIG, USER_MODULE_CONFIG } from "./../constants/app.constants";
 import { Controller, ForbiddenException, Get, Inject, Query, Req } from "@nestjs/common";
 import { DIALOGS_MODULE_CONFIG } from "src/constants/app.constants";
-import { Dialog, DialogActionEnum, DialogsServiceClient, GetDialogDTO, GetHistoryDialogDTO, GetUserDialogsDTO } from "src/proto/dialogs";
+import {
+    Dialog,
+    DialogActionEnum,
+    DialogsServiceClient,
+    GetDialogDTO,
+    GetHistoryDialogDTO,
+    GetUserDialogsDTO,
+    ParticipantRights
+} from "src/proto/dialogs";
 import { GetMessageDTO, GetMessagesDTO, MessagesServiceClient } from "src/proto/messages";
-import { UserServiceClient } from 'src/proto/user';
-import {Addition, AdditionsType, BrokerResponse} from 'src/types';
+import { UserServiceClient } from "src/proto/user";
+import { Addition, AdditionsType, BrokerResponse } from "src/types";
 import { ICustomRequest } from "src/types/request.type";
-import { UtilsService } from 'src/utils/get-item.util';
+import { UtilsService } from "src/utils/get-item.util";
+import { firstValueFrom } from "rxjs";
 
 @Controller("dialog")
 export class DialogsController {
@@ -18,8 +27,47 @@ export class DialogsController {
     ) {}
 
     @Get("many")
-    async getUserDialogs(@Query() data: GetUserDialogsDTO, @Req() {user_id}: ICustomRequest): Promise<Dialog[]> {
-        return (await this.dialogsService.getAllUserDialogs({user_id, skip: data.skip, take: data.take}).toPromise()).dialogs
+    async getUserDialogs(@Query() data: GetUserDialogsDTO, @Req() {user_id}: ICustomRequest): Promise<BrokerResponse.Dialog[]> {
+        const { dialogs } = await firstValueFrom(this.dialogsService.getAllUserDialogs({user_id, skip: data.skip, take: data.take}))
+
+        return dialogs.reduce(async (accumulator, dialog) => {
+            const dialogTmp: BrokerResponse.Dialog = { ...dialog} as any
+            const accumulatorValue = await accumulator
+
+            try {
+                /**
+                 * Если последнее сообщение не найдено то эта штука выкидывает ошибку
+                 * Поэтому юзаем try catch
+                 */
+                const lastMessage = await firstValueFrom(this.messagesService.getLastDialogMessage({ dialog_id: dialog.id }))
+
+                const [ messageUser, messageAttachments] = await Promise.all([
+                    firstValueFrom(this.userService.findUser({ id: lastMessage.user_id })),
+                    this.utilsService.getAdditions((lastMessage.attachments ?? []) as any)
+                ])
+
+                dialogTmp.lastMessage = {...lastMessage, attachments: messageAttachments, user: messageUser }
+
+            } catch (e) {}
+
+            const { participants } = await firstValueFrom(this.dialogsService.getParticipantsDialog({
+                rights: [ParticipantRights.ADMIN, ParticipantRights.CREATOR, ParticipantRights.USER],
+                dialog_id: dialog.id,
+                take: 5,
+                skip: 0
+            }))
+
+            dialogTmp.participants = await Promise.all(
+                participants.map(async (participant) => {
+                    const user = await firstValueFrom(this.userService.findUser({ id: participant.id }))
+                    return { ...user, ...participant }
+                })
+            )
+
+            accumulatorValue.push(dialogTmp)
+
+            return accumulator
+        }, Promise.resolve([]))
     }
 
     @Get()
@@ -55,19 +103,24 @@ export class DialogsController {
          * Проверка на наличие пользователя в далоге, если его там нет то и сообщения он не получит
          */
         const userConsistDialog = dialog.participants.find(user => user.user_id === user_id).user_id
+
         if(!userConsistDialog) throw new ForbiddenException()
 
-        const messages = (await this.messagesService.getDialogMessages(data).toPromise()).messages
+        const { messages } = await this.messagesService.getDialogMessages(data).toPromise()
+
+        if (!messages) return []
 
         return Promise.all(messages.map(async message => {
             // собираем все вложения сообщения
             const attachments: Addition = {}
 
-            for (const attachment of message.attachments) {
+            for (const attachment of (message.attachments ?? [])) {
 
                 const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id)
-                attachments[key] = await data.toPromise()
 
+                if (!attachments[key]) attachments[key] = []
+
+                attachments[key].push(await data.toPromise())
             }
 
             // получаем владельца сообщения

@@ -5,15 +5,14 @@ import {
     Messages,
     MESSAGES_SERVICE_METHODS,
     MESSAGES_SERVICE_NAME,
-    AttachmentType,
     NotFoundDialog,
     NotFoundMessage,
-    REDIS_DEFAULT_TTL,
     REDIS_PROVIDER
 } from "src/common";
 import {
     CreateMessageDTO,
     GetDialogMessagesDTO,
+    GetLastMessageDialogDTO,
     GetMessageDTO,
     UpdateMessageDTO
 } from "./dto";
@@ -29,7 +28,6 @@ export class MessagesController {
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.CREATE_MESSAGE)
     async createMessage(data: CreateMessageDTO): Promise<Messages> {
-        console.log(data)
         if (!data.dialog_id) throw NotFoundDialog;
 
         const msg = await this.messagesService.create(data)
@@ -50,6 +48,15 @@ export class MessagesController {
             { dialog_id: data.dialog_id },
             { take: data.take, skip: data.skip, relations: {attachments: true} }
         )}
+    }
+
+    @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_LAST_DIALOG_MESSAGE)
+    async getLastDialogMessage({ dialog_id }: GetLastMessageDialogDTO): Promise<Messages> {
+        const lastMessage = await this.messagesService.getLast({ dialog_id }, { relations: { attachments: true } })
+
+        if(!lastMessage) throw NotFoundMessage;
+
+        return lastMessage
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_MESSAGE)

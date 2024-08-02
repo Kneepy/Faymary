@@ -30,6 +30,10 @@ export interface GetMessageDTO {
   id: string;
 }
 
+export interface GetLastMessageDialogDTO {
+  dialog_id: string;
+}
+
 export interface CreateMessageDTO {
   attachments: Attachment[];
   dialog_id: string;
@@ -76,6 +80,8 @@ export interface MessagesServiceClient {
 
   getDialogMessages(request: GetMessagesDTO): Observable<Messages>;
 
+  getLastDialogMessage(request: GetLastMessageDialogDTO): Observable<Message>;
+
   getMessage(request: GetMessageDTO): Observable<Message>;
 
   updateMessage(request: UpdateMessageDTO): Observable<Message>;
@@ -87,6 +93,8 @@ export interface MessagesServiceController {
   createMessage(request: CreateMessageDTO): Observable<Message>;
 
   getDialogMessages(request: GetMessagesDTO): Observable<Messages>;
+
+  getLastDialogMessage(request: GetLastMessageDialogDTO): Observable<Message>;
 
   getMessage(request: GetMessageDTO): Observable<Message>;
 
@@ -100,6 +108,7 @@ export function MessagesServiceControllerMethods() {
     const grpcMethods: string[] = [
       "createMessage",
       "getDialogMessages",
+      "getLastDialogMessage",
       "getMessage",
       "updateMessage",
       "deleteMessage",

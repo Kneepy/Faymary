@@ -1,10 +1,10 @@
-import { PostServiceClient } from "src/proto/post"
+import { PostServiceClient } from "src/proto/post";
 import { UserServiceClient } from "src/proto/user";
-import { CommentsServiceClient } from "src/proto/comments"
+import { CommentsServiceClient } from "src/proto/comments";
 import { StoriesServiceClient } from "src/proto/stories";
-import { MessagesServiceClient } from "src/proto/messages"
+import { MessagesServiceClient } from "src/proto/messages";
 import { DialogsServiceClient } from "src/proto/dialogs";
-import { Inject, Injectable } from "@nestjs/common"
+import { Inject, Injectable } from "@nestjs/common";
 import {
     COMMENTS_MODULE_CONFIG,
     DIALOGS_MODULE_CONFIG,
@@ -14,8 +14,8 @@ import {
     STORIES_MODULE_CONFIG,
     USER_MODULE_CONFIG
 } from "src/constants/app.constants";
-import { AdditionsType, Fields } from "src/types/additions.type"
-import { Observable } from "rxjs"
+import { Addition, AdditionsType, Fields } from "src/types/additions.type";
+import { Observable } from "rxjs";
 import { StoreServiceClient } from "../proto/store";
 
 @Injectable()
@@ -71,5 +71,25 @@ export class UtilsService {
 
         const { handler, field } = this.handlers[type]
         return { data: handler({id: item_id}) as Observable<T>, key: field }
+    }
+
+    getAdditions(
+        additions: {type: AdditionsType, item_id: string}[]
+    ): Promise<Addition> {
+        return additions.reduce(async (accumulator, addition, f) => {
+            if (!(addition.type in AdditionsType)) return
+
+            const accumulatorValue = await accumulator
+            const { data, key } = this.getItem(addition.type, addition.item_id)
+            const item = await data?.toPromise()
+
+            if (!item) return accumulator
+            if (accumulatorValue[key]) accumulatorValue[key] = {}
+
+            accumulatorValue[key].push(item)
+
+            return accumulatorValue
+
+        }, Promise.resolve({}))
     }
 }

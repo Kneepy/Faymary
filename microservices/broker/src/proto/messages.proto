@@ -5,6 +5,7 @@ package messages;
 service MessagesService {
     rpc CreateMessage (CreateMessageDTO) returns (stream Message);
     rpc GetDialogMessages (GetMessagesDTO) returns (stream Messages);
+    rpc GetLastDialogMessage (GetLastMessageDialogDTO) returns (stream Message);
     rpc GetMessage (GetMessageDTO) returns (stream Message);
     rpc UpdateMessage (UpdateMessageDTO) returns (stream Message);
     rpc DeleteMessage (DeleteMessageDTO) returns (stream Message);
@@ -18,6 +19,10 @@ message GetMessagesDTO {
 
 message GetMessageDTO {
     string id = 1;
+}
+
+message GetLastMessageDialogDTO {
+    string dialog_id = 1;
 }
 
 message CreateMessageDTO {
