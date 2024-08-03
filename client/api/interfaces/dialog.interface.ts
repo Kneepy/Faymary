@@ -1,3 +1,5 @@
+import type { User } from "~/api";
+
 export enum DialogActionEnum {
     CREATE_DIALOG = 0,
     DELETE_DIALOG = 1,
@@ -20,6 +22,7 @@ export interface DialogParticipants {
     id: string;
     rights: ParticipantRights;
     user_id: string;
+    user: User;
     dialog: Dialog;
 }
 export interface Dialog {

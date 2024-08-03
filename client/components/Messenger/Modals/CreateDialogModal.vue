@@ -124,26 +124,15 @@ const sendMessage = async () => {
             </div>
             <div class="result-search scroll">
                 <div v-if="createDialogStore.resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
-                <SkeletonLoader
-                    v-if="isLoading"
-                    :count=2
-                />
-                <div
+                <SkeletonResultSearchUserCard v-if="isLoading" />
+                <ResultSearchUserCard
                     v-for="(user, key) in createDialogStore.resultSearch"
+                    :user="user as any"
+                    :is-select="checkUserIsSelected(user)"
                     @click="() => toggleSelectUser(user)"
                     :key="key"
-                    :class="[`user`, checkUserIsSelected(user) ? `active` : ``]"
                     v-else
-                >
-                    <div class="user-info">
-                        <Avatar :size=40 :user-name="user.fullName" :href="user.file_id" />
-                        <div class="user-name">
-                            {{ user.fullName }}
-                            <div class="user-id">@{{ user.userName }}</div>
-                        </div>
-                    </div>
-                    <span v-if="checkUserIsSelected(user)" class="material-symbols-rounded">check</span>
-                </div>
+                />
             </div>
             <div
                 v-if="!!createDialogStore.selectedUsers.length"
@@ -299,42 +288,6 @@ const sendMessage = async () => {
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .user {
-            display: flex;
-            color: $white;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            transition: 200ms;
-            border-radius: 10px;
-            justify-content: space-between;
-            background-color: $transparent_button_hover_17;
-            &:hover, &.active {
-                background-color: $transparent_panel_hover;
-                opacity: 1;
-                transition: 200ms;
-            }
-            span {
-                font-weight: 800;
-                font-size: 20px;
-                color: $white;
-            }
-            .user-info {
-                display: flex;
-                align-items: center;
-                .user-name {
-                    margin-left: 15px;
-                    font-weight: bold;
-                    font-size: 16px;
-                    .user-id {
-                        font-size: 14px;
-                        font-weight: 600;
-                        color: $gray;
-                    }
-                }
-            }
         }
     }
     .selected-users {

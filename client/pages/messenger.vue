@@ -5,6 +5,7 @@ import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.v
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 import { type Messenger, useMessengerStore } from "~/store/messenger";
 import { DialogsAPI } from "~/api";
+import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
 
 definePageMeta({
     requiredAuth: true, // это только на время разработки, так должно быть true
@@ -17,14 +18,17 @@ useHead({
 
 const messengerStore = useMessengerStore()
 const messagesBoxRef = ref<HTMLBaseElement>()
+const isLoading = ref(false)
 
 onMounted(async () => {
     // это чтобы при открытии блока с сообщениями прокуртка была внизу блока а не вверху
     messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
 
     // получаем все переписки пользователя и заносим их в состояние
+    isLoading.value = true
     const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
     messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
+    isLoading.value = false
 })
 watch(() => messengerStore.currentDialog, async (dialog_id) => {
     if (!dialog_id) return
@@ -93,13 +97,16 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 </div>
             </div>
             <div class="dialogs scroll">
-                <DialogBlock
-                    v-for="(dialog, key) in messengerStore.dialogs"
-                    @click="messengerStore.changeCurrentDialog(dialog.id)"
-                    :dialog
-                    :key
-                />
-                <div v-if="messengerStore.dialogs.length <= 0" class="no-dialogs">Пока вы ещё ни с кем не общались!</div>
+                <template v-if="!isLoading">
+                    <DialogCard
+                        v-for="(dialog, key) in messengerStore.dialogs"
+                        @click="messengerStore.changeCurrentDialog(dialog.id)"
+                        :dialog
+                        :key
+                    />
+                </template>
+                <SkeletonDialogBlock v-if="messengerStore.dialogs?.length === 0 && isLoading" />
+                <div v-if="messengerStore.dialogs?.length === 0 && !isLoading" class="no-dialogs">Пока вы ещё ни с кем не общались!</div>
             </div>
         </div>
         <div class="right-bar">

@@ -59,8 +59,9 @@ export class DialogsController {
 
             dialogTmp.participants = await Promise.all(
                 participants.map(async (participant) => {
-                    const user = await firstValueFrom(this.userService.findUser({ id: participant.id }))
-                    return { ...user, ...participant }
+                    const user = await firstValueFrom(this.userService.findUser({ id: participant.user_id }))
+
+                    return { ...participant, user }
                 })
             )
 
@@ -97,12 +98,10 @@ export class DialogsController {
 
     @Get("messages")
     async getMessagesDialog(@Query() data: GetMessagesDTO, @Req() { user_id }: ICustomRequest): Promise<BrokerResponse.Message[]> {
-        const dialog = await this.dialogsService.getDialog({id: data.dialog_id}).toPromise()
-
         /**
          * Проверка на наличие пользователя в далоге, если его там нет то и сообщения он не получит
          */
-        const userConsistDialog = dialog.participants.find(user => user.user_id === user_id).user_id
+        const userConsistDialog = await this.dialogsService.dialogIncludesUser({ user_id, dialog_id: data.dialog_id }).toPromise()
 
         if(!userConsistDialog) throw new ForbiddenException()
 
@@ -111,20 +110,13 @@ export class DialogsController {
         if (!messages) return []
 
         return Promise.all(messages.map(async message => {
-            // собираем все вложения сообщения
-            const attachments: Addition = {}
+            const [ attachments, user ] = await Promise.all([
+                // собираем все вложения сообщения
+                this.utilsService.getAdditions((message.attachments ?? []) as any),
 
-            for (const attachment of (message.attachments ?? [])) {
-
-                const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id)
-
-                if (!attachments[key]) attachments[key] = []
-
-                attachments[key].push(await data.toPromise())
-            }
-
-            // получаем владельца сообщения
-            const user = await this.userService.findUser({id: message.user_id}).toPromise()
+                // получаем владельца сообщения
+                this.userService.findUser({id: message.user_id}).toPromise()
+            ])
 
             return {...message, attachments, user}
         }))
@@ -133,16 +125,11 @@ export class DialogsController {
     @Get("message")
     async getMessage(@Query() data: GetMessageDTO): Promise<BrokerResponse.Message> {
         const message = await this.messagesService.getMessage(data).toPromise()
-        const user = await this.userService.findUser({id: message.user_id}).toPromise()
-        const attachments: Addition = {}
+        const [ attachments, user ] = await Promise.all([
+            this.utilsService.getAdditions(message.attachments as any ?? []),
+            this.userService.findUser({id: message.user_id}).toPromise()
+        ])
 
-        for (const attachment of message.attachments) {
-
-            const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id)
-            attachments[key] = await data.toPromise()
-
-        }
-
-        return {...message, attachments, user}
+        return { ...message, attachments, user }
     }
 }

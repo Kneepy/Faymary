@@ -45,7 +45,7 @@ export class DialogsService {
         const criteria = {} as any
         if (rights?.length) criteria.rights = In(rights)
 
-        return await this.participantsRepository.find({ where: {dialog: {id: dialog_id}, ...criteria }, ...otherOptions })
+        return this.participantsRepository.find({ where: {dialog: {id: dialog_id}, ...criteria }, ...otherOptions })
     }
     async createParticipantDialog(participant: Omit<DialogParticipants, "id">): Promise<DialogParticipants> {
         return await this.participantsRepository.save(participant)

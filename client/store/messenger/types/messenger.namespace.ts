@@ -16,6 +16,7 @@ export namespace Messenger {
 
     export interface CustomDialog extends Dialog {
         messages?: Message[]
+        lastMessage?: Message
     }
 
 }
