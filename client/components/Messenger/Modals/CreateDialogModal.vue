@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdditionsType, DialogsWsAPI, ParticipantRights, UserAPI, StoreAPI } from "~/api";
+import { AdditionsType, DialogsWsAPI, ParticipantRights, UserAPI, StoreAPI, DialogsAPI } from "~/api";
 import { type CreateDialog, useCreateDialogStore, useMessengerStore, useUserStore } from "~/store";
 
 const emit = defineEmits(["onClose"])
@@ -22,9 +22,9 @@ watch(() => createDialogStore.inputSearch, async value => {
     // таймаут нужен чтобы оптимизировать работу живого поиска
     clearTimeout(debounceTimeout)
     debounceTimeout = setTimeout(async () => {
-        const users = await UserAPI.getUsersBy({ fullName: value })
+        const { existing, nonexistent } = await DialogsAPI.searchUsersFromDialogs({ fullName: value, take: 10, skip: 0 })
+        createDialogStore.setResultSearch({ existing: existing ?? [], nonexistent: nonexistent ?? [] })
 
-        createDialogStore.setResultSearch(users)
         isLoading.value = false
     }, 500)
 })
@@ -70,7 +70,9 @@ const receiveFiles = (e: Event) => {
     }
 
     // чтобы багав не была
-    (<HTMLInputElement> e.target).value = ""
+    const currentValue = createDialogStore.message as any
+    (<HTMLInputElement> e.target).value = "" as any
+    (<HTMLInputElement> e.target).value = currentValue
 }
 
 /**
@@ -123,15 +125,32 @@ const sendMessage = async () => {
                 <input v-model="createDialogStore.inputSearch" placeholder="Найдите новых собеседников!" type="text">
             </div>
             <div class="result-search scroll">
-                <div v-if="createDialogStore.resultSearch.length <= 0 && !isLoading" class="none">Мы не неашли пользователя с таким именем</div>
+                <div
+                    v-if="
+                        createDialogStore.resultSearch.nonexistent.length <= 0 &&
+                        createDialogStore.resultSearch.existing.length <= 0 &&
+                        !isLoading
+                    "
+                    class="none"
+                >Мы не неашли пользователя с таким именем</div>
+                <div v-if="!!createDialogStore.resultSearch.existing?.length && !isLoading" class="result-type"><span>Вы уже общались</span></div>
                 <SkeletonResultSearchUserCard v-if="isLoading" />
                 <ResultSearchUserCard
-                    v-for="(user, key) in createDialogStore.resultSearch"
+                    v-for="(user, key) in createDialogStore.resultSearch.existing"
                     :user="user as any"
                     :is-select="checkUserIsSelected(user)"
                     @click="() => toggleSelectUser(user)"
                     :key="key"
                     v-else
+                />
+                <div v-if="!!createDialogStore.resultSearch.nonexistent?.length && !isLoading" class="result-type"><span>Общение с ними можно начать</span></div>
+                <ResultSearchUserCard
+                    v-for="(user, key) in createDialogStore.resultSearch.nonexistent"
+                    :user="user as any"
+                    :is-select="checkUserIsSelected(user)"
+                    @click="() => toggleSelectUser(user)"
+                    :key="key"
+                    v-if="!isLoading"
                 />
             </div>
             <div
@@ -279,7 +298,6 @@ const sendMessage = async () => {
         display: flex;
         flex-direction: column;
         position: relative;
-        min-height: 140px;
         .none {
             color: $gray_1;
             font-size: 14px;
@@ -288,6 +306,29 @@ const sendMessage = async () => {
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        .result-type {
+            color: $border_8;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            span {
+                margin: 0 10px;
+            }
+            &::after, &::before {
+                content: "";
+                height: 1px;
+                background-color: $border_8;
+                display: block;
+            }
+            &::after {
+                flex: 1;
+            }
+            &::before {
+                width: 40px;
+            }
         }
     }
     .selected-users {

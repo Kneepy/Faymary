@@ -17,24 +17,18 @@ useHead({
 })
 
 const messengerStore = useMessengerStore()
+const userStore = useUserStore()
 const messagesBoxRef = ref<HTMLBaseElement>()
 const isLoading = ref(false)
 
 onMounted(async () => {
-    // это чтобы при открытии блока с сообщениями прокуртка была внизу блока а не вверху
-    messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
-
     // получаем все переписки пользователя и заносим их в состояние
     isLoading.value = true
+
     const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
     messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
-    isLoading.value = false
-})
-watch(() => messengerStore.currentDialog, async (dialog_id) => {
-    if (!dialog_id) return
 
-    const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 20, skip: 0 })
-    messengerStore.addMessagesDialog(dialog_id, messages)
+    isLoading.value = false
 })
 
 // функции для открытия списка избранных сообщений
@@ -62,6 +56,16 @@ const isOpenCreateDialogModal = ref(false)
 const openCreateDialogModal = () => isOpenCreateDialogModal.value = true
 const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
 
+watch(() => messengerStore.currentDialog, async (dialog_id) => {
+    if (!dialog_id) return
+
+    const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 20, skip: 0 })
+    messengerStore.addMessagesDialog(dialog_id, messages)
+
+    // это чтобы при открытии блока с сообщениями прокуртка была внизу блока а не вверху
+    messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
+})
+const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === messengerStore.currentDialog))
 </script>
 
 <template>
@@ -110,7 +114,7 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             </div>
         </div>
         <div class="right-bar">
-            <template v-if="!!messengerStore.currentDialog || true">
+            <template v-if="currentDialog">
                 <div class="top-box">
                     <div class="user-info" @click="openDialogInfoModal">
                         <div class="user-name">Alex Korf</div>
@@ -130,29 +134,7 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 </div>
                 <div class="wrapper">
                     <div class="messages scroll" ref="messagesBoxRef">
-                        <div v-for="(i, key) in Array(4)" :class="[`message`, key % 2 === 0 ? `interlocutor` : ``]">
-                            <Avatar v-if="key % 2 === 0" :size=18 :user-name="`Alex Korf`" class="avatar" />
-                            <div class="container">
-                                <span v-if="key % 2 === 0" class="user-name">Alex Korf</span>
-                                <div class="answer-message">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo...
-                                </div>
-                                <span>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo id et felis. Aenean elementum egestas nunc eu iaculis. Vestibulum eget tincidunt nibh. Cras sit amet diam porta, vulputate nunc sed, ultrices elit. Ut eu commodo justo. Suspendisse tincidunt, ipsum vel pellentesque tincidunt, metus massa ullamcorper orci, sit amet ultrices lectus diam ac felis. Curabitur egestas varius massa, eget luctus sapien iaculis quis. Fusce volutpat neque fringilla, gravida odio imperdiet, malesuada diam. Phasellus consequat, elit et dictum mollis, turpis lorem convallis eros, sit amet varius nunc massa eget erat. Pellentesque et purus orci.
-                            </span>
-                                <div class="addition">
-                                    <div class="reactions">
-                                        <div class="reaction noselect active">
-                                            ✌️ <span>200</span>
-                                        </div>
-                                        <div class="reaction noselect">
-                                            🍻 <span>652</span>
-                                        </div>
-                                    </div>
-                                    <div class="date">17:42</div>
-                                </div>
-                            </div>
-                        </div>
+                        <Message v-for="message in currentDialog.messages" :message="message" :own="message.user.id === userStore.me.id" />
                     </div>
                 </div>
                 <div class="bottom-box">
@@ -348,7 +330,9 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
             }
         }
         .wrapper {
-            padding: 5px 5px 5px 0px;
+            padding: 5px 5px 5px 0;
+            flex: 1;
+            display: flex;
             .messages {
                 display: flex;
                 flex-direction: column;
@@ -357,79 +341,6 @@ const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
                 overflow-y: auto;
                 flex: 1;
                 padding-bottom: 20px; // убрать позже
-                .message {
-                    align-self: end;
-                    max-width: 80%;
-                    display: flex;
-                    margin-bottom: 20px;
-                    &:first-child {
-                        margin-top: 20px;
-                    }
-                    &.interlocutor {
-                        align-self: auto;
-                        .container {
-                            border-radius: 10px 10px 10px 0;
-                        }
-                    }
-                    .avatar {
-                        align-self: end;
-                        margin-right: 10px;
-                    }
-                    .container {
-                        color: $white;
-                        background-color: $message_background;
-                        width: fit-content;
-                        display: flex;
-                        flex-direction: column;
-                        border-radius: 10px 10px 0 10px;
-                        padding: 10px 15px 8px;
-                        .user-name {
-                            font-size: 16px;
-                            font-weight: bold;
-                            color: $white; // этот цвет должен выбираться в настройках мессенджера
-                        }
-                        .answer-message {
-                            margin: 10px;
-                            padding: 5px 20px;
-                            background-color: rgba(90, 90, 90, 0.2);
-                            border-radius: 5px;
-                            cursor: pointer;
-                            border-left: 6px solid $white; // этот цвет должен выбираться в настройках мессенджера
-                        }
-                        .addition {
-                            display: flex;
-                            justify-content: space-between;
-                            .reactions {
-                                display: flex;
-                                .reaction {
-                                    color: $gray;
-                                    cursor: pointer;
-                                    padding: 2px 5px;
-                                    background-color: $transparent_button_hover_17;
-                                    border-radius: 15px;
-                                    font-size: 16px;
-                                    margin-right: 5px;
-                                    margin-top: 5px;
-                                    &.active {
-                                        background-color: $gray_1;
-                                        color: $white;
-                                    }
-                                    span {
-                                        font-size: 13px;
-                                        font-weight: bold;
-                                        margin-right: 4px;
-                                    }
-                                }
-                            }
-                            .date {
-                                color: $gray;
-                                font-size: 12px;
-                                align-self: end;
-                                margin-left: 35px;
-                            }
-                        }
-                    }
-                }
             }
         }
         .bottom-box {

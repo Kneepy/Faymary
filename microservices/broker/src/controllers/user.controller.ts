@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import {
     AUTH_COOKIE_OPTIONS,
-    COOKIE_REFRESH_TOKEN_NAME,
+    COOKIE_REFRESH_TOKEN_NAME, DIALOGS_MODULE_CONFIG,
     MAIL_MODULE_CONFIG,
     PROFILES_MODULE_CONFIG, REQUEST_FIELD_ACCESS_TOKEN,
     REQUEST_FIELD_REFRESH_TOKEN,
@@ -40,8 +40,10 @@ import { ConfirmAccessCodeDTO, MailServiceClient } from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
 import { IncorrectPasswordError, NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
 import { Account, Profile, ProfilesServiceClient } from "src/proto/profiles";
-import { ICustomResponse } from "src/types";
+import { BrokerResponse, ICustomResponse } from "src/types";
 import { SendAccessCodeDTO } from '../proto/mail';
+import { firstValueFrom } from "rxjs";
+import { DialogsServiceClient } from "../proto/dialogs";
 
 @Controller("/user")
 export class UserController {
@@ -49,7 +51,8 @@ export class UserController {
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
         @Inject(MAIL_MODULE_CONFIG.PROVIDER) private mailService: MailServiceClient,
         @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profilesService: ProfilesServiceClient,
-        @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient
+        @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
+        @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient
     ) {}
     
     @Put("login")
@@ -194,7 +197,6 @@ export class UserController {
 
         return withoutMe ?? []
     }
-
 
     /**
      * Все эндпоинты не требующие аутентификации или создания пользователя

@@ -10,7 +10,12 @@ export namespace CreateDialog {
         /**
          * Все пользователи найденные во время поиска
          */
-        resultSearch: CustomUser[]
+        resultSearch: {
+            // это пользователи с которыми уже есть диалог
+            existing: CustomUser[]
+            // это юзеры с которыми нет диалога
+            nonexistent: CustomUser[]
+        }
 
         /**
          * Данные поля ввода

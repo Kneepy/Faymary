@@ -12,8 +12,15 @@ const cropMessage = (msg: string, maxLength: number) => {
     return msg.slice(0, maxLength)+ "..."
 }
 
-const lastMessage = computed(() => props.dialog.lastMessage ?? {msg: "Тут ещё нет сообщения", createdAt: "17:19"})
-const participant = computed(() => props.dialog?.participants.length <= 2 && props.dialog.participants.find(participant => participant.user.id !== userStore.me.id))
+const fullNameLastMessage = computed(() => {
+    if (!props.dialog.lastMessage) return
+
+    const lastMessageUser = props.dialog.lastMessage.user
+
+    if (lastMessageUser.id === userStore.me.id) return "Вы"
+    else return lastMessageUser.fullName
+})
+const participant = computed(() => props.dialog?.participants.length === 2 && props.dialog.participants.find(participant => participant.user.id !== userStore.me.id))
 </script>
 
 <template>
@@ -24,8 +31,10 @@ const participant = computed(() => props.dialog?.participants.length <= 2 && pro
             :href="participant ? participant.user.file_id : props.dialog.file_id" />
         <div class="dialog__info">
             <div class="name">{{ participant ? participant.user.fullName : props.dialog.name }}</div>
-            <div class="last-message overflow" :style="{}">{{ cropMessage(lastMessage.msg, 40) }}</div>
-            <div class="last-message-time">{{ lastMessage.createdAt }}</div>
+            <div class="last-message overflow">
+                <span>{{ fullNameLastMessage }}</span>: {{ cropMessage(props.dialog?.lastMessage.msg ?? "Тут ещё нет сообщения", 40) }}
+            </div>
+            <div class="last-message-time">{{ props.dialog?.lastMessage.createdAt ?? "" }}</div>
         </div>
     </div>
 </template>
@@ -65,6 +74,9 @@ const participant = computed(() => props.dialog?.participants.length <= 2 && pro
             text-wrap: nowrap;
             overflow: hidden;
             font-size: 16px;
+            span {
+                color: $gray_1;
+            }
             &.overflow {
                 overflow: initial;
                 text-wrap: initial;

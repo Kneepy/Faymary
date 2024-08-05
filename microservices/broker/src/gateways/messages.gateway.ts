@@ -36,34 +36,16 @@ export class MessagesGateway {
          * Конструкция один в один используется в updateMessage
          * Но я пока не буду выносить в отдельный метод
          */
-        const attachments: Addition = {}
-
-        if (!!data.attachments.length) {
-            try {
-                for (const attachment of data.attachments) {
-                    const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id);
-
-                    data.subscribe(value => {
-                        if (!value) return
-                        if (!attachments[key]) attachments[key] = []
-
-                        attachments[key].push(value)
-                    });
-
-                }
-            } catch(e) {
-                await this.serverGateway.sendError(client, e)
-            }
-        }
+        const attachments: Addition = await this.utilsService.getAdditions((data.attachments ?? []) as any)
 
         forkJoin({
             message: this.messagesService.createMessage({user_id: client.user_id, ...data}),
-            dialog: this.dialogsService.getDialog({id: data.dialog_id}),
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }),
             user: this.userService.findUser({id: client.user_id}),
         }).subscribe({
-            next: ({message, dialog, user}) => {
+            next: ({message, participants, user}) => {
 
-                for (const participant of dialog.participants) {
+                for (const participant of participants.participants) {
                     this.serverGateway.broadcastUser<BrokerResponse.Message>(participant.user_id, {
                         data: {
                             ...message,
@@ -103,12 +85,12 @@ export class MessagesGateway {
 
         forkJoin({
             message: this.messagesService.updateMessage({user_id: client.user_id, ...data}),
-            dialog: this.dialogsService.getDialog({id: data.dialog_id}),
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }),
             user: this.userService.findUser({id: client.user_id})
         }).subscribe({
-            next: ({ message, dialog, user }) => {
+            next: ({ message, participants, user }) => {
 
-                for (const participant of dialog.participants) {
+                for (const participant of participants.participants) {
                     this.serverGateway.broadcastUser<BrokerResponse.Message>(participant.user_id, {
                         data: {
                             ...message,
@@ -129,8 +111,8 @@ export class MessagesGateway {
         const deletedMessage = this.messagesService.deleteMessage({user_id: client.user_id, id})
 
         deletedMessage.subscribe({
-            next: message => this.dialogsService.getDialog({id: message.dialog_id}).subscribe({
-                next: dialog => dialog.participants.forEach(async participant => 
+            next: message => this.dialogsService.getAllParticipantsDialog({ dialog_id: message.dialog_id }).subscribe({
+                next: ({ participants }) => participants.forEach(async participant =>
                     this.serverGateway.broadcastUser<Message>(participant.user_id, {
                         data: message,
                         event: WEVENTS.DIALOGS.MESSAGES.DELETE

@@ -5,7 +5,7 @@ import {
     DialogHistory, DialogParticipants,
     Dialogs,
     DIALOGS_SERVICE_METHODS,
-    DIALOGS_SERVICE_NAME,
+    DIALOGS_SERVICE_NAME, FewUsersCreateDialog,
     ImpossibleAddUserDialog,
     InsufficientRightToMoveDialog,
     NotFoundDialog,
@@ -24,9 +24,15 @@ import {
     DialogIncludeUserDTO,
     GetDialogDTO,
     GetHistoryDialogDTO,
-    GetUserDialogsDTO
+    GetUserDialogsDTO, SearchUserDialogsDTO
 } from "./dtos";
-import { GetParticipantsDialogDTO } from "./dtos/get-participants-dialog.dto";
+import {
+    GetAllInterlocutorsUserDTO,
+    GetAllParticipantsDialogDTO,
+    GetParticipantsDialogDTO
+} from "./dtos/get-participants-dialog.dto";
+import { take } from "rxjs";
+import { ILike } from "typeorm";
 
 @Controller()
 export class DialogsController {
@@ -37,7 +43,7 @@ export class DialogsController {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
         const existInviter = await this.dialogsService.findOneParticipantDialog({dialog_id: data.dialog_id, user_id: data.user_id})
 
-        if(!existInviter.id) throw ImpossibleAddUserDialog
+        if(!existInviter?.id) throw ImpossibleAddUserDialog
         if(!dialog) throw NotFoundDialog
 
         const historyNote = await this.dialogsService.createHistoryNote({dialog: dialog, user_id: data.user_id, action: DialogActionEnum.ADD_USER, item_id: data.user_invited_id})
@@ -48,6 +54,14 @@ export class DialogsController {
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CREATE_DIALOG)
     async createDialog({participants, name}: CreateDialogDTO): Promise<Dialogs> {
+        if (participants.length < 2) throw FewUsersCreateDialog
+
+        if (participants.length === 2) {
+            const existDialog = await this.dialogsService.find({ participants: participants, number_participants: 2 })
+
+            if (!!existDialog.length) return existDialog[0]
+        }
+
         const dialog = await this.dialogsService.create({participants, name})
         const creatorId = participants.find(participant => participant.rights === ParticipantRights.CREATOR)?.user_id ?? participants.find(participant => participant.rights === ParticipantRights.ADMIN)?.user_id
         const historyNote = await this.dialogsService.createHistoryNote({dialog, user_id: creatorId, action: DialogActionEnum.CREATE_DIALOG})
@@ -74,6 +88,16 @@ export class DialogsController {
         return { participants: participants ?? [] }
     }
 
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_ALL_PARTICIPANTS_DIALOG)
+    async getAllParticipantsDialog(data: GetAllParticipantsDialogDTO): Promise<{ participants: DialogParticipants[] }> {
+        return { participants: await this.dialogsService.getAllParticipantsDialog({dialog_id: data.dialog_id}) }
+    }
+
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_ALL_INTERLOCUTORS_USER)
+    async getAllInterlocutorsUser({ user_id }: GetAllInterlocutorsUserDTO): Promise<{ participants: DialogParticipants[] }> {
+        return { participants: await this.dialogsService.getAllInterlocutorsUser({ user_id }) }
+    }
+
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.GET_ALL_USER_DIALOGS)
     async getUserDialogs({take, skip, user_id}: GetUserDialogsDTO): Promise<{dialogs: Dialogs[]}> {
         const dialogs = await this.dialogsService.findByUserId({user_id, state: StateDialogEnum.ACTIVE}, { take, skip });
@@ -82,6 +106,19 @@ export class DialogsController {
             throw NotFoundUserDialogs
 
         return { dialogs }
+    }
+
+    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.SEARCH_USER_DIALOGS)
+    async searchUserDialogs({ take, skip, ...data }: SearchUserDialogsDTO): Promise<{ dialogs: Dialogs[] }> {
+        const findOptions = {} as any
+
+        if (data.number_participants) findOptions.number_participants = data.number_participants
+        if (data.participants) findOptions.participants = [{ user_id: data.user_id }, ...data.participants]
+        if (data.name) findOptions.name = ILike(`%${data.name}%`)
+
+        return {
+            dialogs: await this.dialogsService.find(findOptions, { take, skip })
+        }
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.DELETE_DIALOG)
@@ -99,16 +136,16 @@ export class DialogsController {
         const dialog = await this.dialogsService.findOne({id: data.dialog_id})
         const userDeleted = await this.dialogsService.findOneParticipantDialog({user_id: data.delete_id, dialog_id: data.dialog_id})
         const deleter = await this.dialogsService.findOneParticipantDialog({user_id: data.user_id, dialog_id: data.dialog_id})
+        console.log(dialog, userDeleted, deleter)
 
-        if(dialog && deleter && userDeleted) {
-            if(deleter.rights === ParticipantRights.CREATOR || deleter.rights === ParticipantRights.ADMIN) {
-                const historyNote = await this.dialogsService.createHistoryNote({dialog, item_id: data.delete_id, action: DialogActionEnum.REMOVE_USER, user_id: data.user_id})
+        if (!dialog || !deleter || !userDeleted) throw NotFoundDialog
+        if (![ParticipantRights.ADMIN, ParticipantRights.CREATOR].includes(deleter.rights)) throw InsufficientRightToMoveDialog
 
-                await this.dialogsService.removeUserToDialog(dialog, userDeleted)
+        const historyNote = await this.dialogsService.createHistoryNote({dialog, item_id: data.delete_id, action: DialogActionEnum.REMOVE_USER, user_id: data.user_id})
 
-                return historyNote
-            } else throw InsufficientRightToMoveDialog
-        } else throw NotFoundDialog
+        await this.dialogsService.removeUserToDialog(dialog, userDeleted)
+
+        return historyNote
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.CHANGE_NAME_DIALOG)

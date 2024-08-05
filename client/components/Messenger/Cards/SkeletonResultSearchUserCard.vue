@@ -9,5 +9,3 @@
         </SkeletonRow>
     </SkeletonLoader>
 </template>
-<script setup lang="ts">
-</script>

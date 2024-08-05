@@ -6,3 +6,11 @@ export interface GetParticipantsDialogDTO {
     take?: number
     skip?: number
 }
+
+export interface GetAllParticipantsDialogDTO {
+    dialog_id: string
+}
+
+export interface GetAllInterlocutorsUserDTO {
+    user_id: string
+}

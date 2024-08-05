@@ -1,4 +1,4 @@
-import type { CustomRange, Dialog, Message } from "~/api/interfaces";
+import type { CustomRange, Dialog, Message, User } from "~/api/interfaces";
 
 export const DialogsAPI = {
     async getUserDialogs(params: CustomRange): Promise<Dialog[]> {
@@ -15,7 +15,7 @@ export const DialogsAPI = {
     async getDialogMessages(dialog_id: string, { take, skip }: CustomRange): Promise<Message[]> {
         try {
 
-            const messages = useCustomFetch<Message[]>("/dialog/messages", { method: "GET", query: { dialog_id, take, skip } })
+            const messages = await useCustomFetch<Message[]>("/dialog/messages", { method: "GET", query: { dialog_id, take, skip } })
 
             return messages ?? []
 
@@ -23,6 +23,20 @@ export const DialogsAPI = {
             console.log(e)
 
             return []
+        }
+    },
+    async searchUsersFromDialogs({ fullName, take, skip }: Pick<User, "fullName"> & CustomRange): Promise<{existing: User[], nonexistent: User[]}> {
+        try {
+
+            return await useCustomFetch<{ existing: User[], nonexistent: User[] }>("/dialog/search-users", {
+                method: "GET",
+                query: { fullName, take, skip }
+            })
+
+        } catch (e) {
+            console.log(e)
+
+            return { existing: [], nonexistent: [] }
         }
     }
 }

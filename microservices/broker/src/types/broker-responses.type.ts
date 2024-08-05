@@ -25,6 +25,10 @@ export namespace BrokerResponse {
         lastMessage?: Message
         participants: Omit<DialogParticipant, "dialog" | "user_id">[]
     }
+    export interface ResultSearchDialog {
+        existing: User[]
+        nonexistent: User[]
+    }
     export interface DialogParticipant extends BaseDialogParticipants {
         user: User
     }

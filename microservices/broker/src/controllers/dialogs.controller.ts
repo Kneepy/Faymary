@@ -8,10 +8,10 @@ import {
     GetDialogDTO,
     GetHistoryDialogDTO,
     GetUserDialogsDTO,
-    ParticipantRights
+    ParticipantRights, SearchUserDialogsDTO
 } from "src/proto/dialogs";
 import { GetMessageDTO, GetMessagesDTO, MessagesServiceClient } from "src/proto/messages";
-import { UserServiceClient } from "src/proto/user";
+import { FindUsersDTO, User, UserServiceClient } from "src/proto/user";
 import { Addition, AdditionsType, BrokerResponse } from "src/types";
 import { ICustomRequest } from "src/types/request.type";
 import { UtilsService } from "src/utils/get-item.util";
@@ -30,7 +30,7 @@ export class DialogsController {
     async getUserDialogs(@Query() data: GetUserDialogsDTO, @Req() {user_id}: ICustomRequest): Promise<BrokerResponse.Dialog[]> {
         const { dialogs } = await firstValueFrom(this.dialogsService.getAllUserDialogs({user_id, skip: data.skip, take: data.take}))
 
-        return dialogs.reduce(async (accumulator, dialog) => {
+        return (dialogs ?? []).reduce(async (accumulator, dialog) => {
             const dialogTmp: BrokerResponse.Dialog = { ...dialog} as any
             const accumulatorValue = await accumulator
 
@@ -69,6 +69,40 @@ export class DialogsController {
 
             return accumulator
         }, Promise.resolve([]))
+    }
+
+    @Get("search-users")
+    async searchUsersByDialogs(@Query() data: Pick<FindUsersDTO, "take" | "skip" | "fullName">, @Req() { user_id }: ICustomRequest): Promise<BrokerResponse.ResultSearchDialog> {
+        /**
+         * Сначала мы поулчаем всех юзеров которые участвовали в личных переписках с пользователем (до 2 участников диалога)
+         * Проверяем нет ли среди них удовлетворяющих результатам поиска
+         * Если нету то скипаем этот момент
+         */
+        const regex = new RegExp(data.fullName, "i")
+        // все личные собеседники
+        const { participants } = await firstValueFrom(this.dialogsService.getAllInterlocutorsUser({ user_id }))
+        const allInterlocutors = await Promise.all([
+            ...participants.map(participant =>
+                firstValueFrom(this.userService.findUser({ id: participant.user_id }))
+            )
+        ])
+        // собеседники подходящие под условия поиска
+        const matchesInterlocutors = allInterlocutors.reduce((acc, interlocutor) => {
+            if (regex.test(interlocutor.fullName) && interlocutor.id !== user_id) acc.push(interlocutor)
+
+            return acc
+        }, [] as User[])
+
+        // просто пользователи подходящие под условия поиска
+        const matchedUsers = (await firstValueFrom(this.userService.findUsers({
+            fullName: data.fullName,
+            take: data.take,
+            skip: data.skip
+        }))).users?.filter(user =>
+            !matchesInterlocutors.find(interlocutor => interlocutor.id === user.id) && user.id !== user_id
+        )
+
+        return { existing: matchesInterlocutors, nonexistent: matchedUsers }
     }
 
     @Get()

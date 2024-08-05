@@ -14,6 +14,9 @@ export class Dialogs {
     participants: DialogParticipants[]
 
     @Column()
+    number_participants: number
+
+    @Column()
     state: StateDialogEnum
 
     @Column()

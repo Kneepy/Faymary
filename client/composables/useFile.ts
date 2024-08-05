@@ -3,6 +3,7 @@
  */
 export const useFile = (file_id: string): string => {
     const runtimeConfig = useRuntimeConfig();
+    const url = new URL(file_id, runtimeConfig.public.filesApiURL);
 
-    return runtimeConfig.public.filesApiURL + file_id;
+    return url.toString();
 }

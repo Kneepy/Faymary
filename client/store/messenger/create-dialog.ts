@@ -4,7 +4,10 @@ import type { CreateDialog } from "~/store/messenger/types";
 export const useCreateDialogStore = defineStore("create-dialog", {
     state: (): CreateDialog.Store => ({
         selectedUsers: [],
-        resultSearch: [],
+        resultSearch: {
+            existing: [],
+            nonexistent: []
+        },
         inputSearch: "",
         message: "",
         files: []
@@ -14,8 +17,9 @@ export const useCreateDialogStore = defineStore("create-dialog", {
          * Обновляет результаты поиска
          * @param users новые результаты поиска
          */
-        setResultSearch(users: CreateDialog.CustomUser[]) {
-            this.resultSearch = users ?? [];
+        setResultSearch({ existing, nonexistent }: { existing: CreateDialog.CustomUser[]; nonexistent: CreateDialog.CustomUser[] }) {
+            if (existing?.length > 0) this.resultSearch.existing = existing
+            if (nonexistent?.length > 0) this.resultSearch.nonexistent = nonexistent
         },
 
         /**

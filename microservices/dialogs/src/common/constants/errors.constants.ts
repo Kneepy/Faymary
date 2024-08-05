@@ -11,6 +11,11 @@ export const InsufficientRightToMoveDialog = new RpcException(
 export const NotFoundDialog = new RpcException(
     "Не удалось найти диалог с таким id!"
 );
+
 export const ImpossibleAddUserDialog = new RpcException(
     "Не удалось добавить пользователя в диалог!"
 );
+
+export const FewUsersCreateDialog = new RpcException(
+    "Нельзя создать диалог без пользователей!"
+)

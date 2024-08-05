@@ -7,6 +7,7 @@ service DialogsService {
     rpc CreateDialog (CreateDialogDTO) returns (stream Dialog);
     rpc GetDialog (GetDialogDTO) returns (stream Dialog);
     rpc GetAllUserDialogs (GetUserDialogsDTO) returns (stream Dialogs);
+    rpc SearchUserDialogs (SearchUserDialogsDTO) returns (stream Dialogs);
     rpc DeleteDialog (DeleteDialogDTO) returns (stream DialogHistory);
     rpc RemoveUserDialog (DeleteUserDialogDTO) returns (stream DialogHistory);
     rpc ChangeNameDialog (ChangeNameDialogDTO) returns (stream DialogHistory);
@@ -14,6 +15,8 @@ service DialogsService {
     rpc GetHistoryDialog (GetHistoryDialogDTO) returns (stream DialogHistories);
     rpc DialogIncludesUser (DialogIncludesUserDTO) returns (stream DialogIsIncludesUser);
     rpc GetParticipantsDialog (GetParticipantsDialogDTO) returns (stream ManyDialogParticipants);
+    rpc GetAllParticipantsDialog (GetAllParticipantsDialogDTO) returns (stream ManyDialogParticipants);
+    rpc GetAllInterlocutorsUser (GetAllInterlocutorsUserDTO) returns (stream ManyDialogParticipants);
 }
 
 message Dialog {
@@ -22,6 +25,7 @@ message Dialog {
     StateDialogEnum state = 3;
     string name = 4;
     string file_id = 5;
+    int32 number_participants = 6;
 }
 message DialogParticipants {
     string id = 1;
@@ -58,6 +62,14 @@ message GetParticipantsDialogDTO {
     optional int32 skip = 4;
 }
 
+message GetAllParticipantsDialogDTO {
+    string dialog_id = 1;
+}
+
+message GetAllInterlocutorsUserDTO {
+    string user_id = 1;
+}
+
 message DialogIncludesUserDTO {
     string user_id = 1;
     string dialog_id = 2;
@@ -86,6 +98,15 @@ message GetUserDialogsDTO {
     string user_id = 1;
     int32 skip = 2;
     int32 take = 3;
+}
+
+message SearchUserDialogsDTO {
+    string user_id = 1;
+    repeated DialogParticipants participants = 2;
+    optional int32 number_participants = 3;
+    optional string name = 4;
+    optional int32 take = 6;
+    optional int32 skip = 7;
 }
 
 message DeleteDialogDTO {

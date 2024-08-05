@@ -1,4 +1,4 @@
-import type { Dialog, Post, Story, User, Message } from "~/api";
+import type { Dialog, Post, Story, User, Message, File } from "~/api";
 
 export enum AdditionsType {
     USER = 0,
@@ -8,14 +8,15 @@ export enum AdditionsType {
     MESSAGE = 4,
     DIALOG = 5,
     LIKE = 6,
-    FILE= 7
+    FILE = 7
 }
 
 export interface Addition {
-    user?: User
-    post?: Post
-    comment?: Comment
-    story?: Story
-    message?: Message
-    dialog?: Dialog
+    user?: User[]
+    post?: Post[]
+    comment?: Comment[]
+    story?: Story[]
+    message?: Message[]
+    dialog?: Dialog[]
+    file?: File[]
 }

@@ -31,7 +31,7 @@ export class DialogsGateway {
             // передаём всем участинкам диалога сам диалог 
             next: dialog => 
                 dialog.participants.forEach(async participant => 
-                    await this.serverGateway.broadcastUser<Dialog>(participant.user_id, {
+                    this.serverGateway.broadcastUser<Dialog>(participant.user_id, {
                         data: dialog,
                         event: WEVENTS.DIALOGS.CREATE
                     })
@@ -48,16 +48,16 @@ export class DialogsGateway {
     async addUserToDialog(@MessageBody() {user_invited_id, dialog_id}: Omit<AddUserDialogDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         forkJoin({
             historyNote: this.dialogsService.addUserToDialog({user_id: client.user_id, user_invited_id, dialog_id}),
-            dialog: this.dialogsService.getDialog({id: dialog_id})
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id })
         })
         .subscribe({
-            next: ({historyNote, dialog}) => {
+            next: ({historyNote, participants}) => {
                 const attachments = this.usersService.findUser({id: historyNote.item_id})
 
                 attachments.subscribe(user => {
-                    dialog.participants.forEach(async participant => 
-                        await this.serverGateway.broadcastUser<BrokerResponse.DialogHistory>(participant.user_id, {
-                            data: {...historyNote, attachments: {user}},
+                    participants.participants.forEach(async participant =>
+                        this.serverGateway.broadcastUser<BrokerResponse.DialogHistory>(participant.user_id, {
+                            data: { ...historyNote, attachments: { user } },
                             event: WEVENTS.DIALOGS.ADD_USER
                         })
                     )
@@ -75,15 +75,15 @@ export class DialogsGateway {
     async removeUserFromDialog(@MessageBody() {delete_id, dialog_id}: Omit<DeleteUserDialogDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         forkJoin({
             historyNote: this.dialogsService.removeUserDialog({user_id: client.user_id, delete_id, dialog_id}),
-            dialog: this.dialogsService.getDialog({id: dialog_id})
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id })
         })
         .subscribe({
-            next: async ({historyNote, dialog}) => {
+            next: async ({historyNote, participants}) => {
                 const attachments = this.usersService.findUser({id: historyNote.item_id})
                 
                 attachments.subscribe(user => {
-                    dialog.participants.forEach(async participant => 
-                        await this.serverGateway.broadcastUser<BrokerResponse.DialogHistory>(participant.user_id, {
+                    participants.participants.forEach(async participant =>
+                        this.serverGateway.broadcastUser<BrokerResponse.DialogHistory>(participant.user_id, {
                             data: {...historyNote, attachments: {user}},
                             event: WEVENTS.DIALOGS.REMOVE_USER
                         })
@@ -104,11 +104,11 @@ export class DialogsGateway {
     async changeNameDialog(@MessageBody() data: Omit<ChangeNameDialogDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         forkJoin({
             historyNote: this.dialogsService.changeNameDialog({user_id: client.user_id, dialog_id: data.dialog_id, name: data.name}),
-            dialog: this.dialogsService.getDialog({id: data.dialog_id})
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id })
         })
         .subscribe({
-            next: ({historyNote, dialog}) => dialog.participants.forEach(async participants => 
-                await this.serverGateway.broadcastUser<DialogHistory>(participants.user_id, {
+            next: ({historyNote, participants}) => participants.participants.forEach(async participants =>
+                this.serverGateway.broadcastUser<DialogHistory>(participants.user_id, {
                     data: historyNote,
                     event: WEVENTS.DIALOGS.CHANGE_NAME
                 })
@@ -125,11 +125,11 @@ export class DialogsGateway {
     async changeFileDialog(@MessageBody() data: Omit<ChangeFileDialogDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         forkJoin({
             historyNote: this.dialogsService.changeFileDialog({user_id: client.user_id, dialog_id: data.dialog_id, file_id: data.file_id}),
-            dialog: this.dialogsService.getDialog({id: data.dialog_id})
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id })
         })
         .subscribe({
-            next: ({historyNote, dialog}) => dialog.participants.forEach(async participant => 
-                await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
+            next: ({historyNote, participants}) => participants.participants.forEach(async participant =>
+                this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
                     data: historyNote,
                     event: WEVENTS.DIALOGS.CHANGE_FILE
                 })
@@ -146,11 +146,11 @@ export class DialogsGateway {
     async deleteDialog(@MessageBody() {dialog_id}: Omit<DeleteDialogDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         forkJoin({
             historyNote: this.dialogsService.deleteDialog({user_id: client.user_id, dialog_id}),
-            dialog: this.dialogsService.getDialog({id: dialog_id})
+            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id })
         })
         .subscribe({
-            next: ({historyNote, dialog}) =>  dialog.participants.forEach(async participant => {
-                await this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
+            next: ({historyNote, participants}) =>  participants.participants.forEach(async participant => {
+                this.serverGateway.broadcastUser<DialogHistory>(participant.user_id, {
                     data: historyNote,
                     event: WEVENTS.DIALOGS.DELETE
                 })
@@ -159,7 +159,7 @@ export class DialogsGateway {
                     to_id: participant.user_id,
                     type: NotificationAdditionsEnumType.USER,
                     item_id: client.user_id,
-                    parent_id: dialog.id,
+                    parent_id: dialog_id,
                     parent_type: NotificationAdditionsEnumType.DIALOG,
                     notification_type: NotificationEnumType.DELETE_DIALOG
                 })

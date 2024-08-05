@@ -40,6 +40,7 @@ export interface Dialog {
   state: StateDialogEnum;
   name: string;
   file_id: string;
+  number_participants: number;
 }
 
 export interface DialogParticipants {
@@ -78,6 +79,14 @@ export interface GetParticipantsDialogDTO {
   skip?: number | undefined;
 }
 
+export interface GetAllParticipantsDialogDTO {
+  dialog_id: string;
+}
+
+export interface GetAllInterlocutorsUserDTO {
+  user_id: string;
+}
+
 export interface DialogIncludesUserDTO {
   user_id: string;
   dialog_id: string;
@@ -106,6 +115,15 @@ export interface GetUserDialogsDTO {
   user_id: string;
   skip: number;
   take: number;
+}
+
+export interface SearchUserDialogsDTO {
+  user_id: string;
+  participants: DialogParticipants[];
+  number_participants?: number | undefined;
+  name?: string | undefined;
+  take?: number | undefined;
+  skip?: number | undefined;
 }
 
 export interface DeleteDialogDTO {
@@ -151,6 +169,8 @@ export interface DialogsServiceClient {
 
   getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
+  searchUserDialogs(request: SearchUserDialogsDTO): Observable<Dialogs>;
+
   deleteDialog(request: DeleteDialogDTO): Observable<DialogHistory>;
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
@@ -164,6 +184,10 @@ export interface DialogsServiceClient {
   dialogIncludesUser(request: DialogIncludesUserDTO): Observable<DialogIsIncludesUser>;
 
   getParticipantsDialog(request: GetParticipantsDialogDTO): Observable<ManyDialogParticipants>;
+
+  getAllParticipantsDialog(request: GetAllParticipantsDialogDTO): Observable<ManyDialogParticipants>;
+
+  getAllInterlocutorsUser(request: GetAllInterlocutorsUserDTO): Observable<ManyDialogParticipants>;
 }
 
 export interface DialogsServiceController {
@@ -175,6 +199,8 @@ export interface DialogsServiceController {
 
   getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
+  searchUserDialogs(request: SearchUserDialogsDTO): Observable<Dialogs>;
+
   deleteDialog(request: DeleteDialogDTO): Observable<DialogHistory>;
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
@@ -188,6 +214,10 @@ export interface DialogsServiceController {
   dialogIncludesUser(request: DialogIncludesUserDTO): Observable<DialogIsIncludesUser>;
 
   getParticipantsDialog(request: GetParticipantsDialogDTO): Observable<ManyDialogParticipants>;
+
+  getAllParticipantsDialog(request: GetAllParticipantsDialogDTO): Observable<ManyDialogParticipants>;
+
+  getAllInterlocutorsUser(request: GetAllInterlocutorsUserDTO): Observable<ManyDialogParticipants>;
 }
 
 export function DialogsServiceControllerMethods() {
@@ -197,6 +227,7 @@ export function DialogsServiceControllerMethods() {
       "createDialog",
       "getDialog",
       "getAllUserDialogs",
+      "searchUserDialogs",
       "deleteDialog",
       "removeUserDialog",
       "changeNameDialog",
@@ -204,6 +235,8 @@ export function DialogsServiceControllerMethods() {
       "getHistoryDialog",
       "dialogIncludesUser",
       "getParticipantsDialog",
+      "getAllParticipantsDialog",
+      "getAllInterlocutorsUser",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

@@ -76,7 +76,7 @@ export class UtilsService {
     getAdditions(
         additions: {type: AdditionsType, item_id: string}[]
     ): Promise<Addition> {
-        return additions.reduce(async (accumulator, addition, f) => {
+        return (additions ?? []).reduce(async (accumulator, addition, f) => {
             if (!(addition.type in AdditionsType)) return
 
             const accumulatorValue = await accumulator
@@ -84,7 +84,7 @@ export class UtilsService {
             const item = await data?.toPromise()
 
             if (!item) return accumulator
-            if (accumulatorValue[key]) accumulatorValue[key] = {}
+            if (!accumulatorValue[key]) accumulatorValue[key] = []
 
             accumulatorValue[key].push(item)
 

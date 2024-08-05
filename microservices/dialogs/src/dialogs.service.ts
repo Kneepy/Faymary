@@ -9,7 +9,7 @@ import {
     StateDialogEnum,
     DialogParticipants, DEFAULT_TAKE_PARTICIPANTS_DIALOG, DEFAULT_SKIP_PARTICIPANTS_DIALOG
 } from "src/common";
-import {DialogsInterfaces} from "src/interfaces";
+import { DialogsInterfaces } from "src/interfaces";
 import { DeepPartial, FindManyOptions, FindOneOptions, In, Repository } from "typeorm";
 
 export class DialogsService {
@@ -21,16 +21,24 @@ export class DialogsService {
 
     async addUserToDialog(dialog: Dialogs, participant: Omit<DialogParticipants, "id" | "dialog">): Promise<void> {
         const existParticipant = await this.findOneParticipantDialog({user_id: participant.user_id, dialog_id: dialog.id})
-        const addedParticipant = !!existParticipant ? existParticipant : await this.createParticipantDialog({dialog, user_id: participant.user_id, rights: participant.rights})
 
-        await this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).add(addedParticipant)
+        if (!!existParticipant) return
+
+        await this.createParticipantDialog({dialog, user_id: participant.user_id, rights: participant.rights})
+
+        dialog.number_participants++
+        await this.repository.save(dialog)
     }
 
     async removeUserToDialog(dialog: Dialogs, participant: Omit<DialogParticipants, "id" | "dialog">): Promise<void> {
         const removedParticipant = await this.findOneParticipantDialog({dialog_id: dialog.id, user_id: participant.user_id})
 
-        await this.repository.createQueryBuilder().relation(Dialogs, "participants").of(dialog).remove(removedParticipant)
+        if (!removedParticipant) return
+
         await this.deleteParticipantDialog(removedParticipant.id)
+
+        dialog.number_participants--
+        await this.repository.save(dialog)
     }
 
     // CRUD for participants
@@ -40,18 +48,30 @@ export class DialogsService {
         return await this.participantsRepository.findOne({where: {user_id, dialog: {id: dialog_id}}, ...otherOptions})
     }
     async findParticipantsDialog({ dialog_id, rights }: DialogsInterfaces.FindParticipantsDialog, otherOptions: Omit<FindManyOptions<DialogParticipants>, "where"> = {take: DEFAULT_TAKE_PARTICIPANTS_DIALOG, skip: DEFAULT_SKIP_PARTICIPANTS_DIALOG}) {
-        if (!dialog_id) return
+        if (!dialog_id) return []
 
         const criteria = {} as any
         if (rights?.length) criteria.rights = In(rights)
 
         return this.participantsRepository.find({ where: {dialog: {id: dialog_id}, ...criteria }, ...otherOptions })
     }
+    async getAllParticipantsDialog({ dialog_id }: { dialog_id: string }): Promise<DialogParticipants[]> {
+        if (!dialog_id) return []
+
+        return this.participantsRepository.findBy({ dialog: { id: dialog_id } })
+    }
     async createParticipantDialog(participant: Omit<DialogParticipants, "id">): Promise<DialogParticipants> {
         return await this.participantsRepository.save(participant)
     }
     async deleteParticipantDialog(id: string): Promise<any> {
         return await this.participantsRepository.delete(id)
+    }
+    async getAllInterlocutorsUser({ user_id }: Pick<DialogParticipants, "user_id">): Promise<DialogParticipants[]> {
+        const interlocutors = await this.participantsRepository.findBy({
+            dialog: { participants: { user_id }, number_participants: 2 }
+        })
+
+        return interlocutors ?? []
     }
 
     // CRUD for history
@@ -64,7 +84,7 @@ export class DialogsService {
 
     // CRUD for dialogs
     async create({participants, name}: DialogsInterfaces.CreateDialog): Promise<Dialogs> {
-        return await this.repository.save({participants, name, state: StateDialogEnum.ACTIVE})
+        return await this.repository.save({participants, name, state: StateDialogEnum.ACTIVE, number_participants: participants.length})
     }
 
     async update(dialog: Dialogs): Promise<Dialogs> {
