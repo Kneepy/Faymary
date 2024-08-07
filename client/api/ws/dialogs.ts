@@ -3,7 +3,7 @@ import type { CreateDialog } from "~/store/messenger";
 
 interface CustomDialogParticipants extends Pick<DialogParticipants, "rights" | "user_id"> {}
 interface CreateMessage extends Pick<Message, "dialog_id" | "msg" | "user_id"> {
-    attachments: CreateDialog.CustomAttachment[]
+    attachments: CreateDialog.Attachment[]
 }
 
 export const DialogsWsAPI = {

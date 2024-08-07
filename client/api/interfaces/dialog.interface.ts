@@ -29,6 +29,7 @@ export interface Dialog {
     id: string;
     participants: DialogParticipants[];
     state: StateDialogEnum;
+    number_participants: number;
     name: string;
     file_id: string;
 } 

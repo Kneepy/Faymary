@@ -8,7 +8,7 @@ export const useMessengerStore = defineStore("messenger", {
         currentDialog: null
     }),
     actions: {
-        addDialogs(dialogs: Messenger.CustomDialog[]) {
+        addDialogs(dialogs: Messenger.Dialog[]) {
             for (const dialog of dialogs) {
                 const dialogExist = this.dialogs.find(v => v.id === dialog.id);
 

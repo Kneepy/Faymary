@@ -105,11 +105,6 @@ export class DialogsController {
         return { existing: matchesInterlocutors, nonexistent: matchedUsers }
     }
 
-    @Get()
-    async getDialog(@Query() data: GetDialogDTO): Promise<Dialog> {
-        return await this.dialogsService.getDialog({id: data.id}).toPromise()
-    }
-
     /**
      * Эндпоинт выкенет ошибку при отсутсвии пользователя в диалоге
      */

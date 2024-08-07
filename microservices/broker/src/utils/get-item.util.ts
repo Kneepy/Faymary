@@ -14,7 +14,7 @@ import {
     STORIES_MODULE_CONFIG,
     USER_MODULE_CONFIG
 } from "src/constants/app.constants";
-import { Addition, AdditionsType, Fields } from "src/types/additions.type";
+import { Addition, AdditionsType, Attachment, Fields } from "src/types/additions.type";
 import { Observable } from "rxjs";
 import { StoreServiceClient } from "../proto/store";
 
@@ -91,5 +91,32 @@ export class UtilsService {
             return accumulatorValue
 
         }, Promise.resolve({}))
+    }
+
+    /**
+     * Эта функция преобразует вложение из вида { file: [...], user: [...] }
+     * В вид [{item_id: ..., type: ...}, {item_id: ..., type: ...}]
+     * @param addition
+     */
+    additionToMSAttachment(addition: Addition): Attachment[] {
+        const entries = Object.entries(addition)
+        const typeMap = {
+            [Fields.USER]: AdditionsType.USER,
+            [Fields.COMMENT]: AdditionsType.COMMENT,
+            [Fields.DIALOG]: AdditionsType.DIALOG,
+            [Fields.POST]: AdditionsType.POST,
+            [Fields.FILE]: AdditionsType.FILE,
+            [Fields.LIKE]: AdditionsType.LIKE,
+            [Fields.STORY]: AdditionsType.STORY,
+            [Fields.MESSAGE]: AdditionsType.MESSAGE,
+        }
+
+        return entries.reduce((attachments, [key, value]) => {
+            if (!(key in Fields)) return attachments
+
+            value.forEach((item) => attachments.push({ item_id: item.id, type: typeMap[key] }))
+
+            return attachments
+        }, <Attachment[]> [])
     }
 }

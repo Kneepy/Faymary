@@ -96,6 +96,7 @@ const images = computed(() => props.message?.attachments?.file)
         .images {
             display: flex;
             flex-wrap: wrap;
+            margin-bottom: 10px;
             .image {
                 background-size: cover;
                 background-position: center;

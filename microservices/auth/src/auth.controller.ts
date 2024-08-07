@@ -7,6 +7,7 @@ import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
 import { GenerateTokensBySessionDTO, GenerateTokensDTO, VerifyTokensDTO } from "./dtos";
 import { AuthService } from "./services";
 import { TokensPayload, UserAccessTokenPayload } from "./interfaces";
+import * as useragent from "useragent"
 
 @Controller()
 export class AuthController {
@@ -29,6 +30,9 @@ export class AuthController {
     async generateTokens(data: GenerateTokensDTO, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<TokensPayload> {
         if(!data.fingerprint || !data.ua || !data.ip || !data.user_id) throw PoorDataToCreateTokens
 
+        const ua = useragent.parse(data.ua)
+        data.ua = `${ua.device.toString()} ${ua.os.toString()} ${ua.family.toString()}`
+
         /**
          * Я тут даже хз, нужно по идее вообще убрать проверку по ua и ip, скорее всего так и сделаю (если что то она тут была)
          */
@@ -47,9 +51,15 @@ export class AuthController {
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS_BY_SESSION)
     async generateTokensBySession(data: GenerateTokensBySessionDTO): Promise<TokensPayload> {
         if(!data.refresh_token) throw Unauthorized
+        if(![data.session.fingerprint, data.session.ua, data.session.ip].every(v => !!v === true)) throw PoorDataToCreateTokens
+
+        const ua = useragent.parse(data.session.ua)
+        data.session.ua = `${ua.device.toString()} ${ua.os.toString()} ${ua.family.toString()}`
 
         const session = await this.authService.verifyRefreshToken(data.refresh_token)
         const accessCodeIsVerify = this.authService.verifyAccessToken(data.access_token)
+
+        console.log(data.session, session)
 
         if(!session) throw Unauthorized
 
@@ -71,6 +81,7 @@ export class AuthController {
         }
         else {
             await this.sessionService.delete(session.id)
+
             return {
                 access_token: this.authService.getAccessToken(session.user_id),
                 refresh_token: (await this.authService.getRefreshToken({

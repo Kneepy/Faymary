@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { AdditionsType, DialogsWsAPI, ParticipantRights, UserAPI, StoreAPI, DialogsAPI } from "~/api";
-import { type CreateDialog, useCreateDialogStore, useMessengerStore, useUserStore } from "~/store";
+import { AdditionsType, DialogsWsAPI, ParticipantRights, StoreAPI, DialogsAPI } from "~/api";
+import {
+    type CreateDialog,
+    useCreateDialogStore,
+    useMessengerStore,
+    useUserStore,
+    useDraftsMessagesStore,
+    DraftsMessages
+} from "~/store";
+import { ReceiveFiles } from "assets/helpers/receive-files";
 
 const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
@@ -8,6 +16,7 @@ const close = () => emit("onClose")
 const createDialogStore = useCreateDialogStore()
 const userStore = useUserStore()
 const messengerStore = useMessengerStore()
+const draftsMessagesStore = useDraftsMessagesStore()
 
 /**
  * Реализация поиска пользователей
@@ -37,8 +46,8 @@ const isOpenSelectedUsersPanel = ref(true)
 const toggleSelectedUsersPanel = () => isOpenSelectedUsersPanel.value = !isOpenSelectedUsersPanel.value
 
 // сами выбранные пользователи
-const checkUserIsSelected = (user: CreateDialog.CustomUser): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
-const toggleSelectUser = (user: CreateDialog.CustomUser): void => {
+const checkUserIsSelected = (user: CreateDialog.User): boolean => createDialogStore.selectedUsers.indexOf(user) !== -1
+const toggleSelectUser = (user: CreateDialog.User): void => {
     const indexItem = createDialogStore.selectedUsers.indexOf(user)
 
     if (indexItem === -1) {
@@ -54,39 +63,27 @@ const toggleSelectUser = (user: CreateDialog.CustomUser): void => {
  * Штука для получения файла и прикрепления его к сообщению
  */
 const inputFile = ref<HTMLInputElement>(null)
-const refFiles = computed(() => createDialogStore.files.map((file, index) => ({
-    blob: URL.createObjectURL(file),
-    index,
-})).reverse())
-const currentHoverFile = ref(null)
+const draftMessage = reactive(draftsMessagesStore.getDraft(DraftsMessages.ANONYMOUS_DIALOG))
 
 const clickAttachFile = () => inputFile.value.click()
 const receiveFiles = (e: Event) => {
-    const fileList = (<DragEvent> e).dataTransfer?.files ?? (<HTMLInputElement> e.target).files
-    const files: File[] = Object.entries(fileList).map(([key, file]) => <File>file)
+    const files = ReceiveFiles(e)
 
     for (const file of files) {
-        createDialogStore.attachFile(file)
+        draftMessage.addFile(file)
     }
-
-    // чтобы багав не была
-    const currentValue = createDialogStore.message as any
-    (<HTMLInputElement> e.target).value = "" as any
-    (<HTMLInputElement> e.target).value = currentValue
 }
+const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
 
 /**
  * Обработка на нажатие кнопки отправки
  * Тут надо сделать переключатель типа создать беседу или отправить каждому отдельно, но я для теста пока так оставлю
  */
 const sendMessage = async () => {
-    const attachments: CreateDialog.CustomAttachment[] = []
+    const attachments: DraftsMessages.Attachment[] = []
 
-    if (!!createDialogStore.files.length) {
-        const fd = new FormData()
-        createDialogStore.files.forEach((file: File) => fd.append("files", file))
-
-        const files = await StoreAPI.uploadFiles(fd)
+    if (!!draftMessage.files.length) {
+        const files = await StoreAPI.uploadFiles(draftMessage.files)
 
         for (const file of files) {
             attachments.push({ item_id: file.id, type: AdditionsType.FILE })
@@ -101,7 +98,7 @@ const sendMessage = async () => {
         attachments,
         dialog_id: dialog.id,
         user_id: userStore.me.id,
-        msg: createDialogStore.message
+        msg: draftMessage.message
     })
 
     messengerStore.addDialogs([ dialog ])
@@ -176,29 +173,24 @@ const sendMessage = async () => {
                         </div>
                     </div>
                 </Transition>
-                <div v-if="!!refFiles.length" class="attachments">
-                    <HorizontalScroll :count="refFiles.length">
+                <div class="attachments">
+                    <HorizontalScroll :count="draftMessage.files.length">
                         <div class="files">
                             <div
-                                v-for="({blob, index}) in refFiles"
-                                @click="() => createDialogStore.removeFileByIndex(index)"
-                                @mouseenter="() => currentHoverFile = index"
-                                @mouseleave="() => currentHoverFile = null"
-                                :class="{active: currentHoverFile === index}"
+                                v-for="file in (draftMessage.files ?? [])"
+                                @click="() => draftMessage.removeFile(file)"
                                 class="file"
                             >
                                 <div
                                     :style="{
-                                    backgroundImage: `url(${blob})`
+                                    backgroundImage: `url(${getURLPreviewFile(file)})`
                                 }"
                                     class="img"
                                 >
                                 </div>
-                                <Transition name="delete_img">
-                                    <div v-if="currentHoverFile === index" class="remove">
-                                        <GIcon :size=15 fill>delete</GIcon>
-                                    </div>
-                                </Transition>
+                                <div class="remove">
+                                    <GIcon :size=15 fill>delete</GIcon>
+                                </div>
                             </div>
                         </div>
                     </HorizontalScroll>
@@ -217,7 +209,7 @@ const sendMessage = async () => {
                     <TextareaAutosize
                         class="scroll"
                         placeholder="Напишите своим новым собеседникам!"
-                        @change="(v: string) => createDialogStore.setMessage(v)"
+                        @change="(v: string) => draftMessage.setMessage(v)"
                         :max-height=350
                     />
                     <IconButton>
@@ -419,12 +411,9 @@ const sendMessage = async () => {
                         .img {
                             filter: blur(3px);
                         }
-                    }
-                    .delete_img-enter-active, .delete_img-leave-active {
-                        transition: opacity 200ms ease;
-                    }
-                    .delete_img-enter-from, .delete_img-leave-to {
-                        opacity: 0;
+                        .remove {
+                            opacity: 1;
+                        }
                     }
                     .remove {
                         position: absolute;
@@ -436,6 +425,7 @@ const sendMessage = async () => {
                         background-color: $white;
                         justify-content: center;
                         padding: 2px;
+                        opacity: 0;
                         .icon {
                             color: $black;
                         }

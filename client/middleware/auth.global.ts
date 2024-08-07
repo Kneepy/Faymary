@@ -1,5 +1,5 @@
-import { UserAPI, WS_EVENTS } from "~/api";
-import { Socket } from "~/api/ws/socket";
+import { UserAPI } from "~/api";
+import { Socket } from "~/api/ws";
 import { ROUTES } from "assets/constants/routes.constants";
 
 export default defineNuxtRouteMiddleware(async ( route    ) => {

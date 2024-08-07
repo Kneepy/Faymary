@@ -2,7 +2,7 @@
 import type { Messenger } from "~/store/messenger";
 
 const props = defineProps<{
-    dialog: Messenger.CustomDialog
+    dialog: Messenger.Dialog
 }>()
 const userStore = useUserStore()
 

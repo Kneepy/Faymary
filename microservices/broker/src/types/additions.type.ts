@@ -12,6 +12,7 @@ export enum AdditionsType {
     COMMENT = 3,
     MESSAGE = 4,
     DIALOG = 5,
+    LIKE = 6,
     FILE = 7
 }
 
@@ -27,12 +28,17 @@ export enum Fields {
 }
 
 export interface Addition {
-    [Fields.USER]?: User | User[]
-    [Fields.POST]?: Post | Post[]
-    [Fields.COMMENT]?: Comment | Comment[]
-    [Fields.STORY]?: Story | Story[]
-    [Fields.MESSAGE]?: Message | Message[]
-    [Fields.DIALOG]?: Dialog | Dialog[]
-    [Fields.FILE]?: File | File[]
+    [Fields.USER]?: User[]
+    [Fields.POST]?: Post[]
+    [Fields.COMMENT]?: Comment[]
+    [Fields.STORY]?: Story[]
+    [Fields.MESSAGE]?: Message[]
+    [Fields.DIALOG]?: Dialog[]
+    [Fields.FILE]?: File[]
     [key: string]: any | any[]
+}
+
+export interface Attachment {
+    item_id: string
+    type: AdditionsType
 }

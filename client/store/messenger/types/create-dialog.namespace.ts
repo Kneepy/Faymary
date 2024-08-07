@@ -1,38 +1,28 @@
-import type { Attachment, User } from "~/api";
+import type { Attachment as BaseAttachment, User as BaseUser } from "~/api";
+import { type Messenger } from "~/store";
 
 export namespace CreateDialog {
     export interface Store {
         /**
          * Пользователи выбранные при поиске
          */
-        selectedUsers: CustomUser[]
+        selectedUsers: User[]
 
         /**
          * Все пользователи найденные во время поиска
          */
         resultSearch: {
             // это пользователи с которыми уже есть диалог
-            existing: CustomUser[]
+            existing: User[]
             // это юзеры с которыми нет диалога
-            nonexistent: CustomUser[]
+            nonexistent: User[]
         }
 
         /**
          * Данные поля ввода
          */
         inputSearch: string
-
-        /**
-         * Новое сообщение которое будет отправлено всем новым пользователям диалога
-         */
-        message: string
-
-        /**
-         * Файлы которые прикрепил пользователь
-         * Потом эти файлы будут переделаны во вложения (attachments)
-         */
-        files: File[]
     }
-    export interface CustomUser extends Omit<User, "password" | "profile" | "state"> {}
-    export interface CustomAttachment extends Omit<Attachment, "id"> {}
+
+    export interface User extends Omit<BaseUser, "password" | "profile" | "state"> {}
 }

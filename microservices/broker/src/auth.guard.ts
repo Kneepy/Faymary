@@ -35,8 +35,8 @@ export class AuthGuard implements CanActivate {
             if(!refreshToken) throw UnauthorizedError
         
             const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
-            const ua = useragent.parse(request.headers["user-agent"])
-            const sessionOptions = {ua: `${ua.device.toString()} ${ua.os.toString()}`, fingerprint: request.headers["fingerprint"], ip}
+            const ua = request.headers["user-agent"]
+            const sessionOptions = {ua, fingerprint: request.headers["fingerprint"], ip}
             const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
             const verifiedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
 

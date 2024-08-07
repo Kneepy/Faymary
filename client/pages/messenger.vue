@@ -3,9 +3,10 @@ import { ROUTES } from "~/assets/constants/routes.constants";
 import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
-import { type Messenger, useMessengerStore } from "~/store/messenger";
+import { type Messenger, useMessengerStore, useDraftsMessagesStore, DraftsMessages } from "~/store/messenger";
 import { DialogsAPI } from "~/api";
 import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
+import { ReceiveFiles } from "assets/helpers/receive-files";
 
 definePageMeta({
     requiredAuth: true, // это только на время разработки, так должно быть true
@@ -18,6 +19,7 @@ useHead({
 
 const messengerStore = useMessengerStore()
 const userStore = useUserStore()
+const draftsMessagesStore = useDraftsMessagesStore()
 const messagesBoxRef = ref<HTMLBaseElement>()
 const isLoading = ref(false)
 
@@ -26,7 +28,7 @@ onMounted(async () => {
     isLoading.value = true
 
     const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
-    messengerStore.addDialogs(<Messenger.CustomDialog[]> userDialogs)
+    messengerStore.addDialogs(<Messenger.Dialog[]> userDialogs)
 
     isLoading.value = false
 })
@@ -56,8 +58,14 @@ const isOpenCreateDialogModal = ref(false)
 const openCreateDialogModal = () => isOpenCreateDialogModal.value = true
 const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
 
+const draftMessage = ref(null)
 watch(() => messengerStore.currentDialog, async (dialog_id) => {
     if (!dialog_id) return
+
+    const dialog = messengerStore.dialogs.find(dialog => dialog.id === dialog_id)
+    draftMessage.value = draftsMessagesStore.getDraft(dialog_id)
+
+    if (dialog.messages) return
 
     const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 20, skip: 0 })
     messengerStore.addMessagesDialog(dialog_id, messages)
@@ -65,7 +73,34 @@ watch(() => messengerStore.currentDialog, async (dialog_id) => {
     // это чтобы при открытии блока с сообщениями прокуртка была внизу блока а не вверху
     messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
 })
+
 const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === messengerStore.currentDialog))
+const dialogName = computed(() => {
+    if (!currentDialog.value) return
+    if (currentDialog.value.number_participants > 2) return currentDialog.value.name
+    else {
+        const interlocutor = currentDialog.value.participants.find(participant => participant.user.id !== userStore.me.id)
+
+        return interlocutor.user.fullName
+    }
+})
+
+const inputFileRef = ref<HTMLInputElement>(null)
+const clickAttachFileButton = () => inputFileRef.value.click()
+const receiveFiles = (e: Event) => {
+    const files = ReceiveFiles(e)
+    files.forEach(file => draftMessage.value.addFile(file))
+}
+const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
+
+const sendMessage = () => {
+    const msg = draftMessage.value.message
+    const attachments: DraftsMessages.Attachment[] = []
+
+    if (draftMessage.value.files.length) {
+
+    }
+}
 </script>
 
 <template>
@@ -117,7 +152,7 @@ const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === 
             <template v-if="currentDialog">
                 <div class="top-box">
                     <div class="user-info" @click="openDialogInfoModal">
-                        <div class="user-name">Alex Korf</div>
+                        <div class="user-name">{{ dialogName }}</div>
                         <div class="user-status">был(а) в сети 1 час назад</div>
                     </div>
                     <div class="dialog-options">
@@ -137,17 +172,47 @@ const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === 
                         <Message v-for="message in currentDialog.messages" :message="message" :own="message.user.id === userStore.me.id" />
                     </div>
                 </div>
-                <div class="bottom-box">
-                    <IconButton :size=42>
-                        <GIcon style="transform: rotate(30deg)" fill :size=22>attach_file</GIcon>
-                    </IconButton>
-                    <TextareaAutosize class="scroll" placeholder="Напишите что-нибудь!"/>
-                    <IconButton :size=42>
-                        <GIcon fill :size=22>family_star</GIcon>
-                    </IconButton>
-                    <IconButton :size=42>
-                        <GIcon fill :size=22>play_arrow</GIcon>
-                    </IconButton>
+                <div @drop.prevent.stop="receiveFiles" class="bottom-box">
+                    <div v-if="!!draftMessage.files.length" class="attachments">
+                        <HorizontalScroll :count="draftMessage.files.length">
+                            <div class="files">
+                                <div
+                                    v-for="file in (draftMessage.files ?? [])"
+                                    @click="draftMessage.removeFile(file)"
+                                    class="file"
+                                >
+                                    <div class="trash">
+                                        <GIcon fill :weight="700" :size=15>delete</GIcon>
+                                    </div>
+                                    <div :style="{ backgroundImage: `url(${getURLPreviewFile(file)})` }" class="img"></div>
+                                </div>
+                            </div>
+                        </HorizontalScroll>
+                    </div>
+                    <div class="input-message">
+                        <IconButton>
+                            <GIcon @click="clickAttachFileButton" style="transform: rotate(30deg)">attach_file</GIcon>
+                            <input
+                                @input="receiveFiles"
+                                ref="inputFileRef"
+                                type="file"
+                                accept="image/*"
+                                multiple
+                            >
+                        </IconButton>
+                        <TextareaAutosize
+                            class="scroll"
+                            placeholder="Напишите что-нибудь..."
+                            @change="(v: string) => draftMessage.setMessage(v)"
+                            :max-height=170
+                        />
+                        <IconButton>
+                            <GIcon fill>family_star</GIcon>
+                        </IconButton>
+                        <IconButton @click="sendMessage">
+                            <GIcon fill>play_arrow</GIcon>
+                        </IconButton>
+                    </div>
                 </div>
             </template>
             <template v-else>
@@ -175,7 +240,7 @@ const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === 
     padding: 0;
     // это нужно убрать после того как закончу разработку чата
     margin: 40px auto 0;
-    height: 605px; // эту тему нужно будет менять
+    height: 650px; // эту тему нужно будет менять
 
     .left-bar {
         flex: 0.5;
@@ -291,6 +356,7 @@ const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === 
         flex: 1;
         display: flex;
         flex-direction: column;
+        width: 70%;
         .top-box {
             background-color: $transparent_hover_background;
             display: flex;
@@ -330,17 +396,17 @@ const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === 
             }
         }
         .wrapper {
-            padding: 5px 5px 5px 0;
+            padding-right: 5px;
             flex: 1;
             display: flex;
+            max-height: 523px;
+            min-height: 100px;
             .messages {
                 display: flex;
                 flex-direction: column;
                 padding: 0 10px;
-                max-height: 450px;
                 overflow-y: auto;
                 flex: 1;
-                padding-bottom: 20px; // убрать позже
             }
         }
         .bottom-box {
@@ -348,47 +414,107 @@ const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === 
             display: flex;
             border-top: 1px solid $primary_border;
             align-items: center;
-            button {
-                background-color: $transparent_button_hover_1;
-                margin: 0 5px;
-                border-radius: 15px;
-                &:hover {
-                    background-color: $transparent_button_hover_17;
-                    .icon {
-                        color: $white_gray;
-                    }
+            flex-direction: column;
+            .attachments {
+                width: 100%;
+                max-width: 100%;
+                overflow: auto;
+                padding: 5px 0;
+                margin-bottom: 15px;
+                &::-webkit-scrollbar {
+                    width: 0;
+                    height: 0;
                 }
-                .icon {
-                    color: $gray;
+                .files {
+                    display: flex;
+                    .file {
+                        width: 60px;
+                        height: 60px;
+                        margin-left: 10px;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        overflow: hidden;
+                        position: relative;
+                        .trash {
+                            position: absolute;
+                            right: 5px;
+                            top: 5px;
+                            display: flex;
+                            align-items: center;
+                            border-radius: 50%;
+                            background-color: $white;
+                            justify-content: center;
+                            padding: 2px;
+                            z-index: 10;
+                            opacity: 0;
+                            .icon {
+                                color: $black;
+                            }
+                        }
+                        .img {
+                            width: 100%;
+                            height: 100%;
+                            background-position: center;
+                            background-size: cover;
+                        }
+                        &:hover {
+                            box-shadow: 0 0 0 1px $white;
+                            .img {
+                                filter: blur(3px);
+                            }
+                            .trash {
+                                opacity: 1;
+                            }
+                        }
+                    }
                 }
             }
-            textarea {
-                flex: 4;
-                background-color: $transparent_hover_background;
-                border-radius: 10px;
-                color: $gray;
-                border: 1px solid $primary_border;
-                padding: 10px 20px;
-                transition: 200ms;
-                resize: none;
-                overflow: hidden;
-                height: 18px;
-                max-height: 450px;
-                &::placeholder {
-                    color: $gray_1;
-                    transition: 200ms;
-                }
-                &:focus {
-                    outline: none;
-                }
-                &:hover, &:focus {
-                    border-color: $border_8;
-                    transition: 200ms;
-                    color: $white;
-                    &::placeholder {
+            .input-message {
+                flex: 1;
+                display: flex;
+                width: 100%;
+                button {
+                    background-color: transparent;
+                    cursor: pointer;
+                    padding: 10px;
+                    flex: 0;
+                    &:hover {
+                        background-color: $transparent_button_hover_1;
+                    }
+                    &:last-child {
+                        margin-left: 5px;
+                    }
+                    span {
                         color: $gray;
+                    }
+                }
+                textarea {
+                    flex: 1;
+                    background-color: transparent;
+                    border: none;
+                    padding: 10px 20px;
+                    color: $white;
+                    border-radius: 10px;
+                    font-size: 16px;
+                    resize: none;
+                    max-height: 350px;
+                    &::placeholder {
+                        color: $gray_1;
                         transition: 200ms;
                     }
+                    &:focus {
+                        border: none;
+                        outline: none;
+                    }
+                    &:hover, &:focus {
+                        &::placeholder {
+                            color: $gray;
+                            transition: 200ms;
+                        }
+                    }
+                }
+                input[type="file"] {
+                    width: 0;
                 }
             }
         }

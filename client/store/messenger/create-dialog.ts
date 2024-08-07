@@ -8,16 +8,14 @@ export const useCreateDialogStore = defineStore("create-dialog", {
             existing: [],
             nonexistent: []
         },
-        inputSearch: "",
-        message: "",
-        files: []
+        inputSearch: ""
     }),
     actions: {
         /**
          * Обновляет результаты поиска
          * @param users новые результаты поиска
          */
-        setResultSearch({ existing, nonexistent }: { existing: CreateDialog.CustomUser[]; nonexistent: CreateDialog.CustomUser[] }) {
+        setResultSearch({ existing, nonexistent }: { existing: CreateDialog.User[]; nonexistent: CreateDialog.User[] }) {
             if (existing?.length > 0) this.resultSearch.existing = existing
             if (nonexistent?.length > 0) this.resultSearch.nonexistent = nonexistent
         },
@@ -26,7 +24,7 @@ export const useCreateDialogStore = defineStore("create-dialog", {
          * Выбирает пользователя при создании диалога
          * @param user выбранный пользователь
          */
-        selectUser(user: CreateDialog.CustomUser) {
+        selectUser(user: CreateDialog.User) {
             this.selectedUsers.push(user);
         },
 
@@ -34,7 +32,7 @@ export const useCreateDialogStore = defineStore("create-dialog", {
          * Удаляет пользователя из выбранныз при создании диалога
          * @param user выбранный пользователь
          */
-        removeUser(user: CreateDialog.CustomUser) {
+        removeUser(user: CreateDialog.User) {
             const index = this.selectedUsers.indexOf(user);
 
             if (index !== -1) {
@@ -45,30 +43,11 @@ export const useCreateDialogStore = defineStore("create-dialog", {
         },
 
         /**
-         * Изменяет сообщение которое будет использовано при создании диалога
-         * @param msg новое сообщение
-         */
-        setMessage(msg: string) {
-            this.message = msg.trim();
-        },
-
-        /**
          * Удаляет пользователя из выбранныз при создании диалога по его индексу
          * @param index index выбранного пользователя (в массиве this.selectedUsers)
          */
         removeUserByIndex(index: number) {
             this.selectedUsers.splice(index, 1);
         },
-
-        attachFile(file: File) {
-            this.files.push(file);
-        },
-        removeFileByIndex(index: number) {
-            this.files.splice(index, 1);
-        },
-        removeFile(file: File) {
-            const indexFile = this.files.indexOf(file);
-            this.files.splice(indexFile, 1);
-        }
     }
 })

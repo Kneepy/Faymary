@@ -1,4 +1,4 @@
-import type { Dialog, Message } from "~/api";
+import type { Dialog as BaseDialog, Message } from "~/api";
 
 export namespace Messenger {
 
@@ -6,7 +6,7 @@ export namespace Messenger {
         /**
          * Все чаты пользователя
          */
-        dialogs: CustomDialog[]
+        dialogs: Dialog[]
 
         /**
          * ID текущего чата пользователя
@@ -14,9 +14,8 @@ export namespace Messenger {
         currentDialog: string
     }
 
-    export interface CustomDialog extends Dialog {
+    export interface Dialog extends BaseDialog {
         messages?: Message[]
         lastMessage?: Message
     }
-
 }
