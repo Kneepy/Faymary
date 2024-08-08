@@ -1,5 +1,6 @@
 import {GetClientOptionsByConfig, GetClientProvider } from "./app-clients.utils";
 import {
+    ATTACHMENTS_MODULE_CONFIG,
     COMMENTS_MODULE_CONFIG,
     DIALOGS_MODULE_CONFIG,
     LIKES_MODULE_CONFIG, MAIL_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, NOTIFICATIONS_MODULE_CONFIG,
@@ -21,6 +22,7 @@ import { SessionServiceClient } from "./proto/session";
 import { StoreServiceClient } from "./proto/store";
 import { StoriesServiceClient } from "./proto/stories";
 import {UserServiceClient} from "./proto/user"
+import { AttachmentsServiceClient } from "./proto/attachments";
 
 
 // я хрен его знает как отслеживать правильность всех этих зависимостей но так прощё чем в ручную
@@ -60,3 +62,6 @@ export const MailClientDependency = GetClientOptionsByConfig(MAIL_MODULE_CONFIG)
 
 export const ProfilesClient = GetClientProvider<ProfilesServiceClient>(PROFILES_MODULE_CONFIG)
 export const ProfilesClientDependency = GetClientOptionsByConfig(PROFILES_MODULE_CONFIG)
+
+export const AttachmentsClient = GetClientProvider<AttachmentsServiceClient>(ATTACHMENTS_MODULE_CONFIG)
+export const AttachmentsClientDependency = GetClientOptionsByConfig(ATTACHMENTS_MODULE_CONFIG)

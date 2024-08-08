@@ -10,16 +10,6 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "messages";
 
-export enum AttachmentType {
-  USER = 0,
-  STORY = 1,
-  POST = 2,
-  COMMENT = 3,
-  MESSAGE = 4,
-  FILE = 7,
-  UNRECOGNIZED = -1,
-}
-
 export interface GetMessagesDTO {
   dialog_id: string;
   take?: number | undefined;
@@ -35,14 +25,12 @@ export interface GetLastMessageDialogDTO {
 }
 
 export interface CreateMessageDTO {
-  attachments: Attachment[];
   dialog_id: string;
   msg: string;
   user_id: string;
 }
 
 export interface UpdateMessageDTO {
-  attachments: Attachment[];
   dialog_id: string;
   id: string;
   msg?: string | undefined;
@@ -54,19 +42,13 @@ export interface DeleteMessageDTO {
   user_id: string;
 }
 
-export interface Attachment {
-  id: string;
-  type: AttachmentType;
-  item_id: string;
-}
-
 export interface Message {
   id: string;
-  attachments: Attachment[];
   dialog_id: string;
   user_id: string;
   msg: string;
   createdAt: string;
+  has_attachments: boolean;
 }
 
 export interface Messages {

@@ -1,22 +1,19 @@
 import { Inject } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from "@nestjs/websockets";
-import {forkJoin, merge, mergeAll, Subject} from "rxjs";
 import { DIALOGS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, USER_MODULE_CONFIG } from "src/constants/app.constants";
-import {DialogParticipants, DialogsServiceClient} from "src/proto/dialogs";
+import { DialogsServiceClient } from "src/proto/dialogs";
 import {
-    Attachment,
-    CreateMessageDTO,
     DeleteMessageDTO,
     Message,
     MessagesServiceClient,
-    UpdateMessageDTO
 } from "src/proto/messages";
 import { WEVENTS } from "./enums/events.enum";
 import { ServerGateway } from "./server.gateway";
 import { ICustomSocket } from "./types/socket.type";
-import {Addition, BrokerResponse} from "src/types";
-import { UtilsService } from "src/utils/get-item.util";
+import { BrokerRequests, BrokerResponse } from "src/types";
 import { UserServiceClient } from "src/proto/user";
+import { AttachmentsProvider } from "../providers";
+import { AttachmentType } from "../proto/attachments";
 
 @WebSocketGateway()
 export class MessagesGateway {
@@ -24,102 +21,74 @@ export class MessagesGateway {
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesServiceClient,
         @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
-        private utilsService: UtilsService,
-        private serverGateway: ServerGateway
+        private serverGateway: ServerGateway,
+        private attachmentsProvider: AttachmentsProvider,
     ) {}
 
     @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.CREATE)
-    async createMessage(@MessageBody() data: Omit<CreateMessageDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
-        /**
-         * Собираем все вложения которые прикрепил юзер
-         *
-         * Конструкция один в один используется в updateMessage
-         * Но я пока не буду выносить в отдельный метод
-         */
-        const attachments: Addition = await this.utilsService.getAdditions((data.attachments ?? []) as any)
+    async createMessage(@MessageBody() data: BrokerRequests.CreateMessage, @ConnectedSocket() client: ICustomSocket): Promise<void> {
+        try {
+            const [ message, { participants }, user ] = await Promise.all([
+                this.messagesService.createMessage({user_id: client.user_id, ...data}).toPromise(),
+                this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }).toPromise(),
+                this.userService.findUser({id: client.user_id}).toPromise()
+            ])
+            const attachments = await this.attachmentsProvider.setAttachments({ parent_id: message.id, parent_type: AttachmentType.MESSAGE }, data.attachments);
 
-        forkJoin({
-            message: this.messagesService.createMessage({user_id: client.user_id, ...data}),
-            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }),
-            user: this.userService.findUser({id: client.user_id}),
-        }).subscribe({
-            next: ({message, participants, user}) => {
-
-                for (const participant of participants.participants) {
-                    this.serverGateway.broadcastUser<BrokerResponse.Message>(participant.user_id, {
-                        data: {
-                            ...message,
-                            attachments,
-                            user
-                        },
-                        event: WEVENTS.DIALOGS.MESSAGES.CREATE
-                    });
-                }
-
-            },
-            error: e => this.serverGateway.sendError(client, e)
-        })
+            for (const participant of participants) {
+                this.serverGateway.broadcastUser<BrokerResponse.Message>(participant.user_id, {
+                    data: {
+                        ...message,
+                        attachments,
+                        user
+                    },
+                    event: WEVENTS.DIALOGS.MESSAGES.CREATE
+                });
+            }
+        } catch (e) {
+            this.serverGateway.sendError(client, e);
+        }
     }
 
     @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.UPDATE)
-    async updateMessage(@MessageBody() data: Omit<UpdateMessageDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
-        /**
-         * Собираем все вложения которые прикрепил юзер
-         */
-        const attachments: Addition = {}
+    async updateMessage(@MessageBody() data: BrokerRequests.UpdateMessage, @ConnectedSocket() client: ICustomSocket): Promise<void> {
+        try {
+            const attachments = await this.attachmentsProvider.setAttachments({ parent_id: data.id, parent_type: AttachmentType.MESSAGE }, data.attachments);
+            const [ message, { participants }, user ] = await Promise.all([
+                this.messagesService.updateMessage({user_id: client.user_id, ...data}).toPromise(),
+                this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }).toPromise(),
+                this.userService.findUser({id: client.user_id}).toPromise()
+            ])
 
-        if (!!data.attachments.length) {
-            for (const attachment of data.attachments) {
-
-                const { data, key } = this.utilsService.getItem(<any>attachment.type, attachment.item_id);
-
-                data.subscribe(value => {
-                    if (!value) return
-                    if (!attachments[key]) attachments[key] = []
-
-                    attachments[key].push(value)
-                });
-
+            for (const participant of participants) {
+                this.serverGateway.broadcastUser<BrokerResponse.Message>(participant.user_id, {
+                    data: {
+                        ...message,
+                        attachments,
+                        user
+                    },
+                    event: WEVENTS.DIALOGS.MESSAGES.UPDATE
+                })
             }
+        } catch (e) {
+            this.serverGateway.sendError(client, e)
         }
-
-        forkJoin({
-            message: this.messagesService.updateMessage({user_id: client.user_id, ...data}),
-            participants: this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }),
-            user: this.userService.findUser({id: client.user_id})
-        }).subscribe({
-            next: ({ message, participants, user }) => {
-
-                for (const participant of participants.participants) {
-                    this.serverGateway.broadcastUser<BrokerResponse.Message>(participant.user_id, {
-                        data: {
-                            ...message,
-                            attachments,
-                            user
-                        },
-                        event: WEVENTS.DIALOGS.MESSAGES.UPDATE
-                    })
-                }
-
-            },
-            error: e => this.serverGateway.sendError(client, e)
-        })
     }
 
     @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.DELETE)
     async deleteMessage(@MessageBody() {id}: Omit<DeleteMessageDTO, "user_id">, @ConnectedSocket() client: ICustomSocket): Promise<void> {
-        const deletedMessage = this.messagesService.deleteMessage({user_id: client.user_id, id})
+       try {
+           const deletedMessage = await this.messagesService.deleteMessage({user_id: client.user_id, id}).toPromise()
+           const { participants } = await this.dialogsService.getAllParticipantsDialog({ dialog_id: deletedMessage.dialog_id }).toPromise()
 
-        deletedMessage.subscribe({
-            next: message => this.dialogsService.getAllParticipantsDialog({ dialog_id: message.dialog_id }).subscribe({
-                next: ({ participants }) => participants.forEach(async participant =>
-                    this.serverGateway.broadcastUser<Message>(participant.user_id, {
-                        data: message,
-                        event: WEVENTS.DIALOGS.MESSAGES.DELETE
-                    })    
-                )
-            }),
-            error: e => this.serverGateway.sendError(client, e)
-        })
+           for (const participant of participants) {
+               this.serverGateway.broadcastUser<Message>(participant.user_id, {
+                   data: deletedMessage,
+                   event: WEVENTS.DIALOGS.MESSAGES.DELETE
+               })
+           }
+       } catch (e) {
+           this.serverGateway.sendError(client, e)
+       }
     }
 }

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { DraftsMessages } from "~/store";
+import { type Addition, StoreAPI } from "~/api";
 
 export const useDraftsMessagesStore = defineStore("drafts-messages", {
     state: (): DraftsMessages.Store => ({
@@ -9,24 +10,15 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
         addDraft(dialog_id: string) {
             const existDraft = this.drafts.find(draft => draft.dialog_id === dialog_id)
 
-            if (existDraft) return
+            if (existDraft) return existDraft
 
             const newDraft = { message: "", files: [], dialog_id }
-            this.drafts.push(newDraft)
+            this.drafts.push(newDraft as any)
 
             return newDraft
         },
         getDraft(dialog_id: string) {
-            const draft = this.drafts.find(draft => draft.dialog_id === dialog_id) ?? this.addDraft(dialog_id)
-
-            return {
-                ...draft,
-                setMessage: (message: string) => this.setMessage(draft.dialog_id, message),
-                addFile: (file: File) => this.addFile(draft.dialog_id, file),
-                removeFile: (file: File) => this.removeFile(draft.dialog_id, file),
-                removeFileByIndex: (index: number) => this.removeFileByIndex(draft.dialog_id, index),
-                prepareMessage: () => this.prepareMessage(draft.dialog_id)
-            };
+            return this.drafts.find(draft => draft.dialog_id === dialog_id) ?? this.addDraft(dialog_id);
         },
         setMessage(dialog_id: string, message: string) {
             const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
@@ -54,23 +46,33 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
 
             draft.files.splice(indexFile, 1)
         },
-        removeFileByIndex(dialog_id: string, index: number) {
+        clear(dialog_id: string) {
             const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
 
             if (!draft) return
-            if (!draft.files[index]) return
 
-            draft.files.splice(index, 1)
+            draft.files = []
+            draft.message = ""
         },
-        async prepareMessage(dialog_id: string): Promise<DraftsMessages.PrepareMessage> {
+        isEmpty(dialog_id: string) {
             const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
+
+            return !!draft?.files?.length || !!draft?.message
+        },
+        async prepareMessage(dialog_id: string, edits: Partial<DraftsMessages.Draft>): Promise<DraftsMessages.PreparedMessage> {
+            const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
+            const attachments: Addition = {}
 
             if (!draft) return
             if (draft.files.length) {
-
+                attachments.files = await StoreAPI.uploadFiles(draft.files)
             }
+            /**
+             * Это нужно в тех случаях если в качестве id указан ANONIMOUS_DIALOG при создании нового диалога
+             */
+            if (!!edits?.dialog_id) dialog_id = edits.dialog_id
 
-            return
+            return { dialog_id, msg: draft.message, attachments }
         }
     }
 })

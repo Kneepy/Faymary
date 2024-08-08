@@ -2,20 +2,19 @@ import { MESSAGES_MODULE_CONFIG, USER_MODULE_CONFIG } from "./../constants/app.c
 import { Controller, ForbiddenException, Get, Inject, Query, Req } from "@nestjs/common";
 import { DIALOGS_MODULE_CONFIG } from "src/constants/app.constants";
 import {
-    Dialog,
     DialogActionEnum,
     DialogsServiceClient,
-    GetDialogDTO,
     GetHistoryDialogDTO,
     GetUserDialogsDTO,
-    ParticipantRights, SearchUserDialogsDTO
+    ParticipantRights
 } from "src/proto/dialogs";
 import { GetMessageDTO, GetMessagesDTO, MessagesServiceClient } from "src/proto/messages";
 import { FindUsersDTO, User, UserServiceClient } from "src/proto/user";
-import { Addition, AdditionsType, BrokerResponse } from "src/types";
+import { BrokerResponse } from "src/types";
 import { ICustomRequest } from "src/types/request.type";
-import { UtilsService } from "src/utils/get-item.util";
 import { firstValueFrom } from "rxjs";
+import { AttachmentsProvider } from "../providers";
+import { AttachmentType } from "../proto/attachments";
 
 @Controller("dialog")
 export class DialogsController {
@@ -23,7 +22,7 @@ export class DialogsController {
         @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient,
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
-        private utilsService: UtilsService
+        private attachmentsProvider: AttachmentsProvider,
     ) {}
 
     @Get("many")
@@ -34,21 +33,16 @@ export class DialogsController {
             const dialogTmp: BrokerResponse.Dialog = { ...dialog} as any
             const accumulatorValue = await accumulator
 
-            try {
-                /**
-                 * Если последнее сообщение не найдено то эта штука выкидывает ошибку
-                 * Поэтому юзаем try catch
-                 */
-                const lastMessage = await firstValueFrom(this.messagesService.getLastDialogMessage({ dialog_id: dialog.id }))
+            const lastMessage = await firstValueFrom(this.messagesService.getLastDialogMessage({ dialog_id: dialog.id }))
 
+            if (!!lastMessage.dialog_id) {
                 const [ messageUser, messageAttachments] = await Promise.all([
                     firstValueFrom(this.userService.findUser({ id: lastMessage.user_id })),
-                    this.utilsService.getAdditions((lastMessage.attachments ?? []) as any)
+                    this.attachmentsProvider.getAttachments({ parent_id: lastMessage.id, parent_type: AttachmentType.MESSAGE })
                 ])
 
                 dialogTmp.lastMessage = {...lastMessage, attachments: messageAttachments, user: messageUser }
-
-            } catch (e) {}
+            }
 
             const { participants } = await firstValueFrom(this.dialogsService.getParticipantsDialog({
                 rights: [ParticipantRights.ADMIN, ParticipantRights.CREATOR, ParticipantRights.USER],
@@ -105,9 +99,6 @@ export class DialogsController {
         return { existing: matchesInterlocutors, nonexistent: matchedUsers }
     }
 
-    /**
-     * Эндпоинт выкенет ошибку при отсутсвии пользователя в диалоге
-     */
     @Get("history")
     async getHistoryDialog(@Query() {dialog_id, take, skip}: GetHistoryDialogDTO, @Req() {user_id}: ICustomRequest): Promise<BrokerResponse.DialogHistory[]> {
         const historyNotes = await this.dialogsService.getHistoryDialog({dialog_id, skip, take}).toPromise()
@@ -115,13 +106,14 @@ export class DialogsController {
         
         if(!userIsIncludedIntoDialog.isIncluded) throw new ForbiddenException()
 
-        return Promise.all(historyNotes.notes.map(async note => {
-            if(note.action === DialogActionEnum.ADD_USER || note.action === DialogActionEnum.REMOVE_USER) {
-                const attachments = this.utilsService.getItem(AdditionsType.USER, note.item_id)
-                return {...note, attachments: {[attachments.key]: await attachments.data.toPromise()}}
-            }
-            
-            return note
+        return Promise.all(
+            historyNotes.notes.map(async note => {
+                if(note.action === DialogActionEnum.ADD_USER || note.action === DialogActionEnum.REMOVE_USER) {
+                    const user = await firstValueFrom(this.userService.findUser({ id: note.item_id }))
+                    return {...note, attachments: {users: [user]}}
+                }
+
+                return note
         }))
     }
 
@@ -141,7 +133,7 @@ export class DialogsController {
         return Promise.all(messages.map(async message => {
             const [ attachments, user ] = await Promise.all([
                 // собираем все вложения сообщения
-                this.utilsService.getAdditions((message.attachments ?? []) as any),
+                this.attachmentsProvider.getAttachments({ parent_id: message.id, parent_type: AttachmentType.MESSAGE }),
 
                 // получаем владельца сообщения
                 this.userService.findUser({id: message.user_id}).toPromise()
@@ -155,7 +147,7 @@ export class DialogsController {
     async getMessage(@Query() data: GetMessageDTO): Promise<BrokerResponse.Message> {
         const message = await this.messagesService.getMessage(data).toPromise()
         const [ attachments, user ] = await Promise.all([
-            this.utilsService.getAdditions(message.attachments as any ?? []),
+            this.attachmentsProvider.getAttachments({ parent_id: message.id, parent_type: AttachmentType.MESSAGE }),
             this.userService.findUser({id: message.user_id}).toPromise()
         ])
 

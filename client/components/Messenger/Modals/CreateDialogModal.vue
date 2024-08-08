@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdditionsType, DialogsWsAPI, ParticipantRights, StoreAPI, DialogsAPI } from "~/api";
+import { DialogsWsAPI, ParticipantRights, StoreAPI, DialogsAPI } from "~/api";
 import {
     type CreateDialog,
     useCreateDialogStore,
@@ -14,7 +14,6 @@ const emit = defineEmits(["onClose"])
 const close = () => emit("onClose")
 
 const createDialogStore = useCreateDialogStore()
-const userStore = useUserStore()
 const messengerStore = useMessengerStore()
 const draftsMessagesStore = useDraftsMessagesStore()
 
@@ -70,7 +69,7 @@ const receiveFiles = (e: Event) => {
     const files = ReceiveFiles(e)
 
     for (const file of files) {
-        draftMessage.addFile(file)
+        draftsMessagesStore.addFile(DraftsMessages.ANONYMOUS_DIALOG, file)
     }
 }
 const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
@@ -80,26 +79,11 @@ const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
  * Тут надо сделать переключатель типа создать беседу или отправить каждому отдельно, но я для теста пока так оставлю
  */
 const sendMessage = async () => {
-    const attachments: DraftsMessages.Attachment[] = []
-
-    if (!!draftMessage.files.length) {
-        const files = await StoreAPI.uploadFiles(draftMessage.files)
-
-        for (const file of files) {
-            attachments.push({ item_id: file.id, type: AdditionsType.FILE })
-        }
-    }
-
     // создаём чат
     const participants = createDialogStore.selectedUsers.map(user => ({ user_id: user.id, rights: ParticipantRights.USER }))
-    const name = participants.length > 1 ? "Test Dialog" : ""
+    const name = participants.length > 2 ? "Test Dialog" : ""
     const dialog = await DialogsWsAPI.createDialog({ participants, name })
-    const message = await DialogsWsAPI.createMessage({
-        attachments,
-        dialog_id: dialog.id,
-        user_id: userStore.me.id,
-        msg: draftMessage.message
-    })
+    const message = await DialogsWsAPI.createMessage(await draftsMessagesStore.prepareMessage(DraftsMessages.ANONYMOUS_DIALOG, { dialog_id: dialog.id }))
 
     messengerStore.addDialogs([ dialog ])
     messengerStore.addMessagesDialog(dialog.id, [ message ])
@@ -178,7 +162,7 @@ const sendMessage = async () => {
                         <div class="files">
                             <div
                                 v-for="file in (draftMessage.files ?? [])"
-                                @click="() => draftMessage.removeFile(file)"
+                                @click="() => draftsMessagesStore.removeFile(DraftsMessages.ANONYMOUS_DIALOG, file)"
                                 class="file"
                             >
                                 <div
@@ -209,7 +193,8 @@ const sendMessage = async () => {
                     <TextareaAutosize
                         class="scroll"
                         placeholder="Напишите своим новым собеседникам!"
-                        @change="(v: string) => draftMessage.setMessage(v)"
+                        @change="(v: string) => draftsMessagesStore.setMessage(DraftsMessages.ANONYMOUS_DIALOG, v)"
+                        :value="draftMessage.message"
                         :max-height=350
                     />
                     <IconButton>

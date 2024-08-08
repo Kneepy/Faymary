@@ -1,10 +1,4 @@
-import { type Addition, AdditionsType, type User } from "~/api";
-
-export interface Attachment {
-    item_id: string
-    type: AdditionsType
-    id: string
-}
+import { type Addition, type User } from "~/api";
 
 export interface Message {
     id: string;

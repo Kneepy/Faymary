@@ -59,7 +59,7 @@ export namespace BrokerResponse {
         attachment: Addition
     }
     export interface Story extends BaseStory {
-        marks: StoryMark[]
+        attachments: Addition
     }
     export interface UserStories {
         user: User

@@ -2,7 +2,6 @@ import { MessagesController } from './messages.controller';
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
-    Attachments,
     DB,
     DB_HOST,
     DB_PASSWORD,
@@ -26,10 +25,10 @@ import { RedisModule } from './redis';
             username: DB_USERNAME,
             password: DB_PASSWORD,
             database: DB,
-            entities: [Messages, Attachments],
+            entities: [Messages],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([Messages, Attachments]),
+        TypeOrmModule.forFeature([Messages]),
         RedisModule.forRoot({
             url: REDIS_URL,
             username: REDIS_USER,

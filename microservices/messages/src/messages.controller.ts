@@ -34,7 +34,7 @@ export class MessagesController {
 
         // await this.redisService.hSet(`new_message_dialog-${msg.dialog_id}:${msg.id}`, Object.entries(msg))
         // await this.redisService.expire(msg.id, REDIS_DEFAULT_TTL)
-        
+
         return msg;
     }
 
@@ -44,19 +44,16 @@ export class MessagesController {
 
         // const keys = this.redisService.keys(`new_message_dialog-${data.dialog_id}:*`)
         // щас на dialog сервисе нашаманю потом надо будет чисто через getMessage все сообщения отдавать
+
         return {messages: await this.messagesService.find(
-            { dialog_id: data.dialog_id },
-            { take: data.take, skip: data.skip, relations: {attachments: true} }
+            { dialog_id: data.dialog_id, has_attachments: data.has_attachments },
+            { take: data.take, skip: data.skip }
         )}
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_LAST_DIALOG_MESSAGE)
     async getLastDialogMessage({ dialog_id }: GetLastMessageDialogDTO): Promise<Messages> {
-        const lastMessage = await this.messagesService.getLast({ dialog_id }, { relations: { attachments: true } })
-
-        if(!lastMessage) throw NotFoundMessage;
-
-        return lastMessage
+        return await this.messagesService.getLast({ dialog_id }) ?? {} as any
     }
 
     @GrpcMethod(MESSAGES_SERVICE_NAME, MESSAGES_SERVICE_METHODS.GET_MESSAGE)
@@ -76,7 +73,7 @@ export class MessagesController {
         /**
          * Иначе же ищем это сообщение в бд
          */
-        const msg = await this.messagesService.findOne({id: data.id}, {relations: {attachments: true}})
+        const msg = await this.messagesService.findOne({id: data.id})
 
         /**
          * Добавляем сообщение в кеш

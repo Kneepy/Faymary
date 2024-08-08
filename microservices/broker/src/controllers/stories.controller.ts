@@ -1,22 +1,31 @@
-import { Body, Controller, Delete, Get, Inject, NotFoundException, Patch, Post, Query, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Patch, Post, Query, Req } from "@nestjs/common";
 import { STORIES_MODULE_CONFIG, USER_MODULE_CONFIG } from "src/constants/app.constants";
-import { CreateStoryDTO, StoriesServiceClient, Story, UpdateStoryDTO, DeleteStoryDTO, GetStoryDTO } from "src/proto/stories";
+import {
+    CreateStoryDTO,
+    DeleteStoryDTO,
+    GetStoryDTO,
+    StoriesServiceClient,
+    Story,
+    UpdateStoryDTO
+} from "src/proto/stories";
 import { ICustomRequest } from "src/types/request.type";
-import { DisableAuth } from 'src/disable-auth.decorator';
-import { UtilsService } from 'src/utils/get-item.util';
+import { DisableAuth } from "src/disable-auth.decorator";
 import { BrokerRequests, BrokerResponse } from "src/types";
 import { UserServiceClient } from "src/proto/user";
+import { AttachmentsProvider } from "../providers";
+import { AttachmentType } from "../proto/attachments";
 
 @Controller("story")
 export class StoriesController {
     constructor(
         @Inject(STORIES_MODULE_CONFIG.PROVIDER) private storiesService: StoriesServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private usersService: UserServiceClient,
-        private utilsService: UtilsService
+        private attachmentsProvider: AttachmentsProvider
     ) {}
 
     @Post()
     async createStory(@Req() req: ICustomRequest, @Body() data: Omit<CreateStoryDTO, "user_id">): Promise<Story> {
+        /*
         if(data.marks.length) {
             for (const mark of data.marks) {
 
@@ -24,6 +33,7 @@ export class StoriesController {
 
             }
         }
+         */
 
         return await this.storiesService.createStory({...data, user_id: req.user_id}).toPromise()
     }
@@ -61,16 +71,8 @@ export class StoriesController {
     @DisableAuth()
     async getStory(@Query() {id}: GetStoryDTO): Promise<BrokerResponse.Story> {
         const story = await this.storiesService.getStory({id}).toPromise()
+        const attachments = await this.attachmentsProvider.getAttachments({ parent_id: story.id, parent_type: AttachmentType.STORY })
 
-        return {
-            ...story,
-            marks: await Promise.all(
-                story.marks.map(async (mark): Promise<BrokerResponse.StoryMark> => {
-                    const attachment = this.utilsService.getItem(<any>mark.type, mark.item_id)
-                    
-                    return {...mark, attachment: {[attachment.key]: await attachment.data.toPromise()}}
-                })
-            )
-        }
+        return { ...story, attachments }
     }
 }

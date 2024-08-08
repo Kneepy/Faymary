@@ -4,18 +4,19 @@ import { NotificationsServiceClient } from "src/proto/notification";
 import { NotificationGetDTO } from "src/proto/notification";
 import { UserServiceClient } from "src/proto/user";
 import { ICustomRequest, BrokerResponse } from "src/types";
-import { UtilsService } from "src/utils/get-item.util";
+import { AttachmentsProvider } from "../providers";
 
 @Controller("notifications")
 export class NotificationController {
     constructor(
         @Inject(NOTIFICATIONS_MODULE_CONFIG.PROVIDER) private notificationService: NotificationsServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
-        private utilsService: UtilsService
+        private attachmentsProvider: AttachmentsProvider,
     ) {}
  
     @Get()
     async getAllUserNotifications(@Query() {skip, take}: NotificationGetDTO, @Req() {user_id}: ICustomRequest): Promise<BrokerResponse.Notification[]> {
+        /*
         const notifications = (await this.notificationService.getAllUserNotifications({user_id, take, skip}).toPromise()).notifications ?? []
         const to = await this.userService.findUser({id: user_id}).toPromise()
 
@@ -26,5 +27,8 @@ export class NotificationController {
 
             return {...notification, parent: {[parent.key]: await parent.data.toPromise()}, item: {[item.key]: await item.data.toPromise()}, from, to}
         }))
+         */
+
+        return
     }
 }

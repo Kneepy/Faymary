@@ -2,7 +2,7 @@ import { ServerGateway } from './server.gateway';
 import { ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { WEVENTS } from './enums/events.enum';
 import { AddUserDialogDTO, ChangeFileDialogDTO, ChangeNameDialogDTO, CreateDialogDTO, DeleteDialogDTO, DeleteUserDialogDTO, Dialog, DialogActionEnum, DialogHistory, DialogParticipants, DialogsServiceClient, GetUserDialogsDTO, ParticipantRights } from './../proto/dialogs';
-import { DIALOGS_MODULE_CONFIG, USER_MODULE_CONFIG } from './../constants/app.constants';
+import { DIALOGS_MODULE_CONFIG, USER_MODULE_CONFIG } from "../constants/app.constants";
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Inject } from '@nestjs/common';
 import { ICustomSocket } from './types/socket.type';
@@ -24,20 +24,21 @@ export class DialogsGateway {
      */
     @SubscribeMessage(WEVENTS.DIALOGS.CREATE)
     async createDialog(@MessageBody() data: CreateDialogDTO, @ConnectedSocket() client: ICustomSocket): Promise<void> {
-        this.dialogsService.createDialog({
-            participants: [{user_id: client.user_id, rights: ParticipantRights.CREATOR} as DialogParticipants, ...data.participants],
-            name: data.name
-        }).subscribe({
-            // передаём всем участинкам диалога сам диалог 
-            next: dialog => 
-                dialog.participants.forEach(async participant => 
-                    this.serverGateway.broadcastUser<Dialog>(participant.user_id, {
-                        data: dialog,
-                        event: WEVENTS.DIALOGS.CREATE
-                    })
-                ),
-            error: e => this.serverGateway.sendError(client, e)
-        })
+        try {
+            const dialog = await this.dialogsService.createDialog({
+                participants: [{user_id: client.user_id, rights: ParticipantRights.CREATOR} as DialogParticipants, ...data.participants],
+                name: data.name
+            }).toPromise()
+
+            for (const participant of data.participants) {
+                this.serverGateway.broadcastUser<Dialog>(participant.user_id, {
+                    data: dialog,
+                    event: WEVENTS.DIALOGS.CREATE
+                })
+            }
+        } catch (e) {
+            this.serverGateway.sendError(client, e)
+        }
     }
 
     /**
@@ -57,7 +58,7 @@ export class DialogsGateway {
                 attachments.subscribe(user => {
                     participants.participants.forEach(async participant =>
                         this.serverGateway.broadcastUser<BrokerResponse.DialogHistory>(participant.user_id, {
-                            data: { ...historyNote, attachments: { user } },
+                            data: { ...historyNote, attachments: { users: [user] } },
                             event: WEVENTS.DIALOGS.ADD_USER
                         })
                     )
@@ -84,7 +85,7 @@ export class DialogsGateway {
                 attachments.subscribe(user => {
                     participants.participants.forEach(async participant =>
                         this.serverGateway.broadcastUser<BrokerResponse.DialogHistory>(participant.user_id, {
-                            data: {...historyNote, attachments: {user}},
+                            data: {...historyNote, attachments: {users: [user]}},
                             event: WEVENTS.DIALOGS.REMOVE_USER
                         })
                     )

@@ -10,11 +10,7 @@ import { NotificationCreate, NotificationsServiceClient, NotificationAdditionsEn
 import { UserServiceClient } from 'src/proto/user';
 import { WEVENTS } from './enums/events.enum';
 import { ProfilesServiceClient } from 'src/proto/profiles';
-import { GetSettingByNotificationType } from './enums/setting-by-notification-type.enum';
 import { mergeMap, tap } from 'rxjs/operators';
-import { Subject, forkJoin } from 'rxjs';
-import { UtilsService } from 'src/utils/get-item.util';
-import { BrokerResponse, Fields } from 'src/types';
 import * as url from "node:url";
 
 @WebSocketGateway({ cors: { origin: "*" }, cookie: true })
@@ -24,7 +20,6 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         @Inject(NOTIFICATIONS_MODULE_CONFIG.PROVIDER) private notificationsService: NotificationsServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
         @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profileService: ProfilesServiceClient,
-        private utilsService: UtilsService
     ) {}
 
     private users: Map<string, Map<string, ICustomSocket>> = new Map()
@@ -33,65 +28,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
      * Эта функция сама создаёт уведомления и получает все необходимы данные по id и type и отправляет их клиенту
      */
     async sendNotification(data: NotificationCreate): Promise<boolean> {
-        if (data.to_id !== data.from_id) {
-
-            /**
-             * Должен принимать строку как id пользователя которому нужно отправить уведомление
-             * Впервые работаю на такой конструкции
-             * И вообще не знаю норм ли это
-             */
-            const subjectNotification = new Subject<string>()
-
-            subjectNotification.subscribe({
-                next: to_id => {
-                    /**
-                     * Тут делаем проверку на то хочет ли пользователь получать те или иные уведомления указанные в настройках
-                     */
-                    if(data.notification_type in NotificationEnumType) {
-                        const [to_id_socket] = this.users.get(to_id)?.values() ?? []
-
-                        if(to_id_socket && !GetSettingByNotificationType(to_id_socket.settings)[data.notification_type]) return false
-                    }
-                    this.notificationsService.createNotification({...data, to_id: null}).subscribe({
-                        next: notification => {
-                            forkJoin({
-                                parent: this.utilsService.getItem(<any>notification.parent_type, notification.parent_id).data,
-                                item: this.utilsService.getItem(<any>notification.type, notification.item_id).data,
-                                to: this.userService.findUser({id: notification.to_id}),
-                                from: this.userService.findUser({id: notification.from_id})
-                            }).subscribe({
-                                next: ({parent, item, to, from}) => {
-                                    this.broadcastUser<BrokerResponse.Notification>(to_id, { event: WEVENTS.NOTIFICATION, data: {...notification, parent, item, to, from}})
-                                }
-                            })
-                        },
-                        /**
-                         * Я хз как обработать эту ошибку, клиент о ней знать вообще не должен по идее
-                         */
-                        error: e => e
-                    })
-                }
-            })
-
-            /**
-             * Я лично хз норм ли это, но если учитывать что все типы ДОЛЖНЫ\ОБЯЗАНЫ быть одинкаовы для всех микросервисов то норм и возможно нужно будет вынести в отдельую функцию
-             * Эта штука перебирает типы того из-за какой записи было отправлено уведомление и передаёт полученную инфу в to_id т.к из-за особенности сей архитектуры нельзя сразу сказать кто создал запись без её получения
-             * 
-             * В теории можно заменить на:  const a = {...}; a[NotificationAdditionsEnumType.USER] = (...).user_id, но мне лень
-            */
-            if (data.parent_type in NotificationAdditionsEnumType && data.parent_id && !data.to_id) {
-                const parent = this.utilsService.getItem(<any>data.parent_type, data.parent_id)
-
-                parent.data.subscribe({
-                    next: item => subjectNotification.next(parent.key === Fields.USER ? item.id : item.user_id),
-                    error: e => e
-                })
-            } else subjectNotification.next(data.to_id)
-
-            subjectNotification.complete()
-
-            return true
-        }
+        return true
     }
 
     /*
@@ -110,11 +47,11 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return true
     }
 
-    async sendUser<T>(client: ICustomSocket, data: WsResponse<T>) {
+    sendUser<T>(client: ICustomSocket, data: WsResponse<T>) {
         client.send(JSON.stringify(data))
     }
 
-    async sendError(client: ICustomSocket, error: any) {
+    sendError(client: ICustomSocket, error: any) {
         client.send(JSON.stringify({data: error, event: WEVENTS.ERROR}))
     }
 
@@ -129,7 +66,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         // если токены не переданы то закрываем соединение
         if (![authorization, session_id, fingerprint].every(v => typeof v === "string")) {
-            await this.sendError(client, PoorDataError)
+            this.sendError(client, PoorDataError)
             client.close()
 
             return false
@@ -167,7 +104,8 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 this.users.get(client.user_id).set(client.session_id, client)
             },
             error: e => {
-                this.sendError(client, e) && client.close()
+                this.sendError(client, e)
+                client.close()
             }
         })
     }

@@ -10,3 +10,4 @@ export const LIKES_MS_HOST = process.env.LIKES_SERVICE_HOST;
 export const DIALOGS_MS_HOST = process.env.DIALOGS_SERVICE_HOST;
 export const COMMENTS_MS_HOST = process.env.COMMENTS_SERVICE_HOST;
 export const AUTH_MS_HOST = process.env.AUTH_SERVICE_HOST;
+export const ATTACHMENTS_MS_HOST = process.env.ATTACHMENTS_SERVICE_HOST;

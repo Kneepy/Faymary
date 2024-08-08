@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AdditionsType, type Message } from "~/api";
+import { type Message } from "~/api";
 
 interface Props {
     message: Message
@@ -14,7 +14,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     own: false
 })
-const images = computed(() => props.message?.attachments?.file)
+const images = computed(() => props.message?.attachments?.files)
 </script>
 
 <template>

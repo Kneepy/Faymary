@@ -4,41 +4,26 @@ import { Post } from "src/proto/post"
 import { Story } from "src/proto/stories"
 import { User } from "src/proto/user"
 import { File } from "../proto/store";
-
-export enum AdditionsType {
-    USER = 0,
-    STORY = 1,
-    POST = 2,
-    COMMENT = 3,
-    MESSAGE = 4,
-    DIALOG = 5,
-    LIKE = 6,
-    FILE = 7
-}
+import { Like } from "../proto/likes";
 
 export enum Fields {
-    USER = "user",
-    COMMENT = "comment",
-    DIALOG = "dialog",
-    MESSAGE = "message",
-    STORY = "story",
-    POST = "post",
-    FILE = "file",
-    LIKE = "like"
+    USERS = "users",
+    COMMENTS = "comments",
+    DIALOGS = "dialogs",
+    MESSAGES = "messages",
+    STORIES = "stories",
+    POSTS = "posts",
+    FILES = "files",
+    LIKES = "likes"
 }
 
 export interface Addition {
-    [Fields.USER]?: User[]
-    [Fields.POST]?: Post[]
-    [Fields.COMMENT]?: Comment[]
-    [Fields.STORY]?: Story[]
-    [Fields.MESSAGE]?: Message[]
-    [Fields.DIALOG]?: Dialog[]
-    [Fields.FILE]?: File[]
-    [key: string]: any | any[]
-}
-
-export interface Attachment {
-    item_id: string
-    type: AdditionsType
+    [Fields.USERS]?: User[]
+    [Fields.POSTS]?: Post[]
+    [Fields.COMMENTS]?: Comment[]
+    [Fields.STORIES]?: Story[]
+    [Fields.MESSAGES]?: Message[]
+    [Fields.DIALOGS]?: Dialog[]
+    [Fields.FILES]?: File[]
+    [Fields.LIKES]?: Like[]
 }

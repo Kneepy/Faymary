@@ -1,13 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Attachments } from "./attachments.entity";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Messages {
     @PrimaryGeneratedColumn("uuid")
     id: string;
-
-    @OneToMany(() => Attachments, (attachments: Attachments) => attachments.message, {cascade: true})
-    attachments: Attachments[];
 
     @Column()
     dialog_id: string;
@@ -20,4 +16,7 @@ export class Messages {
 
     @Column({ type: "bigint" })
     createdAt: number;
+
+    @Column({ default: false })
+    has_attachments: boolean
 }

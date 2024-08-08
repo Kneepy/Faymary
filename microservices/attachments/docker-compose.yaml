@@ -1,6 +1,6 @@
 version: '0.0'
 services:
-  dialogs_db: 
+  attachments_db:
     container_name: attachments_db
     environment:
       POSTGRES_PASSWORD: postgres

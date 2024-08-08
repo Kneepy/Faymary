@@ -1,5 +1,6 @@
 import {GetModuleConfig, GetProtoPath} from "../app-clients.utils";
 import {
+    ATTACHMENTS_MS_HOST,
     AUTH_MS_HOST, COMMENTS_MS_HOST, DIALOGS_MS_HOST,
     LIKES_MS_HOST, MAIL_MS_HOST, MESSAGES_MS_HOST,
     NOTIFICATIONS_MS_HOST,
@@ -31,3 +32,4 @@ export const STORIES_MODULE_CONFIG = GetModuleConfig({port: 5009, pkgName: "stor
 export const COMMENTS_MODULE_CONFIG = GetModuleConfig({port: 5010, pkgName: "comments", host: COMMENTS_MS_HOST, protoPath: GetProtoPath("comments"), serviceName: "CommentsService"})
 export const MAIL_MODULE_CONFIG = GetModuleConfig({port: 5011, pkgName: "mail", host: MAIL_MS_HOST, protoPath: GetProtoPath("mail"), serviceName: "MailService"})
 export const PROFILES_MODULE_CONFIG = GetModuleConfig({port: 5012, pkgName: "profiles", host: PROFILES_MS_HOST, protoPath: GetProtoPath("profiles"), serviceName: "ProfilesService"})
+export const ATTACHMENTS_MODULE_CONFIG = GetModuleConfig({ port: 5013, pkgName: "attachments", host: ATTACHMENTS_MS_HOST, protoPath: GetProtoPath("attachments"), serviceName: "AttachmentsService" })

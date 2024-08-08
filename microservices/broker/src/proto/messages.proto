@@ -26,18 +26,16 @@ message GetLastMessageDialogDTO {
 }
 
 message CreateMessageDTO {
-    repeated Attachment attachments = 1;
-    string dialog_id = 2;
-    string msg = 3;
-    string user_id = 4;
+    string dialog_id = 1;
+    string msg = 2;
+    string user_id = 3;
 }
 
 message UpdateMessageDTO {
-    repeated Attachment attachments = 1;
-    string dialog_id = 2;
-    string id = 3;
-    optional string msg = 4;
-    string user_id = 5;
+    string dialog_id = 1;
+    string id = 2;
+    optional string msg = 3;
+    string user_id = 4;
 }
 
 message DeleteMessageDTO {
@@ -45,30 +43,15 @@ message DeleteMessageDTO {
     string user_id = 2;
 }
 
-message Attachment {
-    string id = 1;
-    AttachmentType type = 2;
-    string item_id = 3;
-}
-
 message Message {
     string id = 1;
-    repeated Attachment attachments = 2;
-    string dialog_id = 3;
-    string user_id = 4;
-    string msg = 5;
-    string createdAt = 6;
+    string dialog_id = 2;
+    string user_id = 3;
+    string msg = 4;
+    string createdAt = 5;
+    bool has_attachments = 6;
 }
 
 message Messages {
     repeated Message messages = 1;
-}
-
-enum AttachmentType {
-    USER = 0;
-    STORY = 1;
-    POST = 2;
-    COMMENT = 3;
-    MESSAGE = 4;
-    FILE = 7;
 }

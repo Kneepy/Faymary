@@ -1,11 +1,11 @@
-import type { Attachment as BaseAttachment, Message as BaseMessage } from "~/api";
+import type { Message } from "~/api";
 
 export namespace DraftsMessages {
     export interface Store {
-        drafts: NewMessage[]
+        drafts: Draft[]
     }
 
-    export interface NewMessage {
+    export interface Draft {
         /**
          * Новое сообщение
          */
@@ -23,11 +23,7 @@ export namespace DraftsMessages {
         dialog_id: string
     }
 
-    export interface Attachment extends Omit<BaseAttachment, "id"> {}
-
-    export interface PrepareMessage extends Omit<BaseMessage, "id" | "attachments"> {
-        attachments: Attachment[]
-    }
+    export interface PreparedMessage extends Pick<Message, "attachments" | "dialog_id" | "msg"> {}
 
     export const ANONYMOUS_DIALOG = "ANONYMOUS_DIALOG"
 }

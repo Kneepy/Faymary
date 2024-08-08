@@ -4,7 +4,7 @@ import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 import { type Messenger, useMessengerStore, useDraftsMessagesStore, DraftsMessages } from "~/store/messenger";
-import { DialogsAPI } from "~/api";
+import { DialogsAPI, DialogsWsAPI } from "~/api";
 import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
 import { ReceiveFiles } from "assets/helpers/receive-files";
 
@@ -58,7 +58,7 @@ const isOpenCreateDialogModal = ref(false)
 const openCreateDialogModal = () => isOpenCreateDialogModal.value = true
 const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
 
-const draftMessage = ref(null)
+const draftMessage = ref<DraftsMessages.Draft>(null)
 watch(() => messengerStore.currentDialog, async (dialog_id) => {
     if (!dialog_id) return
 
@@ -89,17 +89,15 @@ const inputFileRef = ref<HTMLInputElement>(null)
 const clickAttachFileButton = () => inputFileRef.value.click()
 const receiveFiles = (e: Event) => {
     const files = ReceiveFiles(e)
-    files.forEach(file => draftMessage.value.addFile(file))
+    files.forEach(file => draftsMessagesStore.addFile(messengerStore.currentDialog, file))
 }
 const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
 
-const sendMessage = () => {
-    const msg = draftMessage.value.message
-    const attachments: DraftsMessages.Attachment[] = []
+const sendMessage = async () => {
+    const message = await DialogsWsAPI.createMessage(await draftMessage.value.prepareMessage())
 
-    if (draftMessage.value.files.length) {
-
-    }
+    messengerStore.addMessagesDialog(currentDialog.value.id, [ message ])
+    draftsMessagesStore.clear(messengerStore.currentDialog)
 }
 </script>
 
@@ -173,12 +171,12 @@ const sendMessage = () => {
                     </div>
                 </div>
                 <div @drop.prevent.stop="receiveFiles" class="bottom-box">
-                    <div v-if="!!draftMessage.files.length" class="attachments">
+                    <div v-if="!!draftMessage?.files?.length" class="attachments">
                         <HorizontalScroll :count="draftMessage.files.length">
                             <div class="files">
                                 <div
                                     v-for="file in (draftMessage.files ?? [])"
-                                    @click="draftMessage.removeFile(file)"
+                                    @click="draftsMessagesStore.removeFile(messengerStore.currentDialog, file)"
                                     class="file"
                                 >
                                     <div class="trash">
@@ -190,8 +188,8 @@ const sendMessage = () => {
                         </HorizontalScroll>
                     </div>
                     <div class="input-message">
-                        <IconButton>
-                            <GIcon @click="clickAttachFileButton" style="transform: rotate(30deg)">attach_file</GIcon>
+                        <IconButton @click="clickAttachFileButton">
+                            <GIcon :size="25" style="transform: rotate(30deg)">attach_file</GIcon>
                             <input
                                 @input="receiveFiles"
                                 ref="inputFileRef"
@@ -203,14 +201,15 @@ const sendMessage = () => {
                         <TextareaAutosize
                             class="scroll"
                             placeholder="Напишите что-нибудь..."
-                            @change="(v: string) => draftMessage.setMessage(v)"
+                            @change="(v: string) => draftsMessagesStore.setMessage(messengerStore.currentDialog, v)"
+                            :value="draftMessage?.message"
                             :max-height=170
                         />
                         <IconButton>
-                            <GIcon fill>family_star</GIcon>
+                            <GIcon :size="25" fill>family_star</GIcon>
                         </IconButton>
                         <IconButton @click="sendMessage">
-                            <GIcon fill>play_arrow</GIcon>
+                            <GIcon :size="25" fill>play_arrow</GIcon>
                         </IconButton>
                     </div>
                 </div>
@@ -428,8 +427,8 @@ const sendMessage = () => {
                 .files {
                     display: flex;
                     .file {
-                        width: 60px;
-                        height: 60px;
+                        width: 80px;
+                        height: 80px;
                         margin-left: 10px;
                         border-radius: 10px;
                         cursor: pointer;
@@ -476,7 +475,7 @@ const sendMessage = () => {
                 button {
                     background-color: transparent;
                     cursor: pointer;
-                    padding: 10px;
+                    padding: 12px;
                     flex: 0;
                     &:hover {
                         background-color: $transparent_button_hover_1;
@@ -484,7 +483,7 @@ const sendMessage = () => {
                     &:last-child {
                         margin-left: 5px;
                     }
-                    span {
+                    .icon {
                         color: $gray;
                     }
                 }
@@ -498,6 +497,7 @@ const sendMessage = () => {
                     font-size: 16px;
                     resize: none;
                     max-height: 350px;
+                    align-self: center;
                     &::placeholder {
                         color: $gray_1;
                         transition: 200ms;

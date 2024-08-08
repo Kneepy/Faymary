@@ -52,7 +52,6 @@ export class UserController {
         @Inject(MAIL_MODULE_CONFIG.PROVIDER) private mailService: MailServiceClient,
         @Inject(PROFILES_MODULE_CONFIG.PROVIDER) private profilesService: ProfilesServiceClient,
         @Inject(SESSION_MODULE_CONFIG.PROVIDER) private sessionService: SessionServiceClient,
-        @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient
     ) {}
     
     @Put("login")

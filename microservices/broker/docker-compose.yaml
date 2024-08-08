@@ -23,6 +23,7 @@ services:
       DIALOGS_SERVICE_HOST: dialogs
       COMMENTS_SERVICE_HOST: comments
       AUTH_SERVICE_HOST: auth
+      ATTACHMENTS_SERVICE_HOST: attachments
 networks:
   microservices:
     name: microservices

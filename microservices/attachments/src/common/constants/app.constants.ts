@@ -15,7 +15,9 @@ export const DB_USERNAME = process.env.POSTGRES_PASSWORD
 export const DB_PASSWORD = process.env.POSTGRES_USER
 export const DB = process.env.POSTGRES_DB
 
-export const ATTACHMENT_SERVICE_NAME = "AttachmentService";
+export const ATTACHMENT_SERVICE_NAME = "AttachmentsService";
 export enum ATTACHMENT_SERVICE_METHODS {
-
+    ADD_ATTACHMENT = "AddAttachment",
+    SET_ATTACHMENTS = "SetAttachments",
+    GET_ATTACHMENTS = "GetAttachments",
 }

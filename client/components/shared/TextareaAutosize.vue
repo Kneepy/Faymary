@@ -6,11 +6,12 @@ const props = defineProps<{
     placeholder?: string
     rows?: number
     maxHeight?: number
+    value?: string
 }>()
 
 const resize = (e: Event) => {
     // создаём событие в которое отправляем значение поля
-    emit(`change`, (e.target as HTMLInputElement).value)
+    emit(`change`, (<HTMLInputElement> e.target).value)
 
     e.target.style.height = `auto`
 
@@ -28,8 +29,19 @@ const resize = (e: Event) => {
 
     e.target.style.height = `${scrollHeight - padding}px`
 }
+
+// типа если это не сделать то по какой-то причине до ввода текста в поле высота блока не расчитывается что логично кнш
+const textareaRef = ref<HTMLInputElement>(null)
+onMounted(() => textareaRef.value.dispatchEvent(new Event("input")))
 </script>
 
 <template>
-<textarea @input="resize" :rows="props.rows ?? 1" :placeholder="props.placeholder" :style="{maxHeight: props.maxHeight}"></textarea>
+<textarea
+    @input="resize"
+    ref="textareaRef"
+    :rows="props.rows ?? 1"
+    :placeholder="props.placeholder"
+    :value="value"
+    :style="{maxHeight: props.maxHeight}"
+></textarea>
 </template>

@@ -32,9 +32,9 @@ const participant = computed(() => props.dialog?.participants.length === 2 && pr
         <div class="dialog__info">
             <div class="name">{{ participant ? participant.user.fullName : props.dialog.name }}</div>
             <div class="last-message overflow">
-                <span>{{ fullNameLastMessage }}</span>: {{ cropMessage(props.dialog?.lastMessage.msg ?? "Тут ещё нет сообщения", 40) }}
+                <span>{{ fullNameLastMessage }}</span>: {{ cropMessage(props.dialog.lastMessage?.msg ?? "Тут ещё нет сообщения", 40) }}
             </div>
-            <div class="last-message-time">{{ props.dialog?.lastMessage.createdAt ?? "" }}</div>
+            <div class="last-message-time">{{ props.dialog.lastMessage?.createdAt ?? "" }}</div>
         </div>
     </div>
 </template>
