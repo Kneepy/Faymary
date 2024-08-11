@@ -28,8 +28,9 @@ export class MessagesGateway {
     @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.CREATE)
     async createMessage(@MessageBody() data: BrokerRequests.CreateMessage, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         try {
+            const has_attachments = Object.entries(data.attachments).length > 0
             const [ message, { participants }, user ] = await Promise.all([
-                this.messagesService.createMessage({user_id: client.user_id, ...data}).toPromise(),
+                this.messagesService.createMessage({user_id: client.user_id, has_attachments, ...data}).toPromise(),
                 this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }).toPromise(),
                 this.userService.findUser({id: client.user_id}).toPromise()
             ])
@@ -54,8 +55,9 @@ export class MessagesGateway {
     async updateMessage(@MessageBody() data: BrokerRequests.UpdateMessage, @ConnectedSocket() client: ICustomSocket): Promise<void> {
         try {
             const attachments = await this.attachmentsProvider.setAttachments({ parent_id: data.id, parent_type: AttachmentType.MESSAGE }, data.attachments);
+            const has_attachments = Object.entries(data.attachments).length > 0
             const [ message, { participants }, user ] = await Promise.all([
-                this.messagesService.updateMessage({user_id: client.user_id, ...data}).toPromise(),
+                this.messagesService.updateMessage({user_id: client.user_id, has_attachments, ...data}).toPromise(),
                 this.dialogsService.getAllParticipantsDialog({ dialog_id: data.dialog_id }).toPromise(),
                 this.userService.findUser({id: client.user_id}).toPromise()
             ])

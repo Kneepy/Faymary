@@ -78,7 +78,7 @@ export class AttachmentsProvider {
 
             if (!acc[field]) acc[field] = []
 
-            acc[field].push(lastValueFrom(handler(attachment.item_id)))
+            acc[field].push(handler({ id: attachment.item_id }).toPromise())
 
             return acc
         }, <Addition> {})
@@ -93,7 +93,7 @@ export class AttachmentsProvider {
     }
 
     async setAttachments({ parent_id, parent_type }, addition: Addition): Promise<Addition> {
-        const attachments = Object.entries(addition).reduce((acc, [key, value]) => {
+        const attachments = Object.entries(addition ?? []).reduce((acc, [key, value]) => {
 
             if (!Object.values(Fields).includes(key as any)) return acc
 
@@ -105,6 +105,6 @@ export class AttachmentsProvider {
 
         await lastValueFrom(this.attachmentsService.setAttachments({ parent_id, parent_type, attachments }))
 
-        return this.getAttachments({ parent_id, parent_type })
+        return await this.getAttachments({ parent_id, parent_type })
     }
 }

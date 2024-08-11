@@ -14,5 +14,15 @@ export const DialogsWsAPI = {
 
         return await Socket.send<Message>(WS_EVENTS.DIALOG.MESSAGE.CREATE, { attachments, dialog_id, msg }) as Message;
 
+    },
+
+    /**
+     * Это слушатель новых сообщений
+     * Если приходит событие содержащие новое сообщение то оно передаётся в callback
+     */
+    listenNewMessages(callback: (message: Message) => void): void {
+
+        Socket.on<Message>(WS_EVENTS.DIALOG.MESSAGE.CREATE, (message) => callback(message))
+
     }
 }

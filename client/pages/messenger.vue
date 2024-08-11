@@ -4,7 +4,7 @@ import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 import { type Messenger, useMessengerStore, useDraftsMessagesStore, DraftsMessages } from "~/store/messenger";
-import { DialogsAPI, DialogsWsAPI } from "~/api";
+import { DialogsAPI, DialogsWsAPI, Socket } from "~/api";
 import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
 import { ReceiveFiles } from "assets/helpers/receive-files";
 
@@ -20,7 +20,8 @@ useHead({
 const messengerStore = useMessengerStore()
 const userStore = useUserStore()
 const draftsMessagesStore = useDraftsMessagesStore()
-const messagesBoxRef = ref<HTMLBaseElement>()
+
+const messagesBoxRef = ref<HTMLBaseElement>(null)
 const isLoading = ref(false)
 
 onMounted(async () => {
@@ -31,6 +32,12 @@ onMounted(async () => {
     messengerStore.addDialogs(<Messenger.Dialog[]> userDialogs)
 
     isLoading.value = false
+})
+onUpdated(() => {
+    if (!messagesBoxRef.value) return
+
+    // чтобы скролл всегда был внизу
+    messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
 })
 
 // функции для открытия списка избранных сообщений
@@ -69,9 +76,6 @@ watch(() => messengerStore.currentDialog, async (dialog_id) => {
 
     const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 20, skip: 0 })
     messengerStore.addMessagesDialog(dialog_id, messages)
-
-    // это чтобы при открытии блока с сообщениями прокуртка была внизу блока а не вверху
-    messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
 })
 
 const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === messengerStore.currentDialog))
@@ -94,11 +98,17 @@ const receiveFiles = (e: Event) => {
 const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
 
 const sendMessage = async () => {
-    const message = await DialogsWsAPI.createMessage(await draftMessage.value.prepareMessage())
+    const preparedMessage = await draftsMessagesStore.prepareMessage(messengerStore.currentDialog)
 
-    messengerStore.addMessagesDialog(currentDialog.value.id, [ message ])
+    await DialogsWsAPI.createMessage(preparedMessage)
+
     draftsMessagesStore.clear(messengerStore.currentDialog)
 }
+
+DialogsWsAPI.listenNewMessages(message => {
+    messengerStore.addMessagesDialog(message.dialog_id, [ message ])
+})
+
 </script>
 
 <template>

@@ -29,6 +29,7 @@ message CreateMessageDTO {
     string dialog_id = 1;
     string msg = 2;
     string user_id = 3;
+    bool has_attachments = 4;
 }
 
 message UpdateMessageDTO {
@@ -36,6 +37,7 @@ message UpdateMessageDTO {
     string id = 2;
     optional string msg = 3;
     string user_id = 4;
+    bool has_attachments = 5;
 }
 
 message DeleteMessageDTO {

@@ -19,7 +19,7 @@ const images = computed(() => props.message?.attachments?.files)
 
 <template>
     <div :class="[`message`, !props.own ? `interlocutor` : ``]">
-        <Avatar v-if="!own" :size=18 :user-name="props.message.user.fullName" :href="props.message.user.file_id" class="avatar" />
+        <Avatar v-if="!own" :size=35 :user-name="props.message.user.fullName" :href="props.message.user.file_id" class="avatar" />
         <div class="container">
             <span v-if="!own" class="user-name">{{ props.message.user.fullName }}</span>
             <div class="answer-message">

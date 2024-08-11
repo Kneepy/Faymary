@@ -59,13 +59,14 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
 
             return !!draft?.files?.length || !!draft?.message
         },
-        async prepareMessage(dialog_id: string, edits: Partial<DraftsMessages.Draft>): Promise<DraftsMessages.PreparedMessage> {
+        async prepareMessage(dialog_id: string, edits?: Partial<DraftsMessages.Draft>): Promise<DraftsMessages.PreparedMessage> {
             const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
             const attachments: Addition = {}
 
             if (!draft) return
             if (draft.files.length) {
                 attachments.files = await StoreAPI.uploadFiles(draft.files)
+                console.log(attachments.files)
             }
             /**
              * Это нужно в тех случаях если в качестве id указан ANONIMOUS_DIALOG при создании нового диалога

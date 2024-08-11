@@ -1,8 +1,8 @@
 import { Messages } from "src/common";
 
-export class CreateMessageDTO implements Omit<Messages, "id" | "createdAt" | "has_attachments"> {
+export class CreateMessageDTO implements Omit<Messages, "id" | "createdAt"> {
     dialog_id!: string;
-    item_id: string;
     msg: string;
     user_id: string;
+    has_attachments: boolean;
 }

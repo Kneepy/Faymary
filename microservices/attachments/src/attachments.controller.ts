@@ -51,7 +51,7 @@ export class AttachmentsController {
         await Promise.all(deleteAttachments)
 
         const setAttachments = []
-        for (const attachment of attachments) {
+        for (const attachment of (attachments ?? [])) {
             setAttachments.push(this.attachmentsService.create({ parent_type, parent_id, attached_type: attachment.type, attached_id: attachment.item_id }))
         }
 

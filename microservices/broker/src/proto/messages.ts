@@ -28,6 +28,7 @@ export interface CreateMessageDTO {
   dialog_id: string;
   msg: string;
   user_id: string;
+  has_attachments: boolean;
 }
 
 export interface UpdateMessageDTO {
@@ -35,6 +36,7 @@ export interface UpdateMessageDTO {
   id: string;
   msg?: string | undefined;
   user_id: string;
+  has_attachments: boolean;
 }
 
 export interface DeleteMessageDTO {

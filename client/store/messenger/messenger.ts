@@ -30,6 +30,8 @@ export const useMessengerStore = defineStore("messenger", {
 
                 dialog.messages.push(message);
             }
+
+            dialog.lastMessage = messages.pop()
         },
         changeCurrentDialog(id: string) {
             this.currentDialog = id;
