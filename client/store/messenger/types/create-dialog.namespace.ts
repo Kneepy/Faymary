@@ -1,5 +1,4 @@
-import type { Attachment as BaseAttachment, User as BaseUser } from "~/api";
-import { type Messenger } from "~/store";
+import type { User as BaseUser } from "~/api";
 
 export namespace CreateDialog {
     export interface Store {
@@ -12,10 +11,13 @@ export namespace CreateDialog {
          * Все пользователи найденные во время поиска
          */
         resultSearch: {
+
             // это пользователи с которыми уже есть диалог
             existing: User[]
+
             // это юзеры с которыми нет диалога
             nonexistent: User[]
+
         }
 
         /**

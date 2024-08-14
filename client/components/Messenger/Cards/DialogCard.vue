@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Messenger } from "~/store/messenger";
+import { useTime } from "~/composables/useTime"
 
 const props = defineProps<{
     dialog: Messenger.Dialog
@@ -21,6 +22,7 @@ const fullNameLastMessage = computed(() => {
     else return lastMessageUser.fullName
 })
 const participant = computed(() => props.dialog?.participants.length === 2 && props.dialog.participants.find(participant => participant.user.id !== userStore.me.id))
+const time = computed(() => useTime(props.dialog.lastMessage?.createdAt))
 </script>
 
 <template>
@@ -34,7 +36,7 @@ const participant = computed(() => props.dialog?.participants.length === 2 && pr
             <div class="last-message overflow">
                 <span>{{ fullNameLastMessage }}</span>: {{ cropMessage(props.dialog.lastMessage?.msg ?? "Тут ещё нет сообщения", 40) }}
             </div>
-            <div class="last-message-time">{{ props.dialog.lastMessage?.createdAt ?? "" }}</div>
+            <div class="last-message-time">{{ time }}</div>
         </div>
     </div>
 </template>
@@ -86,7 +88,7 @@ const participant = computed(() => props.dialog?.participants.length === 2 && pr
             position: absolute;
             top: 15px;
             right: 15px;
-            font-size: 15px;
+            font-size: 13px;
             color: $gray_1;
         }
     }

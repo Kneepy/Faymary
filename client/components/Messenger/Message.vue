@@ -15,6 +15,13 @@ const props = withDefaults(defineProps<Props>(), {
     own: false
 })
 const images = computed(() => props.message?.attachments?.files)
+const defaultFileModal = ref<string>(null)
+const isOpenFilesModal = ref<boolean>(false)
+const closeFilesModal = () => isOpenFilesModal.value = false
+const openFilesModal = (file_id: string) => {
+    defaultFileModal.value = file_id
+    isOpenFilesModal.value = true
+}
 </script>
 
 <template>
@@ -33,8 +40,10 @@ const images = computed(() => props.message?.attachments?.files)
                         :class="{
                             last: images.indexOf(img) === images.length - 1 && images.length % 2 !== 0
                         }"
+                        @click="() => openFilesModal(img.id)"
                         class="image"
-                    ></div>
+                    >
+                    </div>
                 </div>
             </template>
             <span>{{ props.message.msg }}</span>
@@ -50,6 +59,7 @@ const images = computed(() => props.message?.attachments?.files)
                 <div class="date">{{ props.message.createdAt }}</div>
             </div>
         </div>
+        <ImagesModal v-if="isOpenFilesModal" @close="closeFilesModal" :images="images.map(img => img.id)" :current="defaultFileModal" />
     </div>
 </template>
 
@@ -103,6 +113,7 @@ const images = computed(() => props.message?.attachments?.files)
                 border-radius: 10px;
                 margin: 3px;
                 height: 250px;
+                cursor: pointer;
                 width: calc(50% - 6px);
                 &.last {
                     width: 100%;

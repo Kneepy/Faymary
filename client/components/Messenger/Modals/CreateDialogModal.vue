@@ -4,7 +4,6 @@ import {
     type CreateDialog,
     useCreateDialogStore,
     useMessengerStore,
-    useUserStore,
     useDraftsMessagesStore,
     DraftsMessages
 } from "~/store";
@@ -86,7 +85,13 @@ const sendMessage = async () => {
     const message = await DialogsWsAPI.createMessage(await draftsMessagesStore.prepareMessage(DraftsMessages.ANONYMOUS_DIALOG, { dialog_id: dialog.id }))
 
     messengerStore.addDialogs([ dialog ])
-    messengerStore.addMessagesDialog(dialog.id, [ message ])
+    messengerStore.insertMessagesDialog(dialog.id, [ message ])
+
+    // переводим пользователя в новый чат
+    messengerStore.changeCurrentDialog(dialog.id)
+    draftsMessagesStore.clear(DraftsMessages.ANONYMOUS_DIALOG)
+    createDialogStore.clear()
+    close()
 }
 </script>
 <template>

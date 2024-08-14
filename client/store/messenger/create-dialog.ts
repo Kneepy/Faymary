@@ -49,5 +49,11 @@ export const useCreateDialogStore = defineStore("create-dialog", {
         removeUserByIndex(index: number) {
             this.selectedUsers.splice(index, 1);
         },
+        clear() {
+            this.selectedUsers = []
+            this.resultSearch.existing = []
+            this.resultSearch.nonexistent = []
+            this.inputSearch = ""
+        }
     }
 })

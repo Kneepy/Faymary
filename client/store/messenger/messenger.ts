@@ -16,7 +16,13 @@ export const useMessengerStore = defineStore("messenger", {
                 this.dialogs.push(dialog);
             }
         },
-        addMessagesDialog(dialog_id: string, messages: Message[]) {
+
+        /**
+         * @param dialog_id ID диалога в который нужно добавить сообщение
+         * @param messages массив сообщений которые нужно добавить в диалог
+         * Эта функция производит вставку сообщений согласно их атрибуту createdAt (типа выстраивает сообщения в порядке увеличения его)
+         */
+        insertMessagesDialog(dialog_id: string, messages: Message[]) {
             const dialog = this.dialogs.find(v => v.id === dialog_id);
 
             if (!dialog) return
@@ -26,12 +32,31 @@ export const useMessengerStore = defineStore("messenger", {
 
                 const messageExist = dialog.messages.find(v => v.id === message.id)
 
-                if (messageExist) return
+                if (messageExist) continue
 
-                dialog.messages.push(message);
+                this.insertMessageDialog(dialog, message)
             }
 
-            dialog.lastMessage = messages.pop()
+            dialog.lastMessage = dialog.messages[0]
+        },
+
+        /**
+         * @param dialog ссылка на диалог в который нужно вставить сообщение
+         * @param message сообщение которое нужно добавить в диалог
+         * Вставка сообщения по возрастанию атрибута createdAt
+         */
+        insertMessageDialog(dialog: Messenger.Dialog, message: Message) {
+            const createdAt = Number(message.createdAt)
+
+            if (!dialog || !createdAt) return
+
+            let msgPos = 0
+
+            while (msgPos < dialog.messages.length && Number(dialog.messages[msgPos]?.createdAt) > createdAt) {
+                msgPos++
+            }
+
+            dialog.messages.splice(msgPos, 0, message)
         },
         changeCurrentDialog(id: string) {
             this.currentDialog = id;

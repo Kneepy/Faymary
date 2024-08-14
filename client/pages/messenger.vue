@@ -3,8 +3,9 @@ import { ROUTES } from "~/assets/constants/routes.constants";
 import SettingsModal from "~/components/Messenger/Modals/SettingsModal.vue";
 import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.vue";
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
+import Dialog from "~/components/Messenger/Dialog.vue"
 import { type Messenger, useMessengerStore, useDraftsMessagesStore, DraftsMessages } from "~/store/messenger";
-import { DialogsAPI, DialogsWsAPI, Socket } from "~/api";
+import { DialogsAPI, DialogsWsAPI } from "~/api";
 import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
 import { ReceiveFiles } from "assets/helpers/receive-files";
 
@@ -20,25 +21,6 @@ useHead({
 const messengerStore = useMessengerStore()
 const userStore = useUserStore()
 const draftsMessagesStore = useDraftsMessagesStore()
-
-const messagesBoxRef = ref<HTMLBaseElement>(null)
-const isLoading = ref(false)
-
-onMounted(async () => {
-    // получаем все переписки пользователя и заносим их в состояние
-    isLoading.value = true
-
-    const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
-    messengerStore.addDialogs(<Messenger.Dialog[]> userDialogs)
-
-    isLoading.value = false
-})
-onUpdated(() => {
-    if (!messagesBoxRef.value) return
-
-    // чтобы скролл всегда был внизу
-    messagesBoxRef.value.scrollTop = messagesBoxRef.value.scrollHeight
-})
 
 // функции для открытия списка избранных сообщений
 const isOpenImportantMsgModal = ref(false)
@@ -65,38 +47,59 @@ const isOpenCreateDialogModal = ref(false)
 const openCreateDialogModal = () => isOpenCreateDialogModal.value = true
 const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
 
+// маркер показывающий загружены ли диалоги
+const isLoadingDialogs = ref(false)
+
+// ссылка на текущий черновик сообщения
 const draftMessage = ref<DraftsMessages.Draft>(null)
+
+// ссылка на текущий диалог
+const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === messengerStore.currentDialog))
+
+// название текущего диалога
+const dialogName = ref<string>("")
+
+// ссылка на элемент для прикрепления картинок/файлов
+const inputFileRef = ref<HTMLInputElement>(null)
+
+onMounted(async () => {
+    // получаем все переписки пользователя и заносим их в состояние
+    isLoadingDialogs.value = true
+
+    const userDialogs = await DialogsAPI.getUserDialogs({take: 10, skip: 0}) ?? []
+    messengerStore.addDialogs(<Messenger.Dialog[]> userDialogs)
+
+    isLoadingDialogs.value = false
+})
 watch(() => messengerStore.currentDialog, async (dialog_id) => {
+
     if (!dialog_id) return
 
+    // находим наш диалог
     const dialog = messengerStore.dialogs.find(dialog => dialog.id === dialog_id)
     draftMessage.value = draftsMessagesStore.getDraft(dialog_id)
 
     if (dialog.messages) return
 
-    const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 20, skip: 0 })
-    messengerStore.addMessagesDialog(dialog_id, messages)
-})
+    // получаем сообщения для диалога
+    const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 10, skip: 0 })
+    messengerStore.insertMessagesDialog(dialog_id, messages)
 
-const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === messengerStore.currentDialog))
-const dialogName = computed(() => {
-    if (!currentDialog.value) return
-    if (currentDialog.value.number_participants > 2) return currentDialog.value.name
+    // проверяем название диалога
+    if (currentDialog.value.number_participants > 2) dialogName.value = currentDialog.value.name
     else {
         const interlocutor = currentDialog.value.participants.find(participant => participant.user.id !== userStore.me.id)
 
-        return interlocutor.user.fullName
+        dialogName.value = interlocutor.user.fullName
     }
 })
 
-const inputFileRef = ref<HTMLInputElement>(null)
 const clickAttachFileButton = () => inputFileRef.value.click()
 const receiveFiles = (e: Event) => {
     const files = ReceiveFiles(e)
     files.forEach(file => draftsMessagesStore.addFile(messengerStore.currentDialog, file))
 }
 const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
-
 const sendMessage = async () => {
     const preparedMessage = await draftsMessagesStore.prepareMessage(messengerStore.currentDialog)
 
@@ -104,13 +107,17 @@ const sendMessage = async () => {
 
     draftsMessagesStore.clear(messengerStore.currentDialog)
 }
+const loadMoreMessages = async (skip_chunks: number) => {
+    const messages = await DialogsAPI.getDialogMessages(messengerStore.currentDialog, { take: 10, skip: (skip_chunks + 1) * 10 })
+    messengerStore.insertMessagesDialog(messengerStore.currentDialog, messages)
+}
 
 DialogsWsAPI.listenNewMessages(message => {
-    messengerStore.addMessagesDialog(message.dialog_id, [ message ])
+    messengerStore.insertMessagesDialog(message.dialog_id, [ message ])
+
+
 })
-
 </script>
-
 <template>
     <div class="messenger">
         <div class="left-bar">
@@ -144,7 +151,7 @@ DialogsWsAPI.listenNewMessages(message => {
                 </div>
             </div>
             <div class="dialogs scroll">
-                <template v-if="!isLoading">
+                <template v-if="!isLoadingDialogs">
                     <DialogCard
                         v-for="(dialog, key) in messengerStore.dialogs"
                         @click="messengerStore.changeCurrentDialog(dialog.id)"
@@ -152,8 +159,8 @@ DialogsWsAPI.listenNewMessages(message => {
                         :key
                     />
                 </template>
-                <SkeletonDialogBlock v-if="messengerStore.dialogs?.length === 0 && isLoading" />
-                <div v-if="messengerStore.dialogs?.length === 0 && !isLoading" class="no-dialogs">Пока вы ещё ни с кем не общались!</div>
+                <SkeletonDialogBlock v-if="messengerStore.dialogs?.length === 0 && isLoadingDialogs" />
+                <div v-if="messengerStore.dialogs?.length === 0 && !isLoadingDialogs" class="no-dialogs">Пока вы ещё ни с кем не общались!</div>
             </div>
         </div>
         <div class="right-bar">
@@ -175,11 +182,7 @@ DialogsWsAPI.listenNewMessages(message => {
                         </IconButton>
                     </div>
                 </div>
-                <div class="wrapper">
-                    <div class="messages scroll" ref="messagesBoxRef">
-                        <Message v-for="message in currentDialog.messages" :message="message" :own="message.user.id === userStore.me.id" />
-                    </div>
-                </div>
+                <Dialog @load-more="loadMoreMessages" :dialog="currentDialog" />
                 <div @drop.prevent.stop="receiveFiles" class="bottom-box">
                     <div v-if="!!draftMessage?.files?.length" class="attachments">
                         <HorizontalScroll :count="draftMessage.files.length">
@@ -404,20 +407,6 @@ DialogsWsAPI.listenNewMessages(message => {
                 }
             }
         }
-        .wrapper {
-            padding-right: 5px;
-            flex: 1;
-            display: flex;
-            max-height: 523px;
-            min-height: 100px;
-            .messages {
-                display: flex;
-                flex-direction: column;
-                padding: 0 10px;
-                overflow-y: auto;
-                flex: 1;
-            }
-        }
         .bottom-box {
             padding: 10px;
             display: flex;
@@ -485,16 +474,19 @@ DialogsWsAPI.listenNewMessages(message => {
                 button {
                     background-color: transparent;
                     cursor: pointer;
-                    padding: 12px;
+                    padding: 9px;
                     flex: 0;
                     &:hover {
                         background-color: $transparent_button_hover_1;
+                        .icon {
+                            color: $gray;
+                        }
                     }
                     &:last-child {
                         margin-left: 5px;
                     }
                     .icon {
-                        color: $gray;
+                        color: $gray_1;
                     }
                 }
                 textarea {
@@ -504,7 +496,7 @@ DialogsWsAPI.listenNewMessages(message => {
                     padding: 10px 20px;
                     color: $white;
                     border-radius: 10px;
-                    font-size: 16px;
+                    font-size: 15px;
                     resize: none;
                     max-height: 350px;
                     align-self: center;
