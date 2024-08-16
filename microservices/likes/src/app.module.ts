@@ -7,9 +7,9 @@ import {
     DB_PORT,
     DB_TYPE,
     DB_USERNAME,
-    Likes,
+    Like, LikesCollection
 } from "./common";
-import {LikesService} from "./providers";
+import { LikesService } from "./providers";
 import {LikesController} from "./controllers";
 
 @Module({
@@ -21,10 +21,10 @@ import {LikesController} from "./controllers";
             username: DB_USERNAME,
             password: DB_PASSWORD,
             database: DB,
-            entities: [Likes],
+            entities: [Like, LikesCollection],
             synchronize: true
         }),
-        TypeOrmModule.forFeature([Likes])
+        TypeOrmModule.forFeature([Like, LikesCollection])
     ],
     controllers: [LikesController],
     providers: [LikesService]

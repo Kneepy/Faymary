@@ -30,7 +30,7 @@ export class DialogsGateway {
                 name: data.name
             }).toPromise()
 
-            for (const participant of data.participants) {
+            for (const participant of dialog.participants) {
                 this.serverGateway.broadcastUser<Dialog>(participant.user_id, {
                     data: dialog,
                     event: WEVENTS.DIALOGS.CREATE

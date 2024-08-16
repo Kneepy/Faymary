@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Message } from "~/api";
+import { type Message, type File } from "~/api";
 
 interface Props {
     message: Message
@@ -15,11 +15,11 @@ const props = withDefaults(defineProps<Props>(), {
     own: false
 })
 const images = computed(() => props.message?.attachments?.files)
-const defaultFileModal = ref<string>(null)
+const defaultFileModal = ref<File>(null)
 const isOpenFilesModal = ref<boolean>(false)
 const closeFilesModal = () => isOpenFilesModal.value = false
-const openFilesModal = (file_id: string) => {
-    defaultFileModal.value = file_id
+const openFilesModal = (file: File) => {
+    defaultFileModal.value = file
     isOpenFilesModal.value = true
 }
 </script>
@@ -40,7 +40,7 @@ const openFilesModal = (file_id: string) => {
                         :class="{
                             last: images.indexOf(img) === images.length - 1 && images.length % 2 !== 0
                         }"
-                        @click="() => openFilesModal(img.id)"
+                        @click="() => openFilesModal(img)"
                         class="image"
                     >
                     </div>
@@ -59,7 +59,7 @@ const openFilesModal = (file_id: string) => {
                 <div class="date">{{ props.message.createdAt }}</div>
             </div>
         </div>
-        <ImagesModal v-if="isOpenFilesModal" @close="closeFilesModal" :images="images.map(img => img.id)" :current="defaultFileModal" />
+        <ImagesModal v-if="isOpenFilesModal" @close="closeFilesModal" :images="images" :current="defaultFileModal" :owner="props.message.user" />
     </div>
 </template>
 

@@ -11,6 +11,10 @@ enum MillisecondsPer {
     years = MillisecondsPer.months * 365,
 }
 
+interface TimeOptions {
+    exactTime?: boolean
+}
+
 const rule = (time: number, period: MillisecondsPer) => {
     const lastNumber = time % 100 > 20 ? time % 10 : time % 100
 
@@ -48,11 +52,13 @@ const rule = (time: number, period: MillisecondsPer) => {
 
 /**
  * @param unix Date.now()
+ * @param options Взависимости от этого будет изменятся формат вывода (напр. 2 часа назад или 15.08.2024 в 13:51)
  * Выводит количество времени прошедшее с момента переданного в аргументе (2 дня, 3 года и т.п)
  */
-export const useTime = (unix: number | string): string => {
+export const useTime = (unix: number | string, options?: TimeOptions): string => {
     if (typeof unix === "string") unix = Number(unix);
 
+    const date = new Date(unix)
     const difference = Date.now() - unix;
     const seconds = Math.floor(difference / MillisecondsPer.seconds);
     const minutes = Math.floor(difference / MillisecondsPer.minutes);
@@ -61,14 +67,24 @@ export const useTime = (unix: number | string): string => {
     const mouths = Math.floor(difference / MillisecondsPer.months);
     const years = Math.floor(difference / MillisecondsPer.years);
 
-    const result = (() => {
-        if (years !== 0) return rule(years, MillisecondsPer.years);
-        if (mouths !== 0) return rule(mouths, MillisecondsPer.months);
-        if (days !== 0) return rule(days, MillisecondsPer.days);
-        if (hours !== 0) return rule(hours, MillisecondsPer.hours);
-        if (minutes !== 0) return rule(minutes, MillisecondsPer.minutes);
-        if (seconds !== 0) return rule(seconds, MillisecondsPer.seconds);
-    })();
 
-    return result ? `${result} назад` : "только что";
+    if (options?.exactTime) {
+        const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+        const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+        const hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+        return `${day}.${month}.${date.getFullYear()} в ${hours}:${minutes}`
+    }
+    else {
+        const result = (() => {
+            if (years !== 0) return rule(years, MillisecondsPer.years);
+            if (mouths !== 0) return rule(mouths, MillisecondsPer.months);
+            if (days !== 0) return rule(days, MillisecondsPer.days);
+            if (hours !== 0) return rule(hours, MillisecondsPer.hours);
+            if (minutes !== 0) return rule(minutes, MillisecondsPer.minutes);
+            if (seconds !== 0) return rule(seconds, MillisecondsPer.seconds);
+        })()
+
+        return result ? `${result} назад` : "только что";
+    }
 };

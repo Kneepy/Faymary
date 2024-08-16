@@ -34,7 +34,7 @@ export class MessagesService {
         if (!otherOpt.take) otherOpt.take = DEFAULT_TAKE_MESSAGES;
         if (!otherOpt.skip) otherOpt.skip = DEFAULT_SKIP_MESSAGES;
 
-        return await this.repository.find({ where: args, ...otherOpt });
+        return await this.repository.find({ where: args, order: { createdAt: "DESC" }, ...otherOpt });
     }
 
     async getLast({ dialog_id }: MessageGetLastInterface, otherOpt?: Omit<FindManyOptions<Messages>, "where" | "order" | "take" | "skip">): Promise<Messages> {

@@ -31,10 +31,10 @@ export class AttachmentsController {
     }
 
     @GrpcMethod(ATTACHMENT_SERVICE_NAME, ATTACHMENT_SERVICE_METHODS.GET_ATTACHMENTS)
-    async getAttachments({ parent_type, parent_id }: GetAttachmentsDTO): Promise<{attachments: PreparedAttachment[]}> {
+    async getAttachments({ parent_type, parent_id, ...options }: GetAttachmentsDTO): Promise<{attachments: PreparedAttachment[]}> {
         if (!(parent_type in AttachmentType) || !parent_id) return { attachments: [] }
 
-        const attachments = await this.attachmentsService.findAll({ parent_type, parent_id })
+        const attachments = await this.attachmentsService.findAll({ parent_type, parent_id, ...options })
 
         return { attachments: attachments.map(attachment => this.attachmentsService.prepare(attachment)) }
     }

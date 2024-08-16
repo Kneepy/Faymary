@@ -32,7 +32,7 @@ import {
     GetParticipantsDialogDTO
 } from "./dtos/get-participants-dialog.dto";
 import { take } from "rxjs";
-import { ILike } from "typeorm";
+import { ILike, In } from "typeorm";
 
 @Controller()
 export class DialogsController {
@@ -57,9 +57,30 @@ export class DialogsController {
         if (participants.length < 2) throw FewUsersCreateDialog
 
         if (participants.length === 2) {
-            const existDialog = await this.dialogsService.find({ participants: participants, number_participants: 2 })
+            /**
+             * TODO: Эту ересть надо переделать пока не знаю как но надо!!!!
+             * Но ваще оно не сильно прожорливо должно быть т.к ищет только чаты с 2 участниками
+             */
+            const user_ids = participants.map(participant => participant.user_id)
+            const dialogs = await this.dialogsService.find({
+                number_participants: 2,
+                participants: {
+                    user_id: In(user_ids)
+                } as any
+            })
+            const dialogsParticipants = await Promise.all(
+                dialogs.map(dialog => this.dialogsService.findParticipantsDialog({ dialog_id: dialog.id }, { relations: {dialog: true} }))
+            )
+            const existDialogParticipants = dialogsParticipants.find(dialogParticipants =>
+                dialogParticipants.every(participant => user_ids.includes(participant.user_id))
+            )
 
-            if (!!existDialog.length) return existDialog[0]
+            if (!!existDialogParticipants) {
+                return {
+                    ...existDialogParticipants[0].dialog,
+                    participants: existDialogParticipants
+                }
+            }
         }
 
         const dialog = await this.dialogsService.create({participants, name})
@@ -106,19 +127,6 @@ export class DialogsController {
             throw NotFoundUserDialogs
 
         return { dialogs }
-    }
-
-    @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.SEARCH_USER_DIALOGS)
-    async searchUserDialogs({ take, skip, ...data }: SearchUserDialogsDTO): Promise<{ dialogs: Dialogs[] }> {
-        const findOptions = {} as any
-
-        if (data.number_participants) findOptions.number_participants = data.number_participants
-        if (data.participants) findOptions.participants = [{ user_id: data.user_id }, ...data.participants]
-        if (data.name) findOptions.name = ILike(`%${data.name}%`)
-
-        return {
-            dialogs: await this.dialogsService.find(findOptions, { take, skip })
-        }
     }
 
     @GrpcMethod(DIALOGS_SERVICE_NAME, DIALOGS_SERVICE_METHODS.DELETE_DIALOG)

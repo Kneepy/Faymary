@@ -32,6 +32,7 @@ export interface AddAttachmentDTO {
 export interface GetAttachmentsDTO {
   parent_type: AttachmentType;
   parent_id: string;
+  attached_type?: AttachmentType | undefined;
 }
 
 export interface SetAttachmentsDTO {

@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
     ATTACHMENTS_MODULE_CONFIG,
     COMMENTS_MODULE_CONFIG,
-    DIALOGS_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, POST_MODULE_CONFIG, STORE_MODULE_CONFIG,
+    DIALOGS_MODULE_CONFIG, LIKES_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, POST_MODULE_CONFIG, STORE_MODULE_CONFIG,
     STORIES_MODULE_CONFIG,
     USER_MODULE_CONFIG
 } from "../constants/app.constants";
@@ -13,9 +13,16 @@ import { StoriesServiceClient } from "../proto/stories";
 import { PostServiceClient } from "../proto/post";
 import { MessagesServiceClient } from "../proto/messages";
 import { StoreServiceClient } from "../proto/store";
-import { Attachment, AttachmentsServiceClient, AttachmentType, GetAttachmentsDTO } from "../proto/attachments";
+import {
+    AddAttachmentDTO,
+    Attachment,
+    AttachmentsServiceClient,
+    AttachmentType,
+    GetAttachmentsDTO
+} from "../proto/attachments";
 import { lastValueFrom } from "rxjs";
 import { Addition, Fields } from "../types";
+import { LikesServiceClient } from "../proto/likes";
 
 @Injectable()
 export class AttachmentsProvider {
@@ -27,6 +34,7 @@ export class AttachmentsProvider {
         @Inject(POST_MODULE_CONFIG.PROVIDER) private postsService: PostServiceClient,
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesServiceClient,
         @Inject(STORE_MODULE_CONFIG.PROVIDER) private storeService: StoreServiceClient,
+        @Inject(LIKES_MODULE_CONFIG.PROVIDER) private likesService: LikesServiceClient,
         @Inject(ATTACHMENTS_MODULE_CONFIG.PROVIDER) private attachmentsService: AttachmentsServiceClient
     ) {}
 
@@ -58,6 +66,10 @@ export class AttachmentsProvider {
         [AttachmentType.FILE]: {
             handler: this.storeService.getFile,
             field: Fields.FILES
+        },
+        [AttachmentType.LIKE]: {
+            handler: this.likesService.getCollection,
+            field: Fields.LIKES
         }
     }
 
@@ -71,7 +83,7 @@ export class AttachmentsProvider {
         [Fields.FILES]: AttachmentType.FILE
     } as const
 
-    async getAttachments({ parent_id, parent_type }: GetAttachmentsDTO): Promise<Addition> {
+    async getAttachments({ parent_id, parent_type }: Omit<GetAttachmentsDTO, "attached_type">): Promise<Addition> {
         const { attachments } = await lastValueFrom(this.attachmentsService.getAttachments({ parent_id, parent_type }))
         const addition = (attachments ?? []).reduce((acc, attachment) => {
             const { handler, field } = this.handlers[attachment.type]
@@ -92,6 +104,20 @@ export class AttachmentsProvider {
         return result
     }
 
+    async getAttachmentsByType({ parent_id, parent_type, attached_type }: GetAttachmentsDTO): Promise<Addition> {
+        const { attachments } = await lastValueFrom(this.attachmentsService.getAttachments({ parent_id, parent_type, attached_type }))
+
+        if (!!attachments?.length) return {}
+
+        const { handler, field } = this.handlers[attachments[0].type]
+        const result = { [field]: [] }
+
+        attachments.forEach(attachment => result[field].push(handler({ id: attachment.item_id }).toPromise()))
+        result[field] = await Promise.all(result[field])
+
+        return result
+    }
+
     async setAttachments({ parent_id, parent_type }, addition: Addition): Promise<Addition> {
         const attachments = Object.entries(addition ?? []).reduce((acc, [key, value]) => {
 
@@ -104,6 +130,12 @@ export class AttachmentsProvider {
         }, <Attachment[]> [])
 
         await lastValueFrom(this.attachmentsService.setAttachments({ parent_id, parent_type, attachments }))
+
+        return await this.getAttachments({ parent_id, parent_type })
+    }
+
+    async addAttachment({ parent_id, parent_type, attached_id, attached_type }: AddAttachmentDTO): Promise<Addition> {
+        const attachment = await lastValueFrom(this.attachmentsService.addAttachment({ parent_id, parent_type, attached_id, attached_type }))
 
         return await this.getAttachments({ parent_id, parent_type })
     }

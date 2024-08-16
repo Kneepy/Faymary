@@ -1,6 +1,7 @@
 import { GetStoriesDTO } from "src/proto/stories";
 import { CreateMessageDTO, UpdateMessageDTO } from "../proto/messages";
 import { Addition } from "./additions.type";
+import { CreateCollectionDTO } from "../proto/likes";
 
 export namespace BrokerRequests {
     export interface GetMeCollectionStories extends GetStoriesDTO {
@@ -8,11 +9,18 @@ export namespace BrokerRequests {
         skip: number
     }
 
-    export interface CreateMessage extends Omit<CreateMessageDTO, "user_id"> {
-        attachments: Addition
+    export namespace Message {
+        export interface Create extends Omit<CreateMessageDTO, "user_id"> {
+            attachments: Addition
+        }
+
+        export interface Update extends Omit<UpdateMessageDTO, "user_id"> {
+            attachments: Addition
+        }
+
+        export interface AddReaction extends CreateCollectionDTO {
+            message_id: string
+        }
     }
 
-    export interface UpdateMessage extends Omit<UpdateMessageDTO, "user_id"> {
-        attachments: Addition
-    }
 }

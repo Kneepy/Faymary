@@ -18,6 +18,7 @@ message AddAttachmentDTO {
 message GetAttachmentsDTO {
     AttachmentType parent_type = 1;
     string parent_id = 2;
+    optional AttachmentType attached_type = 3;
 }
 
 message SetAttachmentsDTO {

@@ -1,1 +1,2 @@
-export * from "./likes.entity"
+export * from "./like.entity"
+export * from "./likes-collection.entity"

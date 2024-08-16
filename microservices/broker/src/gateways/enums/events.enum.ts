@@ -13,9 +13,10 @@ export const WEVENTS = {
         CHANGE_FILE: "dialog.change_file",
         DELETE: "dialog.delete",
         MESSAGES: {
-            CREATE: "dialog.create.message",
-            UPDATE: "dialog.update.message",
-            DELETE: "dialog.delete.message"
+            CREATE: "dialog.message.create",
+            UPDATE: "dialog.message.update",
+            DELETE: "dialog.message.delete",
+            ADD_REACTION: "dialog.message.add_reaction",
         }
     },
     USER: {

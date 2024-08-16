@@ -12,6 +12,6 @@ export namespace DialogsInterfaces {
     }
     export interface FindParticipantsDialog {
         dialog_id: string
-        rights: ParticipantRights[]
+        rights?: ParticipantRights[]
     }
 }

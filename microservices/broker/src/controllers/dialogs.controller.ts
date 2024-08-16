@@ -76,7 +76,7 @@ export class DialogsController {
         // все личные собеседники
         const { participants } = await firstValueFrom(this.dialogsService.getAllInterlocutorsUser({ user_id }))
         const allInterlocutors = await Promise.all([
-            ...participants.map(participant =>
+            ...(participants ?? []).map(participant =>
                 firstValueFrom(this.userService.findUser({ id: participant.user_id }))
             )
         ])

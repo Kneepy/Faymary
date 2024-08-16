@@ -38,7 +38,7 @@ export class ServerGateway implements OnGatewayConnection, OnGatewayDisconnect {
     broadcastUser<T>(user_id: string, data: WsResponse<T>): boolean {
         const wsSessions = this.users.get(user_id)
 
-        if (!wsSessions) return false
+        if (!wsSessions) return
 
         wsSessions.forEach(socket =>
             socket.send(JSON.stringify(data))

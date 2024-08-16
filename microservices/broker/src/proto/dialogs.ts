@@ -117,15 +117,6 @@ export interface GetUserDialogsDTO {
   take: number;
 }
 
-export interface SearchUserDialogsDTO {
-  user_id: string;
-  participants: DialogParticipants[];
-  number_participants?: number | undefined;
-  name?: string | undefined;
-  take?: number | undefined;
-  skip?: number | undefined;
-}
-
 export interface DeleteDialogDTO {
   user_id: string;
   dialog_id: string;
@@ -169,8 +160,6 @@ export interface DialogsServiceClient {
 
   getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
-  searchUserDialogs(request: SearchUserDialogsDTO): Observable<Dialogs>;
-
   deleteDialog(request: DeleteDialogDTO): Observable<DialogHistory>;
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
@@ -199,8 +188,6 @@ export interface DialogsServiceController {
 
   getAllUserDialogs(request: GetUserDialogsDTO): Observable<Dialogs>;
 
-  searchUserDialogs(request: SearchUserDialogsDTO): Observable<Dialogs>;
-
   deleteDialog(request: DeleteDialogDTO): Observable<DialogHistory>;
 
   removeUserDialog(request: DeleteUserDialogDTO): Observable<DialogHistory>;
@@ -227,7 +214,6 @@ export function DialogsServiceControllerMethods() {
       "createDialog",
       "getDialog",
       "getAllUserDialogs",
-      "searchUserDialogs",
       "deleteDialog",
       "removeUserDialog",
       "changeNameDialog",
