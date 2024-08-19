@@ -11,7 +11,7 @@ import { Account, Profile as BaseProfile } from "src/proto/profiles";
 import { Story as BaseStory, Mark } from "src/proto/stories";
 import { Addition } from "./additions.type";
 import { User } from "src/proto/user";
-import { LikesCollection } from "../proto/likes";
+import { HasLiked, LikesCollection } from "../proto/likes";
 
 export namespace BrokerResponse {
     export interface DialogHistory extends BaseDialogHistory {
@@ -33,8 +33,8 @@ export namespace BrokerResponse {
         user: User
     }
     export interface AddLikeResult {
-        message_id: string
-        likes: LikesCollection[]
+        message: Omit<Message, "user" | "attachments">
+        like: LikesCollection
     }
     export interface Notification extends BaseNotification {
         parent: Addition

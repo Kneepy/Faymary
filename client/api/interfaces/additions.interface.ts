@@ -1,4 +1,4 @@
-import type { Dialog, Post, Story, User, Message, File } from "~/api";
+import type { Dialog, Post, Story, User, Message, File, LikesCollection } from "~/api";
 
 export interface Addition {
     users?: User[]
@@ -8,4 +8,5 @@ export interface Addition {
     messages?: Message[]
     dialogs?: Dialog[]
     files?: File[]
+    likes?: LikesCollection[]
 }

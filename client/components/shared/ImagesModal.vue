@@ -64,7 +64,7 @@ const showFilesPanel = () => {
     clearTimeout(showFilesPanelTimeout)
     showFilesPanelTimeout = setTimeout(() => {
         isShowFilesPanel.value = false
-    }, 5000000000000000000000)
+    }, 5000)
 }
 let lastWheelEvent = 0
 const wheelSlideFiles = (e: WheelEvent) => {

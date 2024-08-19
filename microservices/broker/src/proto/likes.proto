@@ -6,7 +6,7 @@ service LikesService {
     rpc AddLike (AddLikeDTO) returns (stream LikesCollection);
     rpc CreateCollection (CreateCollectionDTO) returns (stream LikesCollection);
     rpc GetCollection (GetCollectionDTO) returns (stream LikesCollection);
-    rpc CheckLike (CheckLikeDTO) returns (stream LikesCollection);
+    rpc CheckLike (CheckLikeDTO) returns (stream HasLiked);
 }
 
 message LikesCollection {

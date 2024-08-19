@@ -1,9 +1,8 @@
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, LikesCollection, NotFoundCollection } from "../common";
+import { Like, LikesCollection, NotFoundCollection, LikeStateEnum } from "../common";
 import { Injectable } from "@nestjs/common";
 import { LikesServiceTypes } from "../types";
-import { LikeStateEnum } from "../common/enums/like-state.enum";
 
 @Injectable()
 export class LikesService {
@@ -13,30 +12,30 @@ export class LikesService {
     ) {}
 
     async addLike({ user_id, collection_id }: LikesServiceTypes.AddLike): Promise<LikesCollection> {
-
-        const collection = await this.likesCollectionRepository.findOneBy({ id: collection_id })
+        const collection = await this.likesCollectionRepository.findOne({where: { id: collection_id }})
 
         if (!collection) throw NotFoundCollection
 
-        const like = await this.likesRepository.findOneBy({ user_id, collection: { id: collection_id } })
+        const like = await this.likesRepository.findOne({where: { user_id, collection: { id: collection_id } }, relations: {collection: true}})
 
         if (!like) {
-            await this.likesRepository.save({
+            const newLike = await this.likesRepository.save({
                 user_id,
                 state: LikeStateEnum.ACTIVE,
                 createdAt: Date.now(),
-                collection: { id: collection_id }
+                collection: collection
             })
-            collection.number_likes++
-            return await this.likesCollectionRepository.save(collection)
+            newLike.collection.number_likes++
+
+            await this.likesRepository.save(newLike)
         }
         else {
-            like.state = like.state === LikeStateEnum.ACTIVE ? LikeStateEnum.NOT_ACTIVE : LikeStateEnum.ACTIVE
-            collection.number_likes += like.state === LikeStateEnum.ACTIVE ? -1 : 1
-        }
+            like.collection.number_likes += (like.state === LikeStateEnum.ACTIVE ? -1 : 1)
+            like.state = (like.state === LikeStateEnum.ACTIVE ? LikeStateEnum.NOT_ACTIVE : LikeStateEnum.ACTIVE)
 
-        await this.likesRepository.save(like)
-        return await this.likesCollectionRepository.save(collection)
+            await this.likesRepository.save(like)
+        }
+         return await this.likesCollectionRepository.findOneBy({ id: collection_id })
     }
 
     async checkLike({ user_id, collection_id }: LikesServiceTypes.CheckLike): Promise<boolean> {

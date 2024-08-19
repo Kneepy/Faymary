@@ -71,7 +71,7 @@ export class Socket {
         const request= JSON.stringify({ event, data })
         this.socket.send(request)
 
-        if (!callback) return new Promise((resolve, reject) => this.on(event, resolve))
+        if (!callback) return new Promise((resolve) => this.on(event, resolve))
 
         this.on(event, callback)
     }

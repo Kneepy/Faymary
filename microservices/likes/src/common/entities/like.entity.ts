@@ -16,7 +16,7 @@ export class Like {
     @Column()
     state: LikeStateEnum
 
-    @ManyToOne(() => LikesCollection, (likesCollection: LikesCollection) => likesCollection.likes)
+    @ManyToOne(() => LikesCollection, (likesCollection: LikesCollection) => likesCollection.likes, {cascade: ["update"]})
     @JoinTable()
     collection: LikesCollection
 }

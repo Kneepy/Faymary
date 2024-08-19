@@ -5,6 +5,11 @@ export namespace DraftsMessages {
         drafts: Draft[]
     }
 
+    export interface CustomFile extends File {
+        // ссылка на blob
+        href: string
+    }
+
     export interface Draft {
         /**
          * Новое сообщение
@@ -15,7 +20,7 @@ export namespace DraftsMessages {
          * Файлы которые прикрепил пользователь
          * Потом эти файлы будут переделаны во вложения (attachments)
          */
-        files: File[]
+        files: CustomFile[]
 
         /**
          * Если это черновик для ещё не созданного диалога то надо в качестве id указать ANONYMOUS_DIALOG

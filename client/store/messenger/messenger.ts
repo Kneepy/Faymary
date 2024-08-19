@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { Messenger } from "~/store/messenger/types";
-import type { Message } from "~/api";
+import type { LikesCollection, Message } from "~/api";
 
 export const useMessengerStore = defineStore("messenger", {
     state: (): Messenger.Store => ({
@@ -58,6 +58,39 @@ export const useMessengerStore = defineStore("messenger", {
 
             dialog.messages.splice(msgPos, 0, message)
         },
+
+        updateMessageDialog(updatedMessage: Partial<Message>) {
+            const dialog = this.dialogs.find(v => v.id === updatedMessage.dialog_id)
+
+            if (!dialog) return
+
+            const message = dialog.messages.find(v => v.id === updatedMessage.id)
+
+            if (!message) return
+
+            Object.entries(updatedMessage).forEach(([key, value]) =>
+                message[key] !== value && (message[key] = value)
+            )
+        },
+
+        addLikeMessage({ id, dialog_id }: Message, like: LikesCollection) {
+            const dialog = this.dialogs.find(v => v.id === dialog_id)
+
+            if (!dialog) return
+
+            const { attachments } = dialog.messages.find(v => v.id === id)
+
+            if (!attachments.likes) attachments.likes = []
+
+            const existCollection = attachments.likes.find(v => v.id === like.id || v.unity === like.unity)
+
+            if (existCollection) {
+                existCollection.number_likes = like.number_likes
+            } else {
+                attachments.likes.push(like)
+            }
+        },
+
         changeCurrentDialog(id: string) {
             this.currentDialog = id;
         }

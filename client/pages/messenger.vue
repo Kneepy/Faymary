@@ -5,7 +5,7 @@ import BlockedUsersModal from "~/components/Messenger/Modals/BlockedUsersModal.v
 import CreateDialogModal from "~/components/Messenger/Modals/CreateDialogModal.vue";
 import Dialog from "~/components/Messenger/Dialog.vue"
 import { type Messenger, useMessengerStore, useDraftsMessagesStore, DraftsMessages } from "~/store/messenger";
-import { DialogsAPI, DialogsWsAPI } from "~/api";
+import { DialogsAPI, DialogsWsAPI, MessagesWsAPI } from "~/api";
 import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
 import { ReceiveFiles } from "assets/helpers/receive-files";
 
@@ -99,7 +99,6 @@ const receiveFiles = (e: Event) => {
     const files = ReceiveFiles(e)
     files.forEach(file => draftsMessagesStore.addFile(messengerStore.currentDialog, file))
 }
-const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
 const sendMessage = async () => {
     const preparedMessage = await draftsMessagesStore.prepareMessage(messengerStore.currentDialog)
 
@@ -114,8 +113,9 @@ const loadMoreMessages = async (skip_chunks: number) => {
 
 DialogsWsAPI.listenNewMessages(message => {
     messengerStore.insertMessagesDialog(message.dialog_id, [ message ])
-
-
+})
+MessagesWsAPI.listenNewReactions(({ message, like }) => {
+    messengerStore.addLikeMessage(message, like)
 })
 </script>
 <template>
@@ -185,20 +185,23 @@ DialogsWsAPI.listenNewMessages(message => {
                 <Dialog @load-more="loadMoreMessages" :dialog="currentDialog" />
                 <div @drop.prevent.stop="receiveFiles" class="bottom-box">
                     <div v-if="!!draftMessage?.files?.length" class="attachments">
-                        <HorizontalScroll :count="draftMessage.files.length">
-                            <div class="files">
-                                <div
-                                    v-for="file in (draftMessage.files ?? [])"
-                                    @click="draftsMessagesStore.removeFile(messengerStore.currentDialog, file)"
-                                    class="file"
-                                >
-                                    <div class="trash">
-                                        <GIcon fill :weight="700" :size=15>delete</GIcon>
+                        <div class="files">
+                            <HorizontalScroll>
+                                <KeepAlive>
+                                    <div
+                                        v-for="file in (draftMessage.files ?? [])"
+                                        @click="draftsMessagesStore.removeFile(messengerStore.currentDialog, file)"
+                                        class="file"
+                                    >
+                                        <div class="trash">
+                                            <GIcon fill :weight="700" :size=15>delete</GIcon>
+                                        </div>
+                                        <div :style="{ backgroundImage: `url(${file.href})` }" class="img"></div>
                                     </div>
-                                    <div :style="{ backgroundImage: `url(${getURLPreviewFile(file)})` }" class="img"></div>
-                                </div>
-                            </div>
-                        </HorizontalScroll>
+                                </KeepAlive>
+                            </HorizontalScroll>
+                        </div>
+
                     </div>
                     <div class="input-message">
                         <IconButton @click="clickAttachFileButton">
@@ -245,7 +248,7 @@ DialogsWsAPI.listenNewMessages(message => {
 
 <style scoped lang="scss">
 .messenger {
-    width: 1200px;
+    width: 1400px;
     display: flex;
     border: 1px solid $border_8;
     border-radius: 5px;
@@ -255,7 +258,7 @@ DialogsWsAPI.listenNewMessages(message => {
     height: 650px; // эту тему нужно будет менять
 
     .left-bar {
-        flex: 0.5;
+        flex: 0.4;
         border-right: 1px solid $primary_border;
         display: flex;
         flex-direction: column;
@@ -428,7 +431,7 @@ DialogsWsAPI.listenNewMessages(message => {
                     .file {
                         width: 80px;
                         height: 80px;
-                        margin-left: 10px;
+                        margin: 2px 0 2px 10px;
                         border-radius: 10px;
                         cursor: pointer;
                         overflow: hidden;

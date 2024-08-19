@@ -4,7 +4,7 @@ import { Post } from "src/proto/post"
 import { Story } from "src/proto/stories"
 import { User } from "src/proto/user"
 import { File } from "../proto/store";
-import { LikesCollection } from "../proto/likes";
+import { HasLiked, LikesCollection } from "../proto/likes";
 
 export enum Fields {
     USERS = "users",
@@ -25,5 +25,6 @@ export interface Addition {
     [Fields.MESSAGES]?: Message[]
     [Fields.DIALOGS]?: Dialog[]
     [Fields.FILES]?: File[]
-    [Fields.LIKES]?: LikesCollection[]
+    // это небольшой недочёт системы)
+    [Fields.LIKES]?: (LikesCollection & HasLiked)[]
 }

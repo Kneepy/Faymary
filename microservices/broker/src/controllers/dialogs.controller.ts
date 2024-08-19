@@ -1,4 +1,4 @@
-import { MESSAGES_MODULE_CONFIG, USER_MODULE_CONFIG } from "./../constants/app.constants";
+import { LIKES_MODULE_CONFIG, MESSAGES_MODULE_CONFIG, USER_MODULE_CONFIG } from "./../constants/app.constants";
 import { Controller, ForbiddenException, Get, Inject, Query, Req } from "@nestjs/common";
 import { DIALOGS_MODULE_CONFIG } from "src/constants/app.constants";
 import {
@@ -10,11 +10,12 @@ import {
 } from "src/proto/dialogs";
 import { GetMessageDTO, GetMessagesDTO, MessagesServiceClient } from "src/proto/messages";
 import { FindUsersDTO, User, UserServiceClient } from "src/proto/user";
-import { BrokerResponse } from "src/types";
+import { BrokerResponse, Fields } from "src/types";
 import { ICustomRequest } from "src/types/request.type";
 import { firstValueFrom } from "rxjs";
 import { AttachmentsProvider } from "../providers";
 import { AttachmentType } from "../proto/attachments";
+import { LikesServiceClient } from "../proto/likes";
 
 @Controller("dialog")
 export class DialogsController {
@@ -22,6 +23,7 @@ export class DialogsController {
         @Inject(DIALOGS_MODULE_CONFIG.PROVIDER) private dialogsService: DialogsServiceClient,
         @Inject(MESSAGES_MODULE_CONFIG.PROVIDER) private messagesService: MessagesServiceClient,
         @Inject(USER_MODULE_CONFIG.PROVIDER) private userService: UserServiceClient,
+        @Inject(LIKES_MODULE_CONFIG.PROVIDER) private likesService: LikesServiceClient,
         private attachmentsProvider: AttachmentsProvider,
     ) {}
 
@@ -138,6 +140,14 @@ export class DialogsController {
                 // получаем владельца сообщения
                 this.userService.findUser({id: message.user_id}).toPromise()
             ])
+
+            if (attachments[Fields.LIKES]?.length > 0) {
+                attachments[Fields.LIKES] = await Promise.all(attachments[Fields.LIKES].map(async like => {
+                    like.has_liked = (await this.likesService.checkLike({ user_id, collection_id: like.id }).toPromise()).has_liked
+
+                    return like
+                }))
+            }
 
             return {...message, attachments, user}
         }))

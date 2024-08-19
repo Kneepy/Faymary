@@ -31,6 +31,7 @@ button {
     justify-content: center;
     border: none;
     height: fit-content;
+    width: fit-content;
     padding: 8px;
     border-radius: 10px;
 }

@@ -47,7 +47,7 @@ export interface LikesServiceClient {
 
   getCollection(request: GetCollectionDTO): Observable<LikesCollection>;
 
-  checkLike(request: CheckLikeDTO): Observable<LikesCollection>;
+  checkLike(request: CheckLikeDTO): Observable<HasLiked>;
 }
 
 export interface LikesServiceController {
@@ -57,7 +57,7 @@ export interface LikesServiceController {
 
   getCollection(request: GetCollectionDTO): Observable<LikesCollection>;
 
-  checkLike(request: CheckLikeDTO): Observable<LikesCollection>;
+  checkLike(request: CheckLikeDTO): Observable<HasLiked>;
 }
 
 export function LikesServiceControllerMethods() {

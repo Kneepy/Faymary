@@ -71,7 +71,6 @@ const receiveFiles = (e: Event) => {
         draftsMessagesStore.addFile(DraftsMessages.ANONYMOUS_DIALOG, file)
     }
 }
-const getURLPreviewFile = (file: File) => URL.createObjectURL(file)
 
 /**
  * Обработка на нажатие кнопки отправки
@@ -163,8 +162,8 @@ const sendMessage = async () => {
                     </div>
                 </Transition>
                 <div class="attachments">
-                    <HorizontalScroll :count="draftMessage.files.length">
-                        <div class="files">
+                    <div class="files">
+                        <HorizontalScroll :count="draftMessage.files.length">
                             <div
                                 v-for="file in (draftMessage.files ?? [])"
                                 @click="() => draftsMessagesStore.removeFile(DraftsMessages.ANONYMOUS_DIALOG, file)"
@@ -172,7 +171,7 @@ const sendMessage = async () => {
                             >
                                 <div
                                     :style="{
-                                    backgroundImage: `url(${getURLPreviewFile(file)})`
+                                    backgroundImage: `url(${file.href})`
                                 }"
                                     class="img"
                                 >
@@ -181,8 +180,8 @@ const sendMessage = async () => {
                                     <GIcon :size=15 fill>delete</GIcon>
                                 </div>
                             </div>
-                        </div>
-                    </HorizontalScroll>
+                        </HorizontalScroll>
+                    </div>
                 </div>
                 <div class="input-message">
                     <IconButton>

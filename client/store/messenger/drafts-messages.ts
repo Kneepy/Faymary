@@ -33,9 +33,9 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
             if (!draft) return
             if (!draft.files) draft.files = []
 
-            draft.files.push(file)
+            draft.files.push(Object.assign(file, { href: URL.createObjectURL(file) }))
         },
-        removeFile(dialog_id: string, file: File) {
+        removeFile(dialog_id: string, file: DraftsMessages.CustomFile) {
             const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
 
             if (!draft) return

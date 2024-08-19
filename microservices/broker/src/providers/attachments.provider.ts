@@ -98,7 +98,16 @@ export class AttachmentsProvider {
         const result: Addition = {}
 
         for (const [key, value] of Object.entries(addition)) {
-            result[key] = await Promise.all(value)
+
+            result[key] = (await Promise.allSettled(value)).reduce((accumulator, res) => {
+                if (res.status !== "fulfilled") return accumulator
+                if (!Object.keys(res.value).length) return accumulator
+
+                accumulator.push(res.value)
+
+                return accumulator
+            }, [])
+
         }
 
         return result
@@ -107,13 +116,20 @@ export class AttachmentsProvider {
     async getAttachmentsByType({ parent_id, parent_type, attached_type }: GetAttachmentsDTO): Promise<Addition> {
         const { attachments } = await lastValueFrom(this.attachmentsService.getAttachments({ parent_id, parent_type, attached_type }))
 
-        if (!!attachments?.length) return {}
+        if (!attachments?.length) return {}
 
         const { handler, field } = this.handlers[attachments[0].type]
         const result = { [field]: [] }
 
         attachments.forEach(attachment => result[field].push(handler({ id: attachment.item_id }).toPromise()))
-        result[field] = await Promise.all(result[field])
+        result[field] = (await Promise.allSettled(result[field])).reduce((accumulator, res) => {
+            if (res.status !== "fulfilled") return accumulator
+            if (!Object.keys(res.value).length) return accumulator
+
+            accumulator.push(res.value)
+
+            return accumulator
+        }, [])
 
         return result
     }
@@ -137,6 +153,6 @@ export class AttachmentsProvider {
     async addAttachment({ parent_id, parent_type, attached_id, attached_type }: AddAttachmentDTO): Promise<Addition> {
         const attachment = await lastValueFrom(this.attachmentsService.addAttachment({ parent_id, parent_type, attached_id, attached_type }))
 
-        return await this.getAttachments({ parent_id, parent_type })
+        return await this.getAttachmentsByType({ parent_id, parent_type, attached_type })
     }
 }
