@@ -52,7 +52,7 @@ const hoverScrollEffect = (direction: -1 | 1) => {
 // пролистывание элементов при нажатии на кнопки
 const scrollItems = (direction: -1 | 1) => {
     if (itemsScrollBox.value?.clientWidth < clientScrollBox.value.clientWidth) return
-    addShift(clientScrollBox.value.clientWidth * direction)
+    addShift((clientScrollBox.value.clientWidth * 0.7) * direction)
 }
 
 </script>

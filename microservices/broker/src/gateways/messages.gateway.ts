@@ -15,7 +15,7 @@ import { BrokerRequests, BrokerResponse, Fields } from "src/types";
 import { UserServiceClient } from "src/proto/user";
 import { AttachmentsProvider } from "../providers";
 import { AttachmentType } from "../proto/attachments";
-import { LikesCollection, LikesServiceClient } from "../proto/likes";
+import { LikesCollection, LikesInfo, LikesServiceClient } from "../proto/likes";
 import { NotFoundMessage } from "../constants/errors.constants";
 
 @WebSocketGateway()
@@ -105,7 +105,7 @@ export class MessagesGateway {
         }
     }
 
-    @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.ADD_REACTION)
+    @SubscribeMessage(WEVENTS.DIALOGS.MESSAGES.ADD_LIKE)
     async addReactionMessage(@MessageBody() {
         unity,
         message_id
@@ -123,7 +123,7 @@ export class MessagesGateway {
             attached_type: AttachmentType.LIKE
         });
         const collection = likes?.find(v => v.unity === unity);
-        let like: LikesCollection;
+        let like: LikesInfo;
 
         if (!collection) {
 
@@ -152,7 +152,7 @@ export class MessagesGateway {
                     message,
                     like
                 },
-                event: WEVENTS.DIALOGS.MESSAGES.ADD_REACTION
+                event: WEVENTS.DIALOGS.MESSAGES.ADD_LIKE
             })
         }
     }

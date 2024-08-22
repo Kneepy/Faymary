@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "~/composables/useInfiniteScroll";
-import { type Messenger, useUserStore, useContextMenuStore, useMessengerStore } from "~/store";
+import { type Messenger, useUserStore, useContextMenuStore, useDraftsMessagesStore } from "~/store";
 import { MessagesWsAPI } from "~/api";
 import type { Message } from "~/api";
 
@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const userStore = useUserStore()
 const contextmenuStore = useContextMenuStore()
-const messengerStore = useMessengerStore()
+const draftsMessagesStore = useDraftsMessagesStore()
 
 const messagesBoxRef = ref<HTMLBaseElement>(null)
 const infiniteScroll = ref(null)
@@ -25,23 +25,13 @@ onMounted(() => {
 onUnmounted(() => !!infiniteScroll.value && infiniteScroll.value())
 
 const addReaction = (emoji: string, msg?: Message) => {
-    const message_id = msg?.id ?? currentSelectMessage.value.id
-    const dialog_id = msg?.dialog_id ?? currentSelectMessage.value.dialog_id
-    const message = messengerStore.dialogs
-        .find(v => dialog_id === v.id)
-        .messages.find(v => v.id === message_id)
-    const collection = message.attachments?.likes?.find(v => v.unity === emoji)
-
-    if (collection) {
-        collection.number_likes += collection.has_liked ? -1 : 1
-        collection.has_liked = !collection.has_liked
-    } else {
-        messengerStore.addLikeMessage(message, { id: null, unity: emoji, has_liked: true, number_likes: 1 })
-    }
+    const message_id =  msg?.id ?? currentSelectMessage.value.id
 
     MessagesWsAPI.addReaction({ message_id, emoji })
     contextmenuStore.close()
 }
+const replyMessage = () => draftsMessagesStore.setOriginalMessage(currentSelectMessage.value.dialog_id, currentSelectMessage.value)
+const editMessage = () => draftsMessagesStore.setDraftByMessage(currentSelectMessage.value.dialog_id, currentSelectMessage.value)
 const openContextMenu = (e: MouseEvent, message: Message) => {
     contextmenuStore.open(e.x, e.y)
     currentSelectMessage.value = message
@@ -56,11 +46,15 @@ const openContextMenu = (e: MouseEvent, message: Message) => {
             :y="contextmenuStore.y"
             @onclose="() => contextmenuStore.close()"
             @reaction="addReaction"
+            @reply="replyMessage"
+            @edit="editMessage"
         />
         <div :style="{backgroundImage: `url('')`, filter: `blur(3px)` }" class="background"></div>
         <div class="messages scroll" ref="messagesBoxRef">
             <Message
                 v-for="message in props.dialog.messages"
+                :key="message.id"
+                v-memo="[message.msg, message.attachments, message.user]"
                 @contextmenu.prevent="(e) => openContextMenu(e, message)"
                 @like="(emoji: string) => addReaction(emoji, message)"
                 :message="message"
@@ -92,6 +86,7 @@ const openContextMenu = (e: MouseEvent, message: Message) => {
         padding: 0 5px;
         overflow-y: auto;
         max-height: 523px;
+        height: 100%;
         min-height: 100px;
         flex: 1;
         position: absolute;

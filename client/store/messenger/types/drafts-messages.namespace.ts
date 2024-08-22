@@ -1,4 +1,4 @@
-import type { Message } from "~/api";
+import type { Message, File as StoreFile } from "~/api";
 
 export namespace DraftsMessages {
     export interface Store {
@@ -7,6 +7,11 @@ export namespace DraftsMessages {
 
     export interface CustomFile extends File {
         // ссылка на blob
+        href: string
+    }
+
+    export interface CustomFileRef extends StoreFile {
+        // ссылка на файл в сторе
         href: string
     }
 
@@ -21,6 +26,14 @@ export namespace DraftsMessages {
          * Потом эти файлы будут переделаны во вложения (attachments)
          */
         files: CustomFile[]
+
+        /**
+         * Ссылки на уже загруженные файлы
+         * Надо по большей части для редактирования сообщения
+         */
+        fileRefs: CustomFileRef[]
+
+        originalMessage: Message
 
         /**
          * Если это черновик для ещё не созданного диалога то надо в качестве id указать ANONYMOUS_DIALOG

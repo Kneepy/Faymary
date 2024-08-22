@@ -99,6 +99,8 @@ const receiveFiles = (e: Event) => {
     const files = ReceiveFiles(e)
     files.forEach(file => draftsMessagesStore.addFile(messengerStore.currentDialog, file))
 }
+const removeReply = () => draftsMessagesStore.removeOriginalMessage(messengerStore.currentDialog)
+
 const sendMessage = async () => {
     const preparedMessage = await draftsMessagesStore.prepareMessage(messengerStore.currentDialog)
 
@@ -111,11 +113,12 @@ const loadMoreMessages = async (skip_chunks: number) => {
     messengerStore.insertMessagesDialog(messengerStore.currentDialog, messages)
 }
 
+
 DialogsWsAPI.listenNewMessages(message => {
     messengerStore.insertMessagesDialog(message.dialog_id, [ message ])
 })
 MessagesWsAPI.listenNewReactions(({ message, like }) => {
-    messengerStore.addLikeMessage(message, like)
+    messengerStore.insertLikeMessage(message, like)
 })
 </script>
 <template>
@@ -184,24 +187,42 @@ MessagesWsAPI.listenNewReactions(({ message, like }) => {
                 </div>
                 <Dialog @load-more="loadMoreMessages" :dialog="currentDialog" />
                 <div @drop.prevent.stop="receiveFiles" class="bottom-box">
-                    <div v-if="!!draftMessage?.files?.length" class="attachments">
-                        <div class="files">
+                    <div class="attachments">
+                        <div v-if="!!draftMessage.originalMessage" class="reply">
+                            <GIcon fill :weight="600" :size="25">reply</GIcon>
+                            <div class="message">
+                                <div class="user">{{ draftMessage.originalMessage.user.fullName }}</div>
+                                <div class="text">{{ !!draftMessage.originalMessage.msg ? draftMessage.originalMessage.msg : "Сообщение" }}</div>
+                            </div>
+                            <IconButton @click="removeReply" class="remove">
+                                <GIcon fill :weight="600" :size="25">close</GIcon>
+                            </IconButton>
+                        </div>
+                        <div v-if="!!draftMessage?.files?.length || !!draftMessage?.fileRefs?.length" class="files">
                             <HorizontalScroll>
-                                <KeepAlive>
-                                    <div
-                                        v-for="file in (draftMessage.files ?? [])"
-                                        @click="draftsMessagesStore.removeFile(messengerStore.currentDialog, file)"
-                                        class="file"
-                                    >
-                                        <div class="trash">
-                                            <GIcon fill :weight="700" :size=15>delete</GIcon>
-                                        </div>
-                                        <div :style="{ backgroundImage: `url(${file.href})` }" class="img"></div>
+                                <div
+                                    v-for="file in (draftMessage.fileRefs ?? [])"
+                                    @click="draftsMessagesStore.removeFileRef(messengerStore.currentDialog, file)"
+                                    class="file"
+                                >
+                                    <div class="trash">
+                                        <GIcon fill :weight="700" :size=15>delete</GIcon>
                                     </div>
-                                </KeepAlive>
+                                    <div :style="{ backgroundImage: `url(${file.href})` }" class="img"></div>
+                                </div>
+                                <div v-if="!!draftMessage?.fileRefs?.length && !!draftMessage?.files?.length" class="separator"></div>
+                                <div
+                                    v-for="file in (draftMessage.files ?? [])"
+                                    @click="draftsMessagesStore.removeFile(messengerStore.currentDialog, file)"
+                                    class="file"
+                                >
+                                    <div class="trash">
+                                        <GIcon fill :weight="700" :size=15>delete</GIcon>
+                                    </div>
+                                    <div :style="{ backgroundImage: `url(${file.href})` }" class="img"></div>
+                                </div>
                             </HorizontalScroll>
                         </div>
-
                     </div>
                     <div class="input-message">
                         <IconButton @click="clickAttachFileButton">
@@ -419,19 +440,18 @@ MessagesWsAPI.listenNewReactions(({ message, like }) => {
             .attachments {
                 width: 100%;
                 max-width: 100%;
-                overflow: auto;
-                padding: 5px 0;
-                margin-bottom: 15px;
                 &::-webkit-scrollbar {
                     width: 0;
                     height: 0;
                 }
                 .files {
+                    overflow: auto;
+                    padding: 5px 0;
                     display: flex;
                     .file {
                         width: 80px;
                         height: 80px;
-                        margin: 2px 0 2px 10px;
+                        margin: 2px 2px 2px 10px;
                         border-radius: 10px;
                         cursor: pointer;
                         overflow: hidden;
@@ -467,6 +487,50 @@ MessagesWsAPI.listenNewReactions(({ message, like }) => {
                                 opacity: 1;
                             }
                         }
+                    }
+                    .separator {
+                        width: 2px;
+                        height: 60px;
+                        background-color: $border;
+                        margin: 0 10px;
+                        align-self: center;
+                        border-radius: 5px;
+                    }
+                }
+                .reply {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin: 5px 25px 15px;
+                    .message {
+                        flex: .9;
+                        display: flex;
+                        flex-direction: column;
+                        padding: 5px 20px;
+                        overflow: hidden;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        background-color: rgba(223, 223, 223, .05); // и этот тоже
+                        border-left: 5px solid $white; // этот цвет должен выбираться в настройках мессенджера
+                        .user {
+                            color: rgba(223, 223, 223, 1); // этот цвет должен выбираться в настройках мессенджера
+                            font-weight: 700;
+                            font-size: 14px;
+                        }
+                        .text {
+                            color: $gray;
+                            text-overflow: ellipsis;
+                            overflow: hidden;
+                            font-size: 15px;
+                            white-space: nowrap;
+                        }
+                    }
+                    .icon {
+                        color: $white;
+                    }
+                    .remove {
+                        background-color: transparent;
+                        cursor: pointer;
                     }
                 }
             }

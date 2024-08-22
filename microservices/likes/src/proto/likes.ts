@@ -25,6 +25,13 @@ export interface HasLiked {
   has_liked: boolean;
 }
 
+export interface LikesInfo {
+  id: string;
+  unity: string;
+  number_likes: number;
+  has_liked: boolean;
+}
+
 export interface CreateCollectionDTO {
   unity: string;
 }
@@ -41,7 +48,7 @@ export interface AddLikeDTO {
 export const LIKES_PACKAGE_NAME = "likes";
 
 export interface LikesServiceClient {
-  addLike(request: AddLikeDTO): Observable<LikesCollection>;
+  addLike(request: AddLikeDTO): Observable<LikesInfo>;
 
   createCollection(request: CreateCollectionDTO): Observable<LikesCollection>;
 
@@ -51,7 +58,7 @@ export interface LikesServiceClient {
 }
 
 export interface LikesServiceController {
-  addLike(request: AddLikeDTO): Observable<LikesCollection>;
+  addLike(request: AddLikeDTO): Observable<LikesInfo>;
 
   createCollection(request: CreateCollectionDTO): Observable<LikesCollection>;
 

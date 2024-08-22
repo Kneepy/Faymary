@@ -8,7 +8,7 @@ const emit = defineEmits<{
     (e: "onclose"): void
 
     // ответ на сообщение
-    (e: "answer"): void
+    (e: "reply"): void
 
     // редактирование сообщения
     (e: "edit"): void
@@ -26,18 +26,21 @@ const emit = defineEmits<{
     (e: "reaction", emoji: string): void
 }>()
 const close = () => emit("onclose")
-const emojis = ["🤡", "👺", "💩", "🔥", "🍻", "❤️", "👍", "👎", "💀"]
+const emojis = ["🤡", "😈", "💩", "🔥", "🍻", "❤️", "👍", "👎", "💀"]
 </script>
 
 <template>
-<ContextMenu :x :y @onclose="close">
+<ContextMenu :x :y @onclose="close" @click="close">
     <ContextPanel class="panel emojis">
         <HorizontalScroll>
-            <button
+            <Emoji
                 v-for="emoji in emojis"
-                @click.prevent="emit(`reaction`, emoji), close()"
+                :key="emoji"
+                :emoji="emoji"
+                @click.prevent="emit(`reaction`, emoji)"
+                :size="35"
                 class="emoji"
-            >{{ emoji }}</button>
+            />
             <template #next-btn>
                 <button class="emoji-btn"><GIcon :size="17" :weight="600">chevron_right</GIcon></button>
             </template>
@@ -47,7 +50,7 @@ const emojis = ["🤡", "👺", "💩", "🔥", "🍻", "❤️", "👍", "👎"
         </HorizontalScroll>
     </ContextPanel>
     <ContextPanel class="panel">
-        <ContextItem @click="emit(`answer`), close()">
+        <ContextItem @click="emit(`reply`), close()">
             <template #icon>
                 <GIcon :size="22" fill>reply</GIcon>
             </template>
@@ -88,16 +91,15 @@ const emojis = ["🤡", "👺", "💩", "🔥", "🍻", "❤️", "👍", "👎"
 .emojis {
     display: flex;
     border-radius: 15px;
-    max-width: 250px;
+    max-width: 240px;
     overflow-x: hidden;
     .emoji {
-        font-size: 24px;
         user-select: none;
         cursor: pointer;
-        padding: 3px 5px;
-        border-radius: 50%;
+        padding: 7px;
         background-color: transparent;
         border: none;
+        font-size: 26px;
         &:first-child {
             margin-left: 10px;
         }

@@ -19,7 +19,8 @@ const emit = defineEmits<{
 }>()
 
 const images = computed(() => props.message?.attachments?.files ?? [])
-const likes = computed(() => props.message.attachments?.likes?.filter(like => Number(like.number_likes) > 0) ?? [])
+const likes = computed(() => props.message?.attachments?.likes?.filter(like => Number(like.number_likes) > 0) ?? [])
+const replyMessage = computed(() => props.message.attachments.messages?.length ? props.message.attachments.messages[0] : null)
 const defaultFileModal = ref<File>(null)
 const isOpenFilesModal = ref<boolean>(false)
 const closeFilesModal = () => isOpenFilesModal.value = false
@@ -36,36 +37,43 @@ const time = computed(() => useTime(props.message?.createdAt))
         class="message_wrapper"
     >
         <Avatar v-if="!own" :size=35 :user-name="props.message.user.fullName" :href="props.message.user.file_id" class="avatar" />
-        <div class="message">
+        <div
+            class="message"
+            :style="{
+                width: images.length ? `100%` : null
+            }"
+        >
             <div class="container">
                 <span v-if="!own" class="user-name">{{ props.message.user.fullName }}</span>
-                <div class="answer-message">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at est ac tellus congue commodo...
+                <div v-if="replyMessage" class="answer-message">
+                    <div class="user">Alex Korf</div>
+                    <div class="text">
+                        {{ replyMessage.msg }}
+                    </div>
                 </div>
-                <template v-if="images">
-                    <div class="images">
-                        <div
-                            v-for="img in images"
-                            :style="{ backgroundImage: `url(${useFile(img.id)})` }"
-                            :class="{
+                <div v-if="images.length" class="images">
+                    <div
+                        v-for="img in images"
+                        :style="{ backgroundImage: `url(${useFile(img.id)})` }"
+                        :class="{
                             last: images.indexOf(img) === images.length - 1 && images.length % 2 !== 0
                         }"
-                            @click="() => openFilesModal(img)"
-                            class="image"
-                        >
-                        </div>
+                        @click="() => openFilesModal(img)"
+                        class="image"
+                    >
                     </div>
-                </template>
+                </div>
                 <span>{{ props.message.msg }}</span>
                 <div class="addition">
                     <div v-if="likes.length" class="reactions">
                         <div
                             v-for="like in likes"
+                            :key="like.id"
                             @click="() => emit(`like`, like.unity)"
                             class="reaction noselect"
                             :class="{ active: like.has_liked }"
                         >
-                            {{ like.unity }} <span>{{ like.number_likes }}</span>
+                            <Emoji :emoji="like.unity" :size="25" /> <span>{{ like.number_likes }}</span>
                         </div>
                     </div>
                     <div class="date">{{ time }}</div>
@@ -105,28 +113,42 @@ const time = computed(() => useTime(props.message?.createdAt))
         .container {
             color: $white;
             background-color: $message_background;
-            width: fit-content;
             display: flex;
             flex-direction: column;
             border-radius: 10px 10px 0 10px;
             padding: 10px 15px 8px;
+            width: 100%;
             .user-name {
                 font-size: 16px;
                 font-weight: bold;
+                margin-bottom: 5px;
                 color: $white; // этот цвет должен выбираться в настройках мессенджера
             }
             .answer-message {
-                margin: 10px;
-                padding: 5px 20px;
-                background-color: rgba(90, 90, 90, 0.2); // и этот тоже
+                margin-bottom: 10px;
+                padding: 5px 20px 5px 15px;
+                background-color: rgba(223, 223, 223, .05); // и этот тоже
                 border-radius: 5px;
                 cursor: pointer;
-                border-left: 6px solid $white; // этот цвет должен выбираться в настройках мессенджера
+                border-left: 5px solid rgba(223, 223, 223, 1); // этот цвет должен выбираться в настройках мессенджера
+                .user {
+                    color: rgba(223, 223, 223, 1); // этот цвет должен выбираться в настройках мессенджера
+                    font-weight: 700;
+                    font-size: 14px;
+                }
+                .text {
+                    color: $gray;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    font-size: 15px;
+                    white-space: nowrap;
+                }
             }
             .images {
                 display: flex;
                 flex-wrap: wrap;
                 margin-bottom: 10px;
+                width: 100%;
                 .image {
                     background-size: cover;
                     background-position: center;
@@ -148,12 +170,18 @@ const time = computed(() => useTime(props.message?.createdAt))
                     .reaction {
                         color: $gray;
                         cursor: pointer;
-                        padding: 0 5px;
+                        padding: 5px 10px;
                         background-color: $transparent_button_hover_17;
                         border-radius: 100px;
-                        font-size: 20px;
-                        margin-right: 5px;
                         margin-top: 5px;
+                        margin-left: 5px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        box-sizing: border-box;
+                        &:first-child {
+                            margin-left: 0;
+                        }
                         &.active {
                             background-color: $gray_1;
                             color: $white;
@@ -161,7 +189,8 @@ const time = computed(() => useTime(props.message?.createdAt))
                         span {
                             font-size: 15px;
                             font-weight: bold;
-                            margin-right: 4px;
+                            margin-right: 5px;
+                            margin-left: 10px;
                         }
                     }
                 }

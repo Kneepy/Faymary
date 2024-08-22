@@ -16,7 +16,7 @@ export const WEVENTS = {
             CREATE: "dialog.message.create",
             UPDATE: "dialog.message.update",
             DELETE: "dialog.message.delete",
-            ADD_REACTION: "dialog.message.add_reaction",
+            ADD_LIKE: "dialog.message.add_like",
         }
     },
     USER: {

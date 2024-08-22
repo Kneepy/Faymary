@@ -10,7 +10,7 @@
  *
  */
 export const useInfiniteScroll = (element: HTMLElement, callback: (count: number) => void) => {
-    const metadata = { scrollHeight: 0, numberTriggers: 0, callbackCompleted: false }
+    const metadata = { scrollHeight: 0, numberTriggers: 0, callbackCompleted: false, latsTriggerHeight: 0 }
 
     const handler = (e: WheelEvent) => {
         if (!element) return
@@ -29,15 +29,20 @@ export const useInfiniteScroll = (element: HTMLElement, callback: (count: number
             metadata.scrollHeight = valueScrollHeight
         }
 
-        const percentagePassing = (metadata.scrollHeight / elementHeight) * 100
+        const remained = elementHeight - metadata.scrollHeight
 
-        if (percentagePassing <= 80 && metadata.callbackCompleted) {
+        if (remained >= 300 && metadata.callbackCompleted) {
             metadata.callbackCompleted = false
         }
-        if (percentagePassing > 80 && !metadata.callbackCompleted) {
+        /**
+         * elementHeight > metadata.latsTriggerHeight
+         * Если это условие не выполняется то мы по факту дошли до конца блока когда даже callback не изменяет его высоту
+         */
+        if (remained < 300 && !metadata.callbackCompleted && elementHeight > metadata.latsTriggerHeight) {
             metadata.callbackCompleted = true
             callback(metadata.numberTriggers)
             metadata.numberTriggers++
+            metadata.latsTriggerHeight = elementHeight
         }
     }
 

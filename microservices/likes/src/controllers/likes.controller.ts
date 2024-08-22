@@ -3,15 +3,19 @@ import { LikesService } from "../providers";
 import { LikesCollection } from "../common";
 import { LIKES_SERVICE_NAME, SERVICE_METHODS } from "../common";
 import { GrpcMethod } from "@nestjs/microservices";
-import { AddLikeDTO, CheckLikeDTO, CreateCollectionDTO, GetCollectionDTO, HasLiked } from "../proto/likes";
+import { AddLikeDTO, CheckLikeDTO, CreateCollectionDTO, GetCollectionDTO, HasLiked, LikesInfo } from "../proto/likes";
 
 @Controller()
 export class LikesController {
     constructor(private likesService: LikesService) {}
 
     @GrpcMethod(LIKES_SERVICE_NAME, SERVICE_METHODS.ADD_LIKE)
-    async addLike({ user_id, collection_id }: AddLikeDTO): Promise<LikesCollection> {
-        return this.likesService.addLike({ user_id, collection_id })
+    async addLike({ user_id, collection_id }: AddLikeDTO): Promise<LikesInfo> {
+        const collection = await this.likesService.addLike({ user_id, collection_id })
+        return {
+            ...collection,
+            has_liked: await this.likesService.checkLike({ user_id, collection_id })
+        }
     }
 
     @GrpcMethod(LIKES_SERVICE_NAME, SERVICE_METHODS.CHECK_LIKE)

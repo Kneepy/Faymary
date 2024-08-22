@@ -50,13 +50,24 @@ export const useMessengerStore = defineStore("messenger", {
 
             if (!dialog || !createdAt) return
 
-            let msgPos = 0
+            let startIndex = dialog.messages.length - 1
+            let endIndex = 0
 
-            while (msgPos < dialog.messages.length && Number(dialog.messages[msgPos]?.createdAt) > createdAt) {
-                msgPos++
+            while (startIndex >= endIndex) {
+                const midIndex = Math.floor((startIndex + endIndex) / 2)
+                const midCreatedAt = Number(dialog.messages[midIndex]?.createdAt)
+
+                if (midCreatedAt === createdAt) {
+                    dialog.messages.splice(midIndex + 1, 0, message)
+                    return
+                } else if (midCreatedAt > createdAt) {
+                    endIndex = midIndex + 1
+                } else {
+                    startIndex = midIndex - 1
+                }
             }
 
-            dialog.messages.splice(msgPos, 0, message)
+            dialog.messages.splice(startIndex + 1, 0, message)
         },
 
         updateMessageDialog(updatedMessage: Partial<Message>) {
@@ -73,7 +84,10 @@ export const useMessengerStore = defineStore("messenger", {
             )
         },
 
-        addLikeMessage({ id, dialog_id }: Message, like: LikesCollection) {
+        /**
+         * По факту эта функция нужна только чтобы при получении новых лайков с сервера обновлять их количество
+         */
+        insertLikeMessage({ id, dialog_id }: Message, like: LikesCollection) {
             const dialog = this.dialogs.find(v => v.id === dialog_id)
 
             if (!dialog) return
@@ -82,12 +96,14 @@ export const useMessengerStore = defineStore("messenger", {
 
             if (!attachments.likes) attachments.likes = []
 
-            const existCollection = attachments.likes.find(v => v.id === like.id || v.unity === like.unity)
+            let existCollection = attachments.likes.find(v => v.id === like.id)
 
             if (existCollection) {
                 existCollection.number_likes = like.number_likes
+                existCollection.has_liked = like.has_liked
+                existCollection.unity = like.unity
             } else {
-                attachments.likes.push(like)
+                attachments.likes.unshift(like)
             }
         },
 

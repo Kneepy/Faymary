@@ -3,7 +3,7 @@ syntax = "proto3";
 package likes;
 
 service LikesService {
-    rpc AddLike (AddLikeDTO) returns (stream LikesCollection);
+    rpc AddLike (AddLikeDTO) returns (stream LikesInfo);
     rpc CreateCollection (CreateCollectionDTO) returns (stream LikesCollection);
     rpc GetCollection (GetCollectionDTO) returns (stream LikesCollection);
     rpc CheckLike (CheckLikeDTO) returns (stream HasLiked);
@@ -22,6 +22,13 @@ message CheckLikeDTO {
 
 message HasLiked {
     bool has_liked = 1;
+}
+
+message LikesInfo {
+    string id = 1;
+    string unity = 2;
+    int32 number_likes = 3;
+    bool has_liked = 4;
 }
 
 message CreateCollectionDTO {

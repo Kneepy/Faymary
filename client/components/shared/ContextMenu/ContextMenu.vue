@@ -62,7 +62,7 @@ const position = computed(() => {
             @keydown.stop
             @resize.stop
             @click.stop
-            @contextmenu.prevent.stop
+            @contextmenu.prevent
             :ref="el => contextmenu = <HTMLElement> el"
             :style="{ top: `${position.y}px`, left: `${position.x}px` }"
             class="contextmenu"
@@ -77,7 +77,7 @@ const position = computed(() => {
     position: absolute;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: end;
     transition: 0ms;
 }
 </style>

@@ -35,7 +35,7 @@ export class LikesService {
 
             await this.likesRepository.save(like)
         }
-         return await this.likesCollectionRepository.findOneBy({ id: collection_id })
+        return await this.likesCollectionRepository.findOneBy({ id: collection_id })
     }
 
     async checkLike({ user_id, collection_id }: LikesServiceTypes.CheckLike): Promise<boolean> {
