@@ -70,7 +70,7 @@ export const useMessengerStore = defineStore("messenger", {
             dialog.messages.splice(startIndex + 1, 0, message)
         },
 
-        updateMessageDialog(updatedMessage: Partial<Message>) {
+        updateMessageDialog(updatedMessage: Message) {
             const dialog = this.dialogs.find(v => v.id === updatedMessage.dialog_id)
 
             if (!dialog) return

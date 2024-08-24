@@ -384,6 +384,7 @@ const sendMessage = async () => {
                 .file {
                     width: 60px;
                     height: 60px;
+                    margin: 1px;
                     margin-left: 10px;
                     border-radius: 10px;
                     cursor: pointer;

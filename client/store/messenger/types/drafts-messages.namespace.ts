@@ -33,12 +33,21 @@ export namespace DraftsMessages {
          */
         fileRefs: CustomFileRef[]
 
+        /**
+         * Сообщение на которое создаётся ответ пользователя
+         */
         originalMessage: Message
 
         /**
          * Если это черновик для ещё не созданного диалога то надо в качестве id указать ANONYMOUS_DIALOG
          */
         dialog_id: string
+
+        /**
+         * Содерижт сообщение которое редактирует пользователь
+         * Может быть и null если создаётся новое сообщение
+         */
+        editedMessage: Message
     }
 
     export interface PreparedMessage extends Pick<Message, "attachments" | "dialog_id" | "msg"> {}

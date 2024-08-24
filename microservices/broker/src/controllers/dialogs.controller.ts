@@ -140,7 +140,6 @@ export class DialogsController {
                 // получаем владельца сообщения
                 this.userService.findUser({id: message.user_id}).toPromise()
             ])
-
             if (attachments[Fields.LIKES]?.length > 0) {
                 attachments[Fields.LIKES] = await Promise.all(attachments[Fields.LIKES].map(async like => {
                     like.has_liked = (await this.likesService.checkLike({ user_id, collection_id: like.id }).toPromise()).has_liked

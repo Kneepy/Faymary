@@ -7,7 +7,7 @@ import { Metadata, ServerUnaryCall } from "@grpc/grpc-js";
 import { GenerateTokensBySessionDTO, GenerateTokensDTO, VerifyTokensDTO } from "./dtos";
 import { AuthService } from "./services";
 import { TokensPayload, UserAccessTokenPayload } from "./interfaces";
-import * as useragent from "useragent"
+import * as useragent from "useragent";
 
 @Controller()
 export class AuthController {
@@ -23,7 +23,7 @@ export class AuthController {
 
         if(!!verifyRefresh && !!verifyAccess && (verifyRefresh.user_id === verifyAccess.user_id)) {
             return verifyAccess
-        } else return {user_id: null}
+        } else return { user_id: null }
     }
 
     @GrpcMethod(SESSION_SERVICE, SESSION_SERVICE_METHODS.GENERATE_TOKENS)
@@ -41,7 +41,7 @@ export class AuthController {
         if(!!oldRefreshToken) {
             await this.sessionService.delete(oldRefreshToken.id)
         }
-        
+
         return {
             access_token: this.authService.getAccessToken(data.user_id),
             refresh_token: (await this.authService.getRefreshToken(data)).id
@@ -58,8 +58,6 @@ export class AuthController {
 
         const session = await this.authService.verifyRefreshToken(data.refresh_token)
         const accessCodeIsVerify = this.authService.verifyAccessToken(data.access_token)
-
-        console.log(data.session, session)
 
         if(!session) throw Unauthorized
 

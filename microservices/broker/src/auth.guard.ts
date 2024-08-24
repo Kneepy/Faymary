@@ -10,7 +10,6 @@ import { SESSION_MODULE_CONFIG, USE_AUTH_METADATA } from "./constants/app.consta
 import { SessionServiceClient } from "./proto/session";
 import { UnauthorizedError } from './constants/errors.constants';
 import { ICustomResponse, ICustomRequest } from './types';
-import * as useragent from "useragent"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -33,11 +32,16 @@ export class AuthGuard implements CanActivate {
             const refreshToken = request.cookies.refresh_token ?? request.headers.refresh_token
 
             if(!refreshToken) throw UnauthorizedError
-        
-            const ip = request.ip || request.socket.remoteAddress || request.headers['x-forwarded-for']
-            const ua = request.headers["user-agent"]
-            const sessionOptions = {ua, fingerprint: request.headers["fingerprint"], ip}
-            const tokens = await this.sessionService.generateTokensBySession({access_token: accessToken, refresh_token: refreshToken, session: sessionOptions}).toPromise()
+
+            const tokens = await this.sessionService.generateTokensBySession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+                session: {
+                    ua: request.headers["user-agent"],
+                    fingerprint: request.headers["fingerprint"],
+                    ip: request.ip || request.socket.remoteAddress || request.headers["x-forwarded-for"]
+                }
+            }).toPromise()
             const verifiedTokens = await this.sessionService.verifyTokens(tokens).toPromise()
 
             request.headers.refresh_token = tokens.refresh_token

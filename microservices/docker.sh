@@ -13,18 +13,19 @@ while getopts ":r" opt; do
 done
 
 COMPOSE_FILES=(
+  "./attachments/docker-compose.yaml"
   "./auth/docker-compose.yaml"
   "./broker/docker-compose.yaml"
-  "./comments/docker-compose.yaml"
+  # "./comments/docker-compose.yaml"
   "./dialogs/docker-compose.yaml"
   "./likes/docker-compose.yaml"
   "./mail/docker-compose.yaml"
   "./messages/docker-compose.yaml"
-  "./notifications/docker-compose.yaml"
-  "./post/docker-compose.yaml"
+  # "./notifications/docker-compose.yaml"
+  # "./post/docker-compose.yaml"
   "./profiles/docker-compose.yaml"
   "./store/docker-compose.yaml"
-  "./stories/docker-compose.yaml"
+  # "./stories/docker-compose.yaml"
   "./user/docker-compose.yaml"
 )
 

@@ -2,6 +2,9 @@ import { type Dialog, type DialogParticipants, type Message, WS_EVENTS, Socket }
 
 interface CustomDialogParticipants extends Pick<DialogParticipants, "rights" | "user_id"> {}
 interface CreateMessage extends Pick<Message, "dialog_id" | "msg" | "attachments"> {}
+interface UpdateMessage extends CreateMessage {
+    id: string
+}
 
 export const DialogsWsAPI = {
     async createDialog({ participants, name }: { participants: CustomDialogParticipants[], name: string }): Promise<Dialog> {
@@ -14,6 +17,11 @@ export const DialogsWsAPI = {
         return await Socket.send<Message>(WS_EVENTS.DIALOG.MESSAGE.CREATE, { attachments, dialog_id, msg }) as Message;
 
     },
+    async updateMessage(message: UpdateMessage) {
+
+        return await Socket.send<Message>(WS_EVENTS.DIALOG.MESSAGE.UPDATE, message) as Message
+
+    },
 
     /**
      * Это слушатель новых сообщений
@@ -22,6 +30,16 @@ export const DialogsWsAPI = {
     listenNewMessages(callback: (message: Message) => void): void {
 
         Socket.on<Message>(WS_EVENTS.DIALOG.MESSAGE.CREATE, (message) => callback(message))
+
+    },
+
+    /**
+     * Это слушатель обновлённых сообщений
+     * Если приходит событие содержащие новое сообщение то оно передаётся в callback
+     */
+    listenUpdatedMessages(callback: (message: Message) => void): void {
+
+        Socket.on<Message>(WS_EVENTS.DIALOG.MESSAGE.UPDATE, (message) => callback(message))
 
     },
 

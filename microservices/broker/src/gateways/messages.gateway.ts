@@ -11,11 +11,11 @@ import { DeleteMessageDTO, Message, MessagesServiceClient } from "src/proto/mess
 import { WEVENTS } from "./enums/events.enum";
 import { ServerGateway } from "./server.gateway";
 import { ICustomSocket } from "./types/socket.type";
-import { BrokerRequests, BrokerResponse, Fields } from "src/types";
+import { BrokerRequests, BrokerResponse } from "src/types";
 import { UserServiceClient } from "src/proto/user";
 import { AttachmentsProvider } from "../providers";
 import { AttachmentType } from "../proto/attachments";
-import { LikesCollection, LikesInfo, LikesServiceClient } from "../proto/likes";
+import { LikesInfo, LikesServiceClient } from "../proto/likes";
 import { NotFoundMessage } from "../constants/errors.constants";
 
 @WebSocketGateway()

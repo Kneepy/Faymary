@@ -46,7 +46,7 @@ const time = computed(() => useTime(props.message?.createdAt))
             <div class="container">
                 <span v-if="!own" class="user-name">{{ props.message.user.fullName }}</span>
                 <div v-if="replyMessage" class="answer-message">
-                    <div class="user">Alex Korf</div>
+                    <div class="user">{{ replyMessage.user.fullName }}</div>
                     <div class="text">
                         {{ replyMessage.msg }}
                     </div>

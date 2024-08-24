@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import {
     AUTH_COOKIE_OPTIONS,
-    COOKIE_REFRESH_TOKEN_NAME, DIALOGS_MODULE_CONFIG,
+    COOKIE_REFRESH_TOKEN_NAME,
     MAIL_MODULE_CONFIG,
     PROFILES_MODULE_CONFIG, REQUEST_FIELD_ACCESS_TOKEN,
     REQUEST_FIELD_REFRESH_TOKEN,
@@ -40,10 +40,8 @@ import { ConfirmAccessCodeDTO, MailServiceClient } from "../proto/mail";
 import { DisableAuth } from "src/disable-auth.decorator";
 import { IncorrectPasswordError, NotFoundAccount, PoorDataError } from "src/constants/errors.constants";
 import { Account, Profile, ProfilesServiceClient } from "src/proto/profiles";
-import { BrokerResponse, ICustomResponse } from "src/types";
+import { ICustomResponse } from "src/types";
 import { SendAccessCodeDTO } from '../proto/mail';
-import { firstValueFrom } from "rxjs";
-import { DialogsServiceClient } from "../proto/dialogs";
 
 @Controller("/user")
 export class UserController {
@@ -77,12 +75,18 @@ export class UserController {
         if(!req.headers.fingerprint) throw PoorDataError
 
         const { isConfirmed } = await this.mailService.confirmAccessCode({user_id: data.user_id, code: data.code}).toPromise()
-        const ip = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for']
+        const ip = req.ip || req.socket.remoteAddress || req.headers["x-forwarded-for"]
 
         if(!isConfirmed) throw new ForbiddenException()
         
         await this.userService.updateUser({id: data.user_id, state: UserState.ACTIVE}).toPromise()
-        const tokens = await this.sessionService.generateTokens({ua: req.headers["user-agent"], fingerprint: req.headers["fingerprint"], user_id: data.user_id, ip}).toPromise()
+
+        const tokens = await this.sessionService.generateTokens({
+            ua: req.headers["user-agent"],
+            fingerprint: req.headers["fingerprint"],
+            user_id: data.user_id,
+            ip
+        }).toPromise()
         const userProfile = await this.profilesService.getProfile({user_id: data.user_id}).toPromise()
 
         /**
@@ -104,7 +108,7 @@ export class UserController {
         }
         
         await this.profilesService.addUserAccount({user_id: data.user_id, profile_id: userProfile.id}).toPromise()
-        res.cookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, AUTH_COOKIE_OPTIONS)
+        res.setCookie(COOKIE_REFRESH_TOKEN_NAME, tokens.refresh_token, AUTH_COOKIE_OPTIONS)
 
         return tokens
     }

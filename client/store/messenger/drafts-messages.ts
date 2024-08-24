@@ -7,17 +7,17 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
         drafts: []
     }),
     actions: {
-        addDraft(dialog_id: string) {
+        addDraft(dialog_id: string): DraftsMessages.Draft {
             const existDraft = this.drafts.find(draft => draft.dialog_id === dialog_id)
 
             if (existDraft) return existDraft
 
-            const newDraft = { message: "", files: [], dialog_id, originalMessage: null }
+            const newDraft = { message: "", files: [], fileRefs: [], dialog_id, originalMessage: null, editedMessage: null }
             this.drafts.push(newDraft as any)
 
             return newDraft
         },
-        getDraft(dialog_id: string) {
+        getDraft(dialog_id: string): DraftsMessages.Draft {
             return this.drafts.find(draft => draft.dialog_id === dialog_id) ?? this.addDraft(dialog_id);
         },
         setMessage(dialog_id: string, message: string) {
@@ -75,6 +75,7 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
             draft.files = []
             draft.message = ""
             draft.originalMessage = null
+            draft.fileRefs = []
         },
         setDraftByMessage(dialog_id: string, message: Message) {
             const draft = this.drafts.find(draft => draft.dialog_id === dialog_id)
@@ -82,14 +83,13 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
             if (!draft) return
 
             draft.message = message.msg
+            draft.editedMessage = message
 
             if (Object.keys(message.attachments).length > 0) {
-                draft.originalMessage = !!message.attachments?.messages?.length ? message.attachments?.messages[0] : null
-                draft.fileRefs = []
-
-                for (const file of (message.attachments.files ?? [])) {
-                    draft.fileRefs.push(Object.assign(file, { href: useFile(file.id) }))
+                if (!!message.attachments?.messages?.length) {
+                    draft.originalMessage = message.attachments?.messages[0]
                 }
+                draft.fileRefs = (message.attachments.files ?? []).map(file => Object.assign(file, { href: useFile(file.id) }))
             }
         },
         isEmpty(dialog_id: string) {
@@ -102,8 +102,13 @@ export const useDraftsMessagesStore = defineStore("drafts-messages", {
             const attachments: Addition = {}
 
             if (!draft) return
-            if (draft.files.length) {
-                attachments.files = await StoreAPI.uploadFiles(draft.files)
+            if (draft.fileRefs?.length) {
+                attachments.files = draft.fileRefs
+            }
+            if (draft.files?.length) {
+                if (!attachments.files?.length) attachments.files = []
+
+                attachments.files.push(...(await StoreAPI.uploadFiles(draft.files)))
             }
             if (Object.keys(draft.originalMessage ?? {}).length) {
                 attachments.messages = [ draft.originalMessage ]

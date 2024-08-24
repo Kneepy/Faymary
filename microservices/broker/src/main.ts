@@ -13,6 +13,7 @@ import fastifyCookie from '@fastify/cookie';
 
     app.useWebSocketAdapter(new WsAdapter(app));
     app.use((req: ICustomRequest, res, next) => {
+
         if (req.headers.authorization) {
             const authorizationHeader = req.headers[REQUEST_FIELD_ACCESS_TOKEN].split(" ");
             if (authorizationHeader[0] === "Bearer") {
@@ -25,10 +26,11 @@ import fastifyCookie from '@fastify/cookie';
                 req.headers.refresh_token = refreshTokenHeader[1];
             }
         }
+
         next();
     });
     await app.register(fastifyCookie)
-    
+
     /**
      * Нужно будет поменять origin на конкретный хост FE
      */

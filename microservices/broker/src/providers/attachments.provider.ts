@@ -11,7 +11,7 @@ import { CommentsServiceClient } from "../proto/comments";
 import { DialogsServiceClient } from "../proto/dialogs";
 import { StoriesServiceClient } from "../proto/stories";
 import { PostServiceClient } from "../proto/post";
-import { MessagesServiceClient } from "../proto/messages";
+import { GetMessageDTO, MessagesServiceClient } from "../proto/messages";
 import { StoreServiceClient } from "../proto/store";
 import {
     AddAttachmentDTO,
@@ -20,7 +20,7 @@ import {
     AttachmentType,
     GetAttachmentsDTO
 } from "../proto/attachments";
-import { lastValueFrom } from "rxjs";
+import { lastValueFrom, Observable } from "rxjs";
 import { Addition, Fields } from "../types";
 import { LikesServiceClient } from "../proto/likes";
 
@@ -38,6 +38,13 @@ export class AttachmentsProvider {
         @Inject(ATTACHMENTS_MODULE_CONFIG.PROVIDER) private attachmentsService: AttachmentsServiceClient
     ) {}
 
+    private async getMessage(params: GetMessageDTO) {
+        const message = await this.messagesService.getMessage({ id: params.id }).toPromise()
+        const userMessage = await this.userService.findUser({ id: message.user_id }).toPromise()
+
+        return { ...message, user: userMessage }
+    }
+
     private handlers = {
         [AttachmentType.USER]: {
             handler: this.userService.findUser,
@@ -52,7 +59,7 @@ export class AttachmentsProvider {
             field: Fields.DIALOGS
         },
         [AttachmentType.MESSAGE]: {
-            handler: this.messagesService.getMessage,
+            handler: (params) => this.getMessage(params),
             field: Fields.MESSAGES
         },
         [AttachmentType.STORY]: {
@@ -90,7 +97,13 @@ export class AttachmentsProvider {
 
             if (!acc[field]) acc[field] = []
 
-            acc[field].push(handler({ id: attachment.item_id }).toPromise())
+            const handlerResult = handler({ id: attachment.item_id })
+
+            if (handlerResult instanceof Observable) {
+                acc[field].push(handlerResult.toPromise())
+            } else {
+                acc[field].push(handlerResult)
+            }
 
             return acc
         }, <Addition> {})
@@ -121,7 +134,16 @@ export class AttachmentsProvider {
         const { handler, field } = this.handlers[attachments[0].type]
         const result = { [field]: [] }
 
-        attachments.forEach(attachment => result[field].push(handler({ id: attachment.item_id }).toPromise()))
+        attachments.forEach(attachment => {
+            const handlerResult = handler({ id: attachment.item_id })
+
+            if (handlerResult instanceof Observable) {
+                result[field].push(handlerResult.toPromise())
+            } else {
+                result[field].push(handlerResult)
+            }
+        })
+
         result[field] = (await Promise.allSettled(result[field])).reduce((accumulator, res) => {
             if (res.status !== "fulfilled") return accumulator
             if (!Object.keys(res.value).length) return accumulator

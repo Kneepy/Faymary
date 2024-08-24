@@ -33,7 +33,7 @@ export const GetModuleConfig = (data: ConfingModuleArgs): ConfigModule => ({
 })
 
 /*
-    @returns конфиг для ClientsModule.register
+   @returns конфиг для ClientsModule.register
 */
 export const GetClientOptionsByConfig = (config: ConfigModule): ClientProviderOptions => ({
     name: config.DEPENDENCY,

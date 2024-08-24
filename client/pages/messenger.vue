@@ -104,7 +104,12 @@ const removeReply = () => draftsMessagesStore.removeOriginalMessage(messengerSto
 const sendMessage = async () => {
     const preparedMessage = await draftsMessagesStore.prepareMessage(messengerStore.currentDialog)
 
-    await DialogsWsAPI.createMessage(preparedMessage)
+    if (draftMessage.value.editedMessage) {
+        await DialogsWsAPI.updateMessage({ id: draftMessage.value.editedMessage.id, ...preparedMessage })
+    }
+    else {
+        await DialogsWsAPI.createMessage(preparedMessage)
+    }
 
     draftsMessagesStore.clear(messengerStore.currentDialog)
 }
@@ -113,13 +118,18 @@ const loadMoreMessages = async (skip_chunks: number) => {
     messengerStore.insertMessagesDialog(messengerStore.currentDialog, messages)
 }
 
-
-DialogsWsAPI.listenNewMessages(message => {
+DialogsWsAPI.listenNewDialogs(dialog =>
+    messengerStore.addDialogs([ dialog ])
+)
+DialogsWsAPI.listenNewMessages(message =>
     messengerStore.insertMessagesDialog(message.dialog_id, [ message ])
-})
-MessagesWsAPI.listenNewReactions(({ message, like }) => {
+)
+DialogsWsAPI.listenUpdatedMessages(message =>
+    messengerStore.updateMessageDialog(message)
+)
+MessagesWsAPI.listenNewReactions(({ message, like }) =>
     messengerStore.insertLikeMessage(message, like)
-})
+)
 </script>
 <template>
     <div class="messenger">

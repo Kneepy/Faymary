@@ -41,6 +41,8 @@ export class AttachmentsController {
 
     @GrpcMethod(ATTACHMENT_SERVICE_NAME, ATTACHMENT_SERVICE_METHODS.SET_ATTACHMENTS)
     async setAttachments({ parent_type, parent_id, attachments }: SetAttachmentsDTO): Promise<{attachments: PreparedAttachment[]}> {
+        if (!parent_type || !parent_id) throw PoorDataError
+
         const allParentAttachments = await this.attachmentsService.findAll({ parent_type, parent_id })
         const deleteAttachments = []
 
