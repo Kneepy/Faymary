@@ -7,7 +7,6 @@ import Dialog from "~/components/Messenger/Dialog.vue"
 import { type Messenger, useMessengerStore, useDraftsMessagesStore, DraftsMessages } from "~/store/messenger";
 import { DialogsAPI, DialogsWsAPI, MessagesWsAPI } from "~/api";
 import SkeletonDialogBlock from "~/components/Messenger/Cards/SkeletonDialogCard.vue";
-import { ReceiveFiles } from "assets/helpers/receive-files";
 
 definePageMeta({
     requiredAuth: true, // это только на время разработки, так должно быть true
@@ -19,8 +18,6 @@ useHead({
 })
 
 const messengerStore = useMessengerStore()
-const userStore = useUserStore()
-const draftsMessagesStore = useDraftsMessagesStore()
 
 // функции для открытия списка избранных сообщений
 const isOpenImportantMsgModal = ref(false)
@@ -38,29 +35,12 @@ const openBlockedUsersModal = () => isOpenBlockedUsersModal.value = true
 const closeBlockedUsersModal = () => isOpenBlockedUsersModal.value = false
 
 // функции для открытия информации о диалоге
-const isOpenDialogInfoModal = ref(false)
-const openDialogInfoModal = () => isOpenDialogInfoModal.value = true
-const closeDialogInfoModal = () => isOpenDialogInfoModal.value = false
-
-// функции для открытия информации о диалоге
 const isOpenCreateDialogModal = ref(false)
 const openCreateDialogModal = () => isOpenCreateDialogModal.value = true
 const closeCreateDialogModal = () => isOpenCreateDialogModal.value = false
 
 // маркер показывающий загружены ли диалоги
 const isLoadingDialogs = ref(false)
-
-// ссылка на текущий черновик сообщения
-const draftMessage = ref<DraftsMessages.Draft>(null)
-
-// ссылка на текущий диалог
-const currentDialog = computed(() => messengerStore.dialogs?.find(v => v.id === messengerStore.currentDialog))
-
-// название текущего диалога
-const dialogName = ref<string>("")
-
-// ссылка на элемент для прикрепления картинок/файлов
-const inputFileRef = ref<HTMLInputElement>(null)
 
 onMounted(async () => {
     // получаем все переписки пользователя и заносим их в состояние
@@ -71,52 +51,6 @@ onMounted(async () => {
 
     isLoadingDialogs.value = false
 })
-watch(() => messengerStore.currentDialog, async (dialog_id) => {
-
-    if (!dialog_id) return
-
-    // находим наш диалог
-    const dialog = messengerStore.dialogs.find(dialog => dialog.id === dialog_id)
-    draftMessage.value = draftsMessagesStore.getDraft(dialog_id)
-
-    if (dialog.messages) return
-
-    // получаем сообщения для диалога
-    const messages = await DialogsAPI.getDialogMessages(dialog_id, { take: 10, skip: 0 })
-    messengerStore.insertMessagesDialog(dialog_id, messages)
-
-    // проверяем название диалога
-    if (currentDialog.value.number_participants > 2) dialogName.value = currentDialog.value.name
-    else {
-        const interlocutor = currentDialog.value.participants.find(participant => participant.user.id !== userStore.me.id)
-
-        dialogName.value = interlocutor.user.fullName
-    }
-})
-
-const clickAttachFileButton = () => inputFileRef.value.click()
-const receiveFiles = (e: Event) => {
-    const files = ReceiveFiles(e)
-    files.forEach(file => draftsMessagesStore.addFile(messengerStore.currentDialog, file))
-}
-const removeReply = () => draftsMessagesStore.removeOriginalMessage(messengerStore.currentDialog)
-
-const sendMessage = async () => {
-    const preparedMessage = await draftsMessagesStore.prepareMessage(messengerStore.currentDialog)
-
-    if (draftMessage.value.editedMessage) {
-        await DialogsWsAPI.updateMessage({ id: draftMessage.value.editedMessage.id, ...preparedMessage })
-    }
-    else {
-        await DialogsWsAPI.createMessage(preparedMessage)
-    }
-
-    draftsMessagesStore.clear(messengerStore.currentDialog)
-}
-const loadMoreMessages = async (skip_chunks: number) => {
-    const messages = await DialogsAPI.getDialogMessages(messengerStore.currentDialog, { take: 10, skip: (skip_chunks + 1) * 10 })
-    messengerStore.insertMessagesDialog(messengerStore.currentDialog, messages)
-}
 
 DialogsWsAPI.listenNewDialogs(dialog =>
     messengerStore.addDialogs([ dialog ])
@@ -177,102 +111,16 @@ MessagesWsAPI.listenNewReactions(({ message, like }) =>
             </div>
         </div>
         <div class="right-bar">
-            <template v-if="currentDialog">
-                <div class="top-box">
-                    <div class="user-info" @click="openDialogInfoModal">
-                        <div class="user-name">{{ dialogName }}</div>
-                        <div class="user-status">был(а) в сети 1 час назад</div>
-                    </div>
-                    <div class="dialog-options">
-                        <IconButton>
-                            <GIcon fill :size=22>search</GIcon>
-                        </IconButton>
-                        <IconButton>
-                            <GIcon fill :size=22>call</GIcon>
-                        </IconButton>
-                        <IconButton>
-                            <GIcon fill :size=22>more_vert</GIcon>
-                        </IconButton>
-                    </div>
-                </div>
-                <Dialog @load-more="loadMoreMessages" :dialog="currentDialog" />
-                <div @drop.prevent.stop="receiveFiles" class="bottom-box">
-                    <div class="attachments">
-                        <div v-if="!!draftMessage.originalMessage" class="reply">
-                            <GIcon fill :weight="600" :size="25">reply</GIcon>
-                            <div class="message">
-                                <div class="user">{{ draftMessage.originalMessage.user.fullName }}</div>
-                                <div class="text">{{ !!draftMessage.originalMessage.msg ? draftMessage.originalMessage.msg : "Сообщение" }}</div>
-                            </div>
-                            <IconButton @click="removeReply" class="remove">
-                                <GIcon fill :weight="600" :size="25">close</GIcon>
-                            </IconButton>
-                        </div>
-                        <div v-if="!!draftMessage?.files?.length || !!draftMessage?.fileRefs?.length" class="files">
-                            <HorizontalScroll>
-                                <div
-                                    v-for="file in (draftMessage.fileRefs ?? [])"
-                                    @click="draftsMessagesStore.removeFileRef(messengerStore.currentDialog, file)"
-                                    class="file"
-                                >
-                                    <div class="trash">
-                                        <GIcon fill :weight="700" :size=15>delete</GIcon>
-                                    </div>
-                                    <div :style="{ backgroundImage: `url(${file.href})` }" class="img"></div>
-                                </div>
-                                <div v-if="!!draftMessage?.fileRefs?.length && !!draftMessage?.files?.length" class="separator"></div>
-                                <div
-                                    v-for="file in (draftMessage.files ?? [])"
-                                    @click="draftsMessagesStore.removeFile(messengerStore.currentDialog, file)"
-                                    class="file"
-                                >
-                                    <div class="trash">
-                                        <GIcon fill :weight="700" :size=15>delete</GIcon>
-                                    </div>
-                                    <div :style="{ backgroundImage: `url(${file.href})` }" class="img"></div>
-                                </div>
-                            </HorizontalScroll>
-                        </div>
-                    </div>
-                    <div class="input-message">
-                        <IconButton @click="clickAttachFileButton">
-                            <GIcon :size="25" style="transform: rotate(30deg)">attach_file</GIcon>
-                            <input
-                                @input="receiveFiles"
-                                ref="inputFileRef"
-                                type="file"
-                                accept="image/*"
-                                multiple
-                            >
-                        </IconButton>
-                        <TextareaAutosize
-                            class="scroll"
-                            placeholder="Напишите что-нибудь..."
-                            @change="(v: string) => draftsMessagesStore.setMessage(messengerStore.currentDialog, v)"
-                            :value="draftMessage?.message"
-                            :max-height=170
-                        />
-                        <IconButton>
-                            <GIcon :size="25" fill>family_star</GIcon>
-                        </IconButton>
-                        <IconButton @click="sendMessage">
-                            <GIcon :size="25" fill>play_arrow</GIcon>
-                        </IconButton>
-                    </div>
-                </div>
-            </template>
-            <template v-else>
-                <div class="no-dialog">
-                    <GIcon :size=80 :weight=300>forum</GIcon>
-                    <div class="text" @click="openCreateDialogModal">Выберите или создайте новый чат</div>
-                </div>
-            </template>
+            <Dialog v-if="messengerStore.currentDialog" />
+            <div v-else class="no-dialog">
+                <GIcon :size=80 :weight=300>forum</GIcon>
+                <div class="text" @click="openCreateDialogModal">Выберите или создайте новый чат</div>
+            </div>
         </div>
 
         <ImportantMsgModal v-if="isOpenImportantMsgModal" @on-close="closeImportantMsgModal" />
         <BlockedUsersModal v-if="isOpenBlockedUsersModal" @on-close="closeBlockedUsersModal" />
         <SettingsModal v-if="isOpenSettingsModal" @on-close="closeSettingsModal" />
-        <DialogInfoModal v-if="isOpenDialogInfoModal" @on-close="closeDialogInfoModal" />
         <CreateDialogModal v-if="isOpenCreateDialogModal" @on-close="closeCreateDialogModal" />
     </div>
 </template>
@@ -403,200 +251,6 @@ MessagesWsAPI.listenNewReactions(({ message, like }) =>
         display: flex;
         flex-direction: column;
         width: 70%;
-        .top-box {
-            background-color: $transparent_hover_background;
-            display: flex;
-            justify-content: space-between;
-            .user-info {
-                flex: 1;
-                padding: 10px 30px;
-                cursor: pointer;
-                .user-name {
-                    color: $white;
-                    font-weight: 600;
-                    font-size: 16px;
-                }
-                .user-status {
-                    color: $gray;
-                    font-size: 14px;
-                }
-            }
-            .dialog-options {
-                display: flex;
-                align-items: center;
-                padding-right: 10px;
-                button {
-                    background-color: transparent;
-                    margin-right: 5px;
-                    border-radius: 15px;
-                    &:hover {
-                        background-color: $transparent_button_hover_17;
-                        .icon {
-                            color: $white_gray;
-                        }
-                    }
-                    .icon {
-                        color: $gray;
-                    }
-                }
-            }
-        }
-        .bottom-box {
-            padding: 10px;
-            display: flex;
-            border-top: 1px solid $primary_border;
-            align-items: center;
-            flex-direction: column;
-            .attachments {
-                width: 100%;
-                max-width: 100%;
-                &::-webkit-scrollbar {
-                    width: 0;
-                    height: 0;
-                }
-                .files {
-                    overflow: auto;
-                    padding: 5px 0;
-                    display: flex;
-                    .file {
-                        width: 80px;
-                        height: 80px;
-                        margin: 2px 2px 2px 10px;
-                        border-radius: 10px;
-                        cursor: pointer;
-                        overflow: hidden;
-                        position: relative;
-                        .trash {
-                            position: absolute;
-                            right: 5px;
-                            top: 5px;
-                            display: flex;
-                            align-items: center;
-                            border-radius: 50%;
-                            background-color: $white;
-                            justify-content: center;
-                            padding: 2px;
-                            z-index: 10;
-                            opacity: 0;
-                            .icon {
-                                color: $black;
-                            }
-                        }
-                        .img {
-                            width: 100%;
-                            height: 100%;
-                            background-position: center;
-                            background-size: cover;
-                        }
-                        &:hover {
-                            box-shadow: 0 0 0 1px $white;
-                            .img {
-                                filter: blur(3px);
-                            }
-                            .trash {
-                                opacity: 1;
-                            }
-                        }
-                    }
-                    .separator {
-                        width: 2px;
-                        height: 60px;
-                        background-color: $border;
-                        margin: 0 10px;
-                        align-self: center;
-                        border-radius: 5px;
-                    }
-                }
-                .reply {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin: 5px 25px 15px;
-                    .message {
-                        flex: .9;
-                        display: flex;
-                        flex-direction: column;
-                        padding: 5px 20px;
-                        overflow: hidden;
-                        border-radius: 5px;
-                        cursor: pointer;
-                        background-color: rgba(223, 223, 223, .05); // и этот тоже
-                        border-left: 5px solid $white; // этот цвет должен выбираться в настройках мессенджера
-                        .user {
-                            color: rgba(223, 223, 223, 1); // этот цвет должен выбираться в настройках мессенджера
-                            font-weight: 700;
-                            font-size: 14px;
-                        }
-                        .text {
-                            color: $gray;
-                            text-overflow: ellipsis;
-                            overflow: hidden;
-                            font-size: 15px;
-                            white-space: nowrap;
-                        }
-                    }
-                    .icon {
-                        color: $white;
-                    }
-                    .remove {
-                        background-color: transparent;
-                        cursor: pointer;
-                    }
-                }
-            }
-            .input-message {
-                flex: 1;
-                display: flex;
-                width: 100%;
-                button {
-                    background-color: transparent;
-                    cursor: pointer;
-                    padding: 9px;
-                    flex: 0;
-                    &:hover {
-                        background-color: $transparent_button_hover_1;
-                        .icon {
-                            color: $gray;
-                        }
-                    }
-                    &:last-child {
-                        margin-left: 5px;
-                    }
-                    .icon {
-                        color: $gray_1;
-                    }
-                }
-                textarea {
-                    flex: 1;
-                    background-color: transparent;
-                    border: none;
-                    padding: 10px 20px;
-                    color: $white;
-                    border-radius: 10px;
-                    font-size: 15px;
-                    resize: none;
-                    max-height: 350px;
-                    align-self: center;
-                    &::placeholder {
-                        color: $gray_1;
-                        transition: 200ms;
-                    }
-                    &:focus {
-                        border: none;
-                        outline: none;
-                    }
-                    &:hover, &:focus {
-                        &::placeholder {
-                            color: $gray;
-                            transition: 200ms;
-                        }
-                    }
-                }
-                input[type="file"] {
-                    width: 0;
-                }
-            }
-        }
         .no-dialog {
             display: flex;
             flex: 1;

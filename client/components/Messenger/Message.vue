@@ -9,10 +9,16 @@ interface Props {
      * (это его сообщение)
      */
     own?: boolean
+
+    /**
+     * Флаг который показывает что сообщение выбрано пользователем
+     */
+    selected?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    own: false
+    own: false,
+    selected: false
 })
 const emit = defineEmits<{
     (e: "like", emoji: string): void
@@ -33,7 +39,7 @@ const time = computed(() => useTime(props.message?.createdAt))
 
 <template>
     <div
-        :class="{ active: false, interlocutor: !props.own }"
+        :class="{ active: !!props.selected, interlocutor: !props.own }"
         class="message_wrapper"
     >
         <Avatar v-if="!own" :size=35 :user-name="props.message.user.fullName" :href="props.message.user.file_id" class="avatar" />
