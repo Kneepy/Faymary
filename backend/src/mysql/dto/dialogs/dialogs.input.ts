@@ -1,13 +1,16 @@
-import { IsArray, ArrayMinSize } from "class-validator";
 import { Type } from "class-transformer";
-import { Users, Messages } from "src/entity";
+import { ArrayMinSize, IsNotEmpty, IsOptional } from "class-validator";
+import { Users } from "src/entity";
 
 export class DialogsInput {
-    @IsArray()
-    @ArrayMinSize(2)
     @Type(() => Users)
+    @ArrayMinSize(1)
     users: Users[];
 
-    @Type(() => Messages)
-    message: Messages[];
+    @IsNotEmpty()
+    @Type(() => Users)
+    creator: Users;
+
+    @IsOptional()
+    title: string;
 }

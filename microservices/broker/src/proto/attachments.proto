@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package attachments;
+
+service AttachmentsService {
+    rpc AddAttachment (AddAttachmentDTO) returns (stream Attachment);
+    rpc GetAttachments (GetAttachmentsDTO) returns (stream Attachments);
+    rpc SetAttachments (SetAttachmentsDTO) returns (stream Attachments);
+}
+
+message AddAttachmentDTO {
+    AttachmentType parent_type = 1;
+    string parent_id = 2;
+    AttachmentType attached_type = 3;
+    string attached_id = 4;
+}
+
+message GetAttachmentsDTO {
+    AttachmentType parent_type = 1;
+    string parent_id = 2;
+    optional AttachmentType attached_type = 3;
+}
+
+message SetAttachmentsDTO {
+    AttachmentType parent_type = 1;
+    string parent_id = 2;
+    repeated Attachment attachments = 3;
+}
+
+message Attachment {
+    string item_id = 1;
+    AttachmentType type = 2;
+}
+
+message Attachments {
+    repeated Attachment attachments = 1;
+}
+
+enum AttachmentType {
+    USER = 0;
+    STORY = 1;
+    POST = 2;
+    COMMENT = 3;
+    MESSAGE = 4;
+    DIALOG = 5;
+    LIKE = 6;
+    FILE = 7;
+}

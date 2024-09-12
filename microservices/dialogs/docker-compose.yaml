@@ -1,0 +1,49 @@
+version: '0.0'
+services:
+  dialogs_db: 
+    container_name: dialogs_db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: dialogs
+    image: postgres:latest
+    restart: always
+    volumes:
+      - dialogs_db:/var/lib/postgres
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d dialogs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices
+      - dialogs_service
+  dialogs: 
+    container_name: dialogs
+    build: .
+    ports:
+      - 5003:5003
+    command: npm run start:prod
+    depends_on:
+      dialogs_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: dialogs
+      POSTGRES_HOST: dialogs_db
+      POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - dialogs_service
+volumes:
+  dialogs_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  dialogs_service:

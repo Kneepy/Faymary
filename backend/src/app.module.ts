@@ -8,7 +8,13 @@ import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./auth";
 
 @Module({
-    imports: [MySqlModule, CommonModule, AuthModule, BaseModule, ConfigModule],
+    imports: [
+        MySqlModule,
+        CommonModule,
+        AuthModule,
+        BaseModule,
+        ConfigModule
+    ],
     providers: [
         {
             provide: APP_GUARD,

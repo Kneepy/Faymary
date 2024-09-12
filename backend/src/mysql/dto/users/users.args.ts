@@ -8,7 +8,7 @@ export class UsersArgs {
 
     @IsString()
     @IsOptional()
-    lastName?: string;
+    userName?: string;
 
     @IsString()
     @IsEmail()

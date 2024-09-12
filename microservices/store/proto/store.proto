@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package store;
+
+service StoreService {
+    rpc RemoveFile (RemoveFileDTO) returns (stream RemoveFileRes);
+    rpc GetFile (GetFileDTO) returns (stream File);
+}
+
+message RemoveFileDTO {
+    string id = 1;
+}
+
+message GetFileDTO {
+    string id = 1;
+}
+
+message File {
+    string id = 1;
+    string createdAt = 2;
+    string user_id = 3;
+    string filename = 4;
+    string extname = 5;
+}
+
+message RemoveFileRes {}

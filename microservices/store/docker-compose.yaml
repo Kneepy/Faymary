@@ -1,0 +1,53 @@
+version: '0.0'
+services:
+  store_db: 
+    container_name: store_db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: store
+    image: postgres:latest
+    restart: always
+    volumes:
+      - store_db:/var/lib/postgres
+    ports:
+      - 5438:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d store"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices
+  store: 
+    container_name: store
+    build: .
+    ports:
+      - 5008:5008
+      - 5014:5014
+    volumes:
+      - files:/app/files
+    command: npm run start:prod
+    depends_on:
+      store_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: store
+      POSTGRES_HOST: store_db
+      POSTGRES_PORT: 5432
+      STORE_FOLDER: files
+    networks:
+      - microservices
+      - store_service
+volumes:
+  store_db:
+  files:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  store_service:

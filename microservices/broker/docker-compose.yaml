@@ -1,0 +1,30 @@
+version: '0.0'
+services:
+  broker: 
+    container_name: broker
+    build: .
+    ports:
+      - 5000:5000
+    command: npm run start:prod
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    networks:
+      - microservices
+    environment:
+      USERS_SERVICE_HOST: users
+      STORIES_SERVICE_HOST: stories
+      STORE_SERVICE_HOST: store
+      PROFILES_SERVICE_HOST: profiles
+      POSTS_SERVICE_HOST: posts
+      NOTIFICATIONS_SERVICE_HOST: notifications
+      MESSAGES_SERVICE_HOST: messages
+      MAIL_SERVICE_HOST: mail
+      LIKES_SERVICE_HOST: likes
+      DIALOGS_SERVICE_HOST: dialogs
+      COMMENTS_SERVICE_HOST: comments
+      AUTH_SERVICE_HOST: auth
+      ATTACHMENTS_SERVICE_HOST: attachments
+networks:
+  microservices:
+    name: microservices
+    external: true

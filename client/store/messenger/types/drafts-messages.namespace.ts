@@ -1,0 +1,56 @@
+import type { Message, File as StoreFile } from "~/api";
+
+export namespace DraftsMessages {
+    export interface Store {
+        drafts: Draft[]
+    }
+
+    export interface CustomFile extends File {
+        // ссылка на blob
+        href: string
+    }
+
+    export interface CustomFileRef extends StoreFile {
+        // ссылка на файл в сторе
+        href: string
+    }
+
+    export interface Draft {
+        /**
+         * Новое сообщение
+         */
+        message: string
+
+        /**
+         * Файлы которые прикрепил пользователь
+         * Потом эти файлы будут переделаны во вложения (attachments)
+         */
+        files: CustomFile[]
+
+        /**
+         * Ссылки на уже загруженные файлы
+         * Надо по большей части для редактирования сообщения
+         */
+        fileRefs: CustomFileRef[]
+
+        /**
+         * Сообщение на которое создаётся ответ пользователя
+         */
+        originalMessage: Message
+
+        /**
+         * Если это черновик для ещё не созданного диалога то надо в качестве id указать ANONYMOUS_DIALOG
+         */
+        dialog_id: string
+
+        /**
+         * Содерижт сообщение которое редактирует пользователь
+         * Может быть и null если создаётся новое сообщение
+         */
+        editedMessage: Message
+    }
+
+    export interface PreparedMessage extends Pick<Message, "attachments" | "dialog_id" | "msg"> {}
+
+    export const ANONYMOUS_DIALOG = "ANONYMOUS_DIALOG"
+}

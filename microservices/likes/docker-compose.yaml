@@ -1,0 +1,48 @@
+version: '0.0'
+services:
+  likes_db: 
+    container_name: likes_db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: likes
+    image: postgres:latest
+    restart: always
+    volumes:
+      - likes_db:/var/lib/postgres
+    ports:
+      - 5431:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d likes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - likes_service
+  likes: 
+    container_name: likes
+    build: .
+    ports:
+      - 5001:5001
+    command: npm run start:prod
+    depends_on:
+      likes_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: likes
+      POSTGRES_HOST: likes_db
+      POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - likes_service
+volumes:
+  likes_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  likes_service:

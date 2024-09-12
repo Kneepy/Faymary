@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package messages;
+
+service MessagesService {
+    rpc CreateMessage (CreateMessageDTO) returns (stream Message);
+    rpc GetDialogMessages (GetMessagesDTO) returns (stream Messages);
+    rpc GetLastDialogMessage (GetLastMessageDialogDTO) returns (stream Message);
+    rpc GetMessage (GetMessageDTO) returns (stream Message);
+    rpc UpdateMessage (UpdateMessageDTO) returns (stream Message);
+    rpc DeleteMessage (DeleteMessageDTO) returns (stream Message);
+}
+
+message GetMessagesDTO {
+    string dialog_id = 1;
+    optional int32 take = 2;
+    optional int32 skip = 3;
+}
+
+message GetMessageDTO {
+    string id = 1;
+}
+
+message GetLastMessageDialogDTO {
+    string dialog_id = 1;
+}
+
+message CreateMessageDTO {
+    string dialog_id = 1;
+    string msg = 2;
+    string user_id = 3;
+    bool has_attachments = 4;
+}
+
+message UpdateMessageDTO {
+    string dialog_id = 1;
+    string id = 2;
+    optional string msg = 3;
+    string user_id = 4;
+    bool has_attachments = 5;
+}
+
+message DeleteMessageDTO {
+    string id = 1;
+    string user_id = 2;
+}
+
+message Message {
+    string id = 1;
+    string dialog_id = 2;
+    string user_id = 3;
+    string msg = 4;
+    string createdAt = 5;
+    bool has_attachments = 6;
+}
+
+message Messages {
+    repeated Message messages = 1;
+}

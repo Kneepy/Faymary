@@ -1,0 +1,29 @@
+{
+  "private": true,
+  "name": "client",
+  "scripts": {
+    "build": "nuxt build",
+    "start:dev": "nuxt dev --hostname 0.0.0.0 --port 3000",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "nuxt": "^3.6.1",
+    "sass": "^1.60.0",
+    "sass-loader": "13.2.1",
+    "scss": "^0.2.4"
+  },
+  "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^3.4.0",
+    "@pinia/nuxt": "^0.4.7",
+    "@types/md5": "^2.3.5",
+    "gsap": "^3.11.5",
+    "lottie-web": "^5.12.2",
+    "md5": "^2.3.0",
+    "pinia": "^2.0.33"
+  },
+  "overrides": {
+    "vue": "latest"
+  }
+}

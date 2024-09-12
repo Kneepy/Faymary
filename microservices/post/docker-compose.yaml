@@ -1,0 +1,48 @@
+version: '0.0'
+services:
+  posts_db:
+    container_name: posts_db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: posts
+    image: postgres:latest
+    restart: always
+    volumes:
+      - posts_db:/var/lib/postgres
+    ports:
+      - 5436:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d posts"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - posts_service
+  posts:
+    container_name: posts
+    build: .
+    ports:
+      - 5006:5006
+    command: npm run start:prod
+    depends_on:
+      posts_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: posts
+      POSTGRES_HOST: posts_db
+      POSTGRES_PORT: 5432
+    networks:
+      - posts_service
+      - microservices
+volumes:
+  posts_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  posts_service:

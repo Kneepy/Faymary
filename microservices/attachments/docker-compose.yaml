@@ -1,0 +1,49 @@
+version: '0.0'
+services:
+  attachments_db:
+    container_name: attachments_db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: attachments
+    image: postgres:latest
+    restart: always
+    volumes:
+      - attachments_db:/var/lib/postgres
+    ports:
+      - 5443:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d attachments"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices
+      - attachments_service
+  attachments:
+    container_name: attachments
+    build: .
+    ports:
+      - 5013:5013
+    command: npm run start:prod
+    depends_on:
+      attachments_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: attachments
+      POSTGRES_HOST: attachments_db
+      POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - attachments_service
+volumes:
+  attachments_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  attachments_service:

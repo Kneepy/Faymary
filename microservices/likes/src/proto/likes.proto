@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package likes;
+
+service LikesService {
+    rpc AddLike (AddLikeDTO) returns (stream LikesInfo);
+    rpc CreateCollection (CreateCollectionDTO) returns (stream LikesCollection);
+    rpc GetCollection (GetCollectionDTO) returns (stream LikesCollection);
+    rpc CheckLike (CheckLikeDTO) returns (stream HasLiked);
+}
+
+message LikesCollection {
+    string id = 1;
+    string unity = 2;
+    int32 number_likes = 3;
+}
+
+message CheckLikeDTO {
+    string user_id = 1;
+    string collection_id = 2;
+}
+
+message HasLiked {
+    bool has_liked = 1;
+}
+
+message LikesInfo {
+    string id = 1;
+    string unity = 2;
+    int32 number_likes = 3;
+    bool has_liked = 4;
+}
+
+message CreateCollectionDTO {
+    string unity = 1;
+}
+
+message GetCollectionDTO {
+    string id = 1;
+}
+
+message AddLikeDTO {
+    string user_id = 1;
+    string collection_id = 2;
+}
+

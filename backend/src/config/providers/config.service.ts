@@ -3,25 +3,53 @@ import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { JwtModuleOptions } from "@nestjs/jwt";
 import {
     EXPIRENS_IN_ACCESS_TOKEN,
-    MAIL_ACCOUNT_PASS,
-    MAIL_HOST,
-    MAIL_PORT,
-    SECRET_ACCESS_JWT
+    EXPIRENS_IN_REFRESH_TOKEN,
+    SECRET_ACCESS_JWT,
+    SMTP,
+    STORE_FOLDER
 } from "../config.constants";
 import { MailerModuleOptions } from "@lib/mailer";
+import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
+import * as path from "path";
+import * as multer from "multer";
+import { ICustomRequest } from "src/common/types/request.type";
+import { ServeStaticModuleOptions } from "@nestjs/serve-static";
 
 @Injectable()
 export class ConfigService {
-
     // mailer connaction data
     getMailerOptions = (): MailerModuleOptions => ({
-        host: MAIL_HOST,
-        port: MAIL_PORT,
+        host: SMTP.HOST,
+        port: SMTP.PORT,
+        secure: true,
         auth: {
-            user: MAIL_ACCOUNT_PASS,
-            pass: MAIL_ACCOUNT_PASS
+            user: SMTP.USER,
+            pass: SMTP.PASS
         }
+    });
+
+    getStaticOptions = (): ServeStaticModuleOptions => ({
+        rootPath: path.join(process.cwd(), STORE_FOLDER)
     })
+
+    getMulterOptions = (): MulterOptions => ({
+        dest: path.join(process.cwd(), STORE_FOLDER),
+        storage: multer.diskStorage({
+            destination: (req: ICustomRequest, file, cb) => {
+                cb(null, this.getStaticOptions().rootPath);
+            },
+            filename: (req, file, cb) => {
+                cb(null, Buffer.from(`${Date.now()}`).toString("base64") + path.extname(file.originalname));
+            }
+        })
+    });
+
+    getCookieOptions = () => ({
+        // prodaction all true
+        httpOnly: true,
+        secure: false,
+        maxAge: EXPIRENS_IN_REFRESH_TOKEN
+    });
 
     // mysql connaction data
     getMySqlConnectionData = (): TypeOrmModuleOptions => ({
@@ -30,7 +58,7 @@ export class ConfigService {
         port: 3306,
         username: "root",
         password: "root",
-        database: "social_network",
+        database: "faymary",
         synchronize: false,
         entities: ["dist/**/*.entity{.ts,.js}"]
     });

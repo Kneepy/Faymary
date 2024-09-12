@@ -1,0 +1,48 @@
+version: '0.0'
+services:
+  auth_db: 
+    container_name: auth_db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: auth
+    image: postgres:latest
+    restart: always
+    volumes:
+      - auth_db:/var/lib/postgres
+    ports:
+      - 5437:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U postgres -d auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auth_service
+  auth: 
+    container_name: auth
+    build: .
+    ports:
+      - 5007:5007
+    command: npm run start:prod
+    depends_on:
+      auth_db:
+        condition: service_healthy
+    extra_hosts:
+      - "docker.for.win.localhost:host-gateway"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: auth
+      POSTGRES_HOST: auth_db
+      POSTGRES_PORT: 5432
+    networks:
+      - microservices
+      - auth_service
+volumes:
+  auth_db:
+networks:
+  microservices:
+    name: microservices
+    external: true
+  auth_service:
